@@ -1,42 +1,67 @@
-import * as PIXI from 'pixi.js';
-import { Position, Sprite } from '../components';
-
+import * as ROT from 'rot-js';
 import { System } from 'tecs';
-import { HEIGHT, WIDTH } from '../utils';
+
+import { Playable, Position, Renderable, Glyph } from '../components';
+import { HEIGHT, WIDTH, glyphs } from '../utils';
+
+const TILE = 8;
+const tileAt = (x: number, y: number): [number, number] => [x * TILE, y * TILE];
 
 export class Renderer extends System {
   public static readonly type = 'renderer';
 
-  public app!: PIXI.Application;
-  public sprites: Record<string, PIXI.Sprite> = {};
+  public display!: ROT.Display;
 
   public tick(): void {
-    for (const { $ } of this.world.query.with(Sprite, Position)) {
-      const { sprite, position } = $;
-      if (!(sprite.id in this.sprites)) {
-        this.addChild(sprite);
-      }
-      const pixi = this.sprites[sprite.id];
-      pixi.position = new PIXI.Point(position.x, position.y);
-      pixi.rotation = position.r;
+    const query = this.world.query
+      .changed(Glyph, Renderable, Position)
+      .some(Playable);
+
+    const results = query
+      .all()
+      .sort((a, b) => (a.$.player ? 1 : b.$.player ? -1 : 0));
+
+    for (const { $ } of results) {
+      const fg = $.render.active ? $.render.fg : $.glyph.fg;
+      const bg = $.render.active ? $.render.bg : $.glyph.bg;
+      // draw glyph to display
+      this.display.draw(
+        $.position.x,
+        $.position.y,
+        $.glyph.text,
+        fg ? ROT.Color.toRGB(fg) : null,
+        bg ? ROT.Color.toRGB(bg) : null
+      );
     }
   }
 
-  public init(): void {
-    PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
-    this.app = new PIXI.Application({
-      width: WIDTH,
-      height: HEIGHT,
-      antialias: false,
-      transparent: true
-    });
-    this.app.ticker.add(this.world.tick.bind(this.world));
-    document.getElementById('root')?.appendChild(this.app.view);
-  }
+  public async init(): Promise<void> {
+    const tiles = document.createElement('img');
+    tiles.src = glyphs;
 
-  protected addChild = (sprite: Sprite): void => {
-    const pixi = (this.sprites[sprite.id] ??= PIXI.Sprite.from(sprite.image));
-    pixi.anchor.set(0.5);
-    this.app.stage.addChild(pixi);
-  };
+    await new Promise(resolve => (tiles.onload = resolve));
+
+    this.display = new ROT.Display({
+      layout: 'tile-gl',
+      bg: 'transparent',
+      tileWidth: TILE,
+      tileHeight: TILE,
+      tileSet: tiles,
+      tileColorize: true,
+      tileMap: {
+        '#': tileAt(12, 0),
+        '.': tileAt(0, 0),
+        '@': tileAt(0, 4),
+        '-': tileAt(13, 2),
+        '/': tileAt(15, 2)
+      },
+      width: WIDTH,
+      height: HEIGHT
+    });
+
+    const container = this.display.getContainer();
+    if (container) {
+      document.getElementById('root')?.appendChild(container);
+    }
+  }
 }

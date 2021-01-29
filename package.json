@@ -1,16 +1,28 @@
 {
   "name": "tecs-example",
   "dependencies": {
-    "@jest/globals": "^26.6.2",
-    "pixi.js": "^5.3.7",
     "prettier": "^2.2.1",
-    "tecs": "noahlange/tecs",
+    "rot-js": "^2.1.5",
+    "tecs": "noahlange/tecs"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.2.0",
+    "@typescript-eslint/parser": "^4.2.0",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "npm-run-all": "^4.1.5",
     "typescript": "^4.1.3"
   },
   "scripts": {
+    "types": "tsc --noEmit",
+    "lint": "eslint 'src/**/*.{js,ts,jsx,tsx}' --fix ",
+    "postinstall": "cd node_modules/tecs && npm run build",
+    "precommit": "npm-run-all types lint pretty",
     "pretty": "prettier 'src/**/*.{js,ts,jsx,tsx}' --write",
-    "types": "tsc",
-    "start": "npx parcel serve ./public/index.html",
-    "postinstall": "cd node_modules/tecs && npm run build"
-  }
+    "start": "npx parcel serve ./public/index.html"
+  },
+  "browserslist": [
+    "last 2 Chrome versions"
+  ]
 }
