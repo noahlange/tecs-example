@@ -12,7 +12,7 @@ import {
   Renderable
 } from '../components';
 
-import { AMBIENT_DARK, AMBIENT_LIGHT } from '../utils';
+import { AMBIENT_DARK, AMBIENT_LIGHT, timer } from '../utils';
 
 // structure is [ 'x,y' => T ]
 type PointMap<T> = Record<string, T>;
@@ -27,7 +27,7 @@ export class Lighting extends System {
   public fovData: PointMap<number> = {};
 
   // since most coordinate pairs are generated independently of entity data, this can't be cleared without needing to re-run the query in computeColors()
-  public keyToID: PointMap<string[]> = {};
+  public keyToID: PointMap<Set<string>> = {};
 
   // grid coordinates that need to be repainted
   public repaint: string[] = [];
@@ -40,7 +40,7 @@ export class Lighting extends System {
   public getCoordString(position: Point, id?: string): string {
     const key = position.x + ',' + position.y;
     if (id) {
-      (this.keyToID[key] ??= []).push(id);
+      (this.keyToID[key] ??= new Set()).add(id);
     }
     return key;
   }
@@ -116,7 +116,8 @@ export class Lighting extends System {
    */
   protected computeColors(): void {
     const ids = (this.firstPaint ? [] : this.repaint).reduce(
-      (a: string[], key) => a.concat(this.keyToID[key] ?? []),
+      (a: string[], key) =>
+        a.concat(Array.from(this.keyToID[key]?.values() ?? [])),
       []
     );
 

@@ -10,7 +10,7 @@ export class Input extends System {
 
   public tick(): void {
     const input = this.inputs.shift();
-    const player = this.world.query.changed(Playable, Action).first();
+    const player = this.world.query.with(Playable, Action).first();
 
     if (input && player) {
       let action = ID.NONE;
@@ -38,10 +38,8 @@ export class Input extends System {
   }
 
   public init(): void {
-    // currently using user input to advance "the clock"
     window.addEventListener('keydown', e => {
       this.inputs.push(e.key);
-      this.world.tick(0, Date.now());
     });
   }
 }

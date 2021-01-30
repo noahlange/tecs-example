@@ -2,25 +2,22 @@ import * as ROT from 'rot-js';
 import { World } from 'tecs';
 
 import { Actions, Input, MapGen, Renderer, Lighting } from './systems';
-import { timer } from './utils';
 
 ROT.RNG.setSeed(123454321);
 
 class MyWorld extends World.with(MapGen, Input, Actions, Lighting, Renderer) {
-  @timer('tick', false)
-  public tick(delta: number, timestamp: number): void {
-    super.tick(delta, timestamp);
+  public step(timestamp: number): void {
+    const delta = timestamp - this.ts;
+    this.ts = timestamp;
+    this.tick(delta, timestamp);
+    window.requestAnimationFrame(t => this.step(t));
   }
 
-  @timer('init')
-  public async start(): Promise<void> {
-    await super.start?.();
-  }
+  protected ts: number = 0;
 }
 
 (async () => {
   const world = new MyWorld();
-  world.start().then(() => {
-    world.tick(0, Date.now());
-  });
+  await world.start();
+  world.step(0);
 })();

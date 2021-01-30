@@ -4,6 +4,10 @@
     <meta charset="utf-8" />
     <title>tecs</title>
     <style>
+      :root {
+        --width: 768px;
+        --height: 512px;
+      }
       body {
         display: flex;
         justify-content: space-around;
@@ -12,16 +16,30 @@
         background: #000;
       }
 
+      main,
       canvas {
-        width: 1280px;
-        height: 720px;
-        image-rendering: -webkit-optimize-contrast; /* historic fallback */
-        image-rendering: crisp-edges; /* standard property */
+        width: var(--width);
+        height: var(--height);
+      }
+
+      main {
+        position: relative;
+      }
+
+      canvas {
+        position: absolute;
+        left: 0;
+        top: 0;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
       }
     </style>
   </head>
   <body>
-    <div id="root"></div>
+    <main>
+      <div id="root"></div>
+    </main>
+
     <script type="text/javascript" src="../src/index.ts"></script>
   </body>
 </html>
