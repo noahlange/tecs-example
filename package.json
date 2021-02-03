@@ -1,11 +1,11 @@
 {
   "name": "tecs-example",
   "dependencies": {
-    "prettier": "^2.2.1",
     "rot-js": "^2.1.5",
     "tecs": "noahlange/tecs"
   },
   "devDependencies": {
+    "prettier": "^2.2.1",
     "@typescript-eslint/eslint-plugin": "^4.2.0",
     "@typescript-eslint/parser": "^4.2.0",
     "eslint": "^7.14.0",

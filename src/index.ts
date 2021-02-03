@@ -1,23 +1,29 @@
-import * as ROT from 'rot-js';
 import { World } from 'tecs';
 
-import { Actions, Input, MapGen, Renderer, Lighting } from './systems';
+import { Actions, Input, Renderer, Lighting, DiggerMap } from './systems';
 
-ROT.RNG.setSeed(123454321);
+class MyWorld extends World.with(
+  DiggerMap,
+  Input,
+  Actions,
+  Lighting,
+  Renderer
+) {
+  protected ts: number = 0;
 
-class MyWorld extends World.with(MapGen, Input, Actions, Lighting, Renderer) {
-  public step(timestamp: number): void {
-    const delta = timestamp - this.ts;
-    this.ts = timestamp;
-    this.tick(delta, timestamp);
-    window.requestAnimationFrame(t => this.step(t));
+  public tick(delta: number, time: number): void {
+    super.tick(delta, time);
   }
 
-  protected ts: number = 0;
+  public step(time: number): void {
+    this.ts = time;
+    this.tick(time - this.ts, time);
+    window.requestAnimationFrame(t => this.step(t));
+  }
 }
 
 (async () => {
   const world = new MyWorld();
   await world.start();
-  world.step(0);
+  world.step(Date.now());
 })();

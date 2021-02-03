@@ -1,30 +1,30 @@
 import { Entity } from 'tecs';
+
 import {
-  Action,
   Glyph,
   Position,
   Collision,
-  Playable,
   LightSource,
-  Renderable
+  Renderable,
+  Description,
+  Interactive,
+  GameMap as Game
 } from '../components';
-import { Interactive } from '../components/Interactive';
+
+export { Door } from './Door';
+export { Player } from './Player';
 
 export const Cell = Entity.with(Glyph, Position, Collision, Renderable);
-export const Door = Entity.with(
-  Glyph,
-  Position,
-  Interactive,
-  Collision,
-  Renderable
-);
-export const Light = Entity.with(Position, LightSource);
 export const Mob = Entity.with(Glyph, Position, Renderable, LightSource);
-export const Player = Entity.with(
-  Glyph,
+export const Light = Entity.with(Position, LightSource);
+
+export const Item = Entity.with(
   Position,
-  Action,
+  Glyph,
   Renderable,
-  Playable,
-  LightSource
+  Interactive,
+  Description,
+  Collision
 );
+
+export const GameMap = Entity.with(Game);

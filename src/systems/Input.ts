@@ -1,6 +1,5 @@
 import { System } from 'tecs';
-import { Playable } from '../components';
-import { Action } from '../components/Action';
+import { Player } from '../entities';
 import { ID } from '../types';
 
 export class Input extends System {
@@ -10,31 +9,40 @@ export class Input extends System {
 
   public tick(): void {
     const input = this.inputs.shift();
-    const player = this.world.query.with(Playable, Action).first();
 
-    if (input && player) {
-      let action = ID.NONE;
-
-      switch (input) {
-        case 'w':
-          action = ID.MOVE_UP;
-          break;
-        case 'a':
-          action = ID.MOVE_LEFT;
-          break;
-        case 'd':
-          action = ID.MOVE_RIGHT;
-          break;
-        case 's':
-          action = ID.MOVE_DOWN;
-          break;
-        case ' ':
-          action = ID.INTERACT;
-      }
-
-      player.$$.action.action = action;
-      player.$$.action.subject = player.id;
+    if (!input) {
+      return;
     }
+
+    const player = this.world.query.ofType(Player).first();
+
+    if (!player) {
+      return;
+    }
+
+    const { action } = player.$$;
+    let next = ID.NONE;
+
+    switch (input) {
+      case 'w':
+        next = ID.MOVE_UP;
+        break;
+      case 'a':
+        next = ID.MOVE_LEFT;
+        break;
+      case 'd':
+        next = ID.MOVE_RIGHT;
+        break;
+      case 's':
+        next = ID.MOVE_DOWN;
+        break;
+      case ' ':
+        next = ID.INTERACT;
+        break;
+    }
+
+    action.action = next;
+    action.subject = player.id;
   }
 
   public init(): void {

@@ -1,13 +1,19 @@
 import type { Point, RGBColor } from './types';
-import { Direction } from './types';
+import { Direction, ID } from './types';
 
-export const WIDTH = 48;
-export const HEIGHT = 32;
-export const AMBIENT_LIGHT: RGBColor = [40, 40, 40];
-export const AMBIENT_DARK: RGBColor = [30, 30, 30];
+export const WIDTH = 60;
+export const HEIGHT = 40;
+export const AMBIENT_LIGHT: RGBColor = [50, 50, 50];
+export const AMBIENT_DARK: RGBColor = [50, 50, 50];
 
 export function toCoordString({ x, y }: Point): string {
   return x + ',' + y;
+}
+
+export function getGrid<T>(width: number, height: number, value?: T): T[][] {
+  return value
+    ? new Array(width).fill(1).map(() => new Array(height).fill(value))
+    : new Array(width).fill(1).map(() => new Array(height));
 }
 
 export function getInteractionPos(point: Point, d: Direction): Point {
@@ -37,6 +43,21 @@ export function getInteractionPos(point: Point, d: Direction): Point {
       break;
   }
   return { x, y };
+}
+
+export function getNewDirection(action: ID): Direction | null {
+  switch (action) {
+    case ID.MOVE_UP:
+      return Direction.N;
+    case ID.MOVE_DOWN:
+      return Direction.S;
+    case ID.MOVE_LEFT:
+      return Direction.W;
+    case ID.MOVE_RIGHT:
+      return Direction.E;
+    default:
+      return null;
+  }
 }
 
 /**

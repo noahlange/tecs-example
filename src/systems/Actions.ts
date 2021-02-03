@@ -1,15 +1,21 @@
+import type { Entity } from 'tecs';
 import { System } from 'tecs';
 
 import type { Point } from '../types';
 
 import { Collision, Glyph, Position, Interactive, Action } from '../components';
-import { Direction, ID } from '../types';
-import { getInteractionPos, toCoordString } from '../utils';
+import { ID } from '../types';
+import { getInteractionPos, getNewDirection, toCoordString } from '../utils';
+import { Door } from '../entities';
 
 export class Actions extends System {
   public static type = 'actions';
 
-  public cells: Record<string, boolean> = {};
+  public collisions: Record<string, boolean> = {};
+  public mobs: Record<
+    string,
+    Entity<{ collision: Collision; position: Position }>
+  > = {};
 
   public tick(): void {
     const mobs = this.world.query
@@ -27,43 +33,28 @@ export class Actions extends System {
       const noCollision = ({ x, y }: Point): boolean => {
         const key = toCoordString({ x, y });
         return (
-          this.cells[key] !== false &&
+          this.collisions[key] !== false &&
           !adjacent
             .filter(mob => !mob.$.collision.passable)
-            .find(a => a.$.position.x === x && a.$.position.y === y)
+            .find(mob => mob.$.position.x === x && mob.$.position.y === y)
         );
       };
 
-      // even if we can't move, we'd still like to change direction.
-      switch ($.action.action) {
-        case ID.MOVE_UP:
-          $$.position.d = Direction.N;
-          break;
-        case ID.MOVE_DOWN:
-          $$.position.d = Direction.S;
-          break;
-        case ID.MOVE_LEFT:
-          $$.position.d = Direction.W;
-          break;
-        case ID.MOVE_RIGHT:
-          $$.position.d = Direction.E;
-          break;
-      }
+      const direction = getNewDirection($.action.action) ?? $.position.d;
+      $$.position.d = direction;
 
-      const next = getInteractionPos($.position, $.position.d);
+      const next = getInteractionPos($.position, direction);
+
+      const interacting = adjacent.filter(
+        ({ $ }) => $.position.x === next.x && $.position.y === next.y
+      );
 
       switch ($.action.action) {
         case ID.INTERACT:
           {
-            const doors = adjacent.filter(({ $ }) => {
-              return $.position.x === next.x && $.position.y === next.y;
-            });
-            for (const { $$ } of doors) {
-              if ($$.glyph) {
-                const passable = !$$.collision.passable;
-                $$.collision.passable = passable;
-                $$.collision.allowLOS = passable;
-                $$.glyph.text = passable ? '/' : '-';
+            for (const interactive of interacting) {
+              if (interactive instanceof Door) {
+                interactive.toggle();
               }
             }
           }
@@ -71,12 +62,16 @@ export class Actions extends System {
         case ID.MOVE_UP:
         case ID.MOVE_DOWN:
         case ID.MOVE_LEFT:
-        case ID.MOVE_RIGHT:
+        case ID.MOVE_RIGHT: {
+          if (direction) {
+            $$.position.d = direction;
+          }
           if (noCollision(next)) {
-            $$.position.y = next.y;
             $$.position.x = next.x;
+            $$.position.y = next.y;
           }
           break;
+        }
       }
 
       // unset action
@@ -85,13 +80,13 @@ export class Actions extends System {
   }
 
   public init(): void {
-    this.cells = this.world.query
+    this.collisions = this.world.query
       .with(Collision, Position)
       .without(Interactive, Action)
       .all()
       .filter(item => !item.$.collision.passable)
       .reduce((a, { $ }) => {
         return { ...a, [toCoordString($.position)]: $.collision.passable };
-      }, this.cells);
+      }, this.collisions);
   }
 }

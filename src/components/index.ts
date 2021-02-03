@@ -6,3 +6,5 @@ export { Playable } from './Playable';
 export { Interactive } from './Interactive';
 export { LightSource } from './LightSource';
 export { Renderable } from './Renderable';
+export { GameMap } from './GameMap';
+export { Description } from './Description';
