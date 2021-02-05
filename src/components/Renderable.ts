@@ -1,5 +1,5 @@
-import { Component } from 'tecs';
 import type { RGBColor } from '../types';
+import { Component } from 'tecs';
 
 /**
  * Something that can have its color affected by lighting.

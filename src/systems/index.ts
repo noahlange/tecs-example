@@ -5,3 +5,4 @@ export { Renderer } from './Renderer';
 
 export { DiggerMap } from './maps/DiggerMap';
 export { CellMap } from './maps/CellMap';
+export { UI } from './UI';

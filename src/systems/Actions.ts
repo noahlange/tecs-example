@@ -2,11 +2,19 @@ import type { Entity } from 'tecs';
 import { System } from 'tecs';
 
 import type { Point } from '../types';
-
-import { Collision, Glyph, Position, Interactive, Action } from '../components';
-import { ID } from '../types';
+import {
+  Collision,
+  Glyph,
+  Position,
+  Interactive,
+  Action,
+  Text,
+  Talk
+} from '../components';
+import { ID, UIMode } from '../types';
 import { getInteractionPos, getNewDirection, toCoordString } from '../utils';
-import { Door } from '../entities';
+import { Core, Door } from '../entities';
+import { NPC } from '../entities/NPC';
 
 export class Actions extends System {
   public static type = 'actions';
@@ -18,12 +26,21 @@ export class Actions extends System {
   > = {};
 
   public tick(): void {
+    const game = this.world.query.ofType(Core).first();
+
+    // bail if we're not in "interacting with the world" mode
+    if (game?.$.game.mode === UIMode.DIALOGUE) {
+      return;
+    }
+
     const mobs = this.world.query
       .with(Collision, Position, Interactive)
-      .some(Glyph)
-      .all();
+      .some(Glyph, Text, Talk)
+      .get();
 
-    for (const { $, $$ } of this.world.query.changed(Action, Position)) {
+    for (const c of this.world.query.changed(Action, Position)) {
+      const { $$, $ } = c;
+
       const adjacent = mobs.filter(
         mob =>
           Math.abs(mob.$.position.x - $.position.x) <= 1 &&
@@ -45,20 +62,17 @@ export class Actions extends System {
 
       const next = getInteractionPos($.position, direction);
 
-      const interacting = adjacent.filter(
-        ({ $ }) => $.position.x === next.x && $.position.y === next.y
-      );
+      const interactive = adjacent
+        .filter(({ $ }) => $.position.x === next.x && $.position.y === next.y)
+        .shift();
 
       switch ($.action.action) {
-        case ID.INTERACT:
-          {
-            for (const interactive of interacting) {
-              if (interactive instanceof Door) {
-                interactive.toggle();
-              }
-            }
+        case ID.INTERACT: {
+          if (interactive instanceof Door || interactive instanceof NPC) {
+            interactive.interact();
           }
           break;
+        }
         case ID.MOVE_UP:
         case ID.MOVE_DOWN:
         case ID.MOVE_LEFT:
@@ -83,7 +97,7 @@ export class Actions extends System {
     this.collisions = this.world.query
       .with(Collision, Position)
       .without(Interactive, Action)
-      .all()
+      .get()
       .filter(item => !item.$.collision.passable)
       .reduce((a, { $ }) => {
         return { ...a, [toCoordString($.position)]: $.collision.passable };

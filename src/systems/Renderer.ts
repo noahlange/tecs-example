@@ -3,10 +3,8 @@ import type { DisplayOptions } from 'rot-js/lib/display/types';
 import { System } from 'tecs';
 
 import { Playable, Position, Renderable, Glyph } from '../components';
-import { HEIGHT, WIDTH, glyphs } from '../utils';
-
-const TILE = 8;
-const tileAt = (x: number, y: number): [number, number] => [x * TILE, y * TILE];
+import { HEIGHT, WIDTH, TILE } from '../utils';
+import { glyphs, tileMap } from '../utils/tiles';
 
 export class Renderer extends System {
   public static readonly type = 'renderer';
@@ -18,7 +16,7 @@ export class Renderer extends System {
     const query = this.world.query
       .changed(Glyph, Renderable, Position)
       .some(Playable)
-      .all();
+      .get();
 
     const results = query.sort((a, b) =>
       a.$.player ? 1 : b.$.player ? -1 : 0
@@ -41,31 +39,22 @@ export class Renderer extends System {
   public async init(): Promise<void> {
     const tiles = document.createElement('img');
     tiles.src = glyphs;
-
+    // tileset loaded
     await new Promise(resolve => (tiles.onload = resolve));
 
     const settings: Partial<DisplayOptions> = {
       layout: 'tile-gl',
       bg: 'transparent',
+      width: WIDTH,
+      height: HEIGHT,
       tileWidth: TILE,
       tileHeight: TILE,
       tileSet: tiles,
       tileColorize: true,
-      tileMap: {
-        '#': tileAt(12, 0),
-        B: tileAt(2, 4),
-        '.': tileAt(0, 0),
-        '@': tileAt(0, 4),
-        '-': tileAt(13, 2),
-        '/': tileAt(15, 2),
-        '+': tileAt(8, 14)
-      },
-      width: WIDTH,
-      height: HEIGHT
+      tileMap
     };
 
     this.display = new ROT.Display(settings);
-
     const container = this.display.getContainer();
     if (container) {
       document.getElementById('root')?.appendChild(container);

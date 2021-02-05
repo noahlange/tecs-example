@@ -1,10 +1,13 @@
-export { Position } from './Position';
 export { Action } from './Action';
-export { Glyph } from './Glyph';
 export { Collision } from './Collision';
-export { Playable } from './Playable';
+export { Glyph } from './Glyph';
 export { Interactive } from './Interactive';
 export { LightSource } from './LightSource';
+
+export { Playable } from './Playable';
+export { Position } from './Position';
 export { Renderable } from './Renderable';
-export { GameMap } from './GameMap';
-export { Description } from './Description';
+export { Talk } from './Talk';
+export { Text } from './Text';
+export { Game } from './Singletons';
+export { UI } from './UI';

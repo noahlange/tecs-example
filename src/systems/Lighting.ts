@@ -9,11 +9,11 @@ import {
   LightSource,
   Glyph,
   Playable,
-  Renderable,
-  GameMap
+  Renderable
 } from '../components';
 
 import { AMBIENT_DARK, AMBIENT_LIGHT, getGrid } from '../utils';
+import { Core } from '../entities';
 
 type LightPoint = Point & { color: RGBColor };
 
@@ -54,7 +54,7 @@ export class Lighting extends System {
     const res: Record<string, LightPoint> = {};
     const changed = this.world.query.changed(LightSource, Position);
 
-    for (const { $, id } of changed.all()) {
+    for (const { $, id } of changed.get()) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
       this.lights[id] = { x, y, color: $.light.color };
@@ -76,7 +76,7 @@ export class Lighting extends System {
    */
   protected computeFOV(): void {
     // line-of-sight obstructions...
-    const results = this.world.query.changed(Collision, Position).all();
+    const results = this.world.query.changed(Collision, Position).get();
     for (const { id, $ } of results) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
@@ -145,7 +145,7 @@ export class Lighting extends System {
      * in FOV/lighting, but not at the component level. That's why we have to
      * track IDs.
      */
-    const results = !ids.length ? query.all() : query.findIn(ids);
+    const results = !ids.length ? query.get() : query.findIn(ids);
 
     for (const { id, $, $$ } of results) {
       const { x, y } = $.position;
@@ -175,10 +175,10 @@ export class Lighting extends System {
   }
 
   public init(): void {
-    const map = this.world.query.with(GameMap).first();
-    if (map) {
-      const w = (this.width = map.$.game.width);
-      const h = (this.height = map.$.game.height);
+    const core = this.world.query.ofType(Core).first();
+    if (core) {
+      const w = (this.width = core.$.game.width);
+      const h = (this.height = core.$.game.height);
 
       this.lightGrid = getGrid(w, h);
       this.passable = getGrid(w, h);

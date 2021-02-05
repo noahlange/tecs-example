@@ -1,0 +1,23 @@
+div.log {
+  pointer-events: auto;
+  overflow-y: hidden;
+}
+
+.log ul {
+  line-height: 0.75;
+  li {
+    padding-left: 1ch;
+    margin-bottom: 1rem;
+    color: white;
+    list-style: none;
+    &:last-child {
+      position: relative;
+      &::before {
+        position: absolute;
+        left: -1ch;
+        display: block;
+        content: '>';
+      }
+    }
+  }
+}

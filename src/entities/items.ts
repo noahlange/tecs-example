@@ -8,7 +8,7 @@ export const items: DataType<typeof Item>[] = [
   {
     glyph: { text: 'B', fg: [255, 255, 255] },
     collision: { passable: true, allowLOS: true },
-    description: { name: 'Book', text: 'This is a book.' }
+    text: { title: 'Book', value: 'This is a book.' }
   }
 ];
 

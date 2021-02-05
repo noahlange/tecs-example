@@ -22,5 +22,19 @@ export enum ID {
   MOVE_LEFT = 'move_left',
   MOVE_RIGHT = 'move_right',
   MOVE_UP = 'move_up',
-  MOVE_DOWN = 'move_down'
+  MOVE_DOWN = 'move_down',
+  DIALOGUE_START = 'dialogue_start',
+  DIALOGUE_NEXT = 'dialogue_next',
+  DIALOGUE_CHOOSE = 'dialogue_choose'
+}
+
+export interface UITextMessage {
+  text: string;
+  title: string;
+}
+
+export enum UIMode {
+  DEFAULT = 'DEFAULT',
+  DIALOGUE = 'DIALOGUE',
+  MENU = 'MENU'
 }

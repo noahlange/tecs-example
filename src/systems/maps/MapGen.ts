@@ -31,7 +31,7 @@ export abstract class MapGen extends System {
     this.world.create(Cell, {
       position: point,
       collision: { passable: !isWall, allowLOS: !isWall },
-      glyph: { text: isWall ? '#' : '.', fg: [120, 120, 120] }
+      glyph: { text: isWall ? '#' : ' ', fg: [120, 120, 120] }
     });
   }
 

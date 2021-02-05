@@ -1,6 +1,5 @@
 import * as ROT from 'rot-js';
 
-import { GameMap } from '../../entities';
 import { HEIGHT, WIDTH } from '../../utils';
 import { MapGen } from './MapGen';
 
@@ -12,7 +11,6 @@ export class CellMap extends MapGen {
   protected generate(): void {
     const data: Record<string, number> = {};
 
-    this.world.create(GameMap, { game: { width: WIDTH, height: HEIGHT } });
     this.map = new ROT.Map.Cellular(WIDTH, HEIGHT);
     this.map.randomize(0.5);
 
