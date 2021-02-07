@@ -1,5 +1,5 @@
 import { Entity } from 'tecs';
-import { UIMessage } from '.';
+import { UIMessage } from '..';
 
 import {
   Collision,
@@ -7,7 +7,9 @@ import {
   Interactive,
   Position,
   Renderable
-} from '../components';
+} from '../../components';
+import type { RGBColor } from '../../types';
+import { T } from '../../utils/tiles';
 
 const openedText = [
   'you have opened the door',
@@ -38,6 +40,11 @@ export class Door extends Entity.with(
   Collision,
   Renderable
 ) {
+  public static data = {
+    glyph: { fg: [40, 20, 10] as RGBColor, text: T.DOOR },
+    collision: { passable: false, allowLOS: false }
+  };
+
   public count: number = 0;
 
   public interact(): void {
@@ -49,7 +56,7 @@ export class Door extends Entity.with(
     const next = !$$.collision.passable;
     $$.collision.passable = next;
     $$.collision.allowLOS = next;
-    $$.glyph.text = next ? '/' : '-';
+    $$.glyph.text = next ? T.DOOR_OPEN : T.DOOR;
 
     const value = next ? openedText[this.count] : closedText[this.count];
     this.manager.create(UIMessage, { text: { title: '', value } });

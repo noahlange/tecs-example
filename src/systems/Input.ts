@@ -66,8 +66,8 @@ export class Input extends System {
       return;
     }
 
-    const game = this.world.query.ofType(Core).first();
-    const player = this.world.query.ofType(Player).first();
+    const game = this.world.query.entities(Core).first();
+    const player = this.world.query.entities(Player).first();
 
     if (!player) {
       return;

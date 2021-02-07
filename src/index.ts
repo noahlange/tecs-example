@@ -1,25 +1,35 @@
+import * as ROT from 'rot-js';
+
 import { World } from 'tecs';
 import { Core } from './entities';
 import Stats from 'stats.js';
 
-import { Actions, Input, Renderer, Lighting, DiggerMap, UI } from './systems';
-import { Dialogue } from './systems/Dialogue';
+import {
+  Actions,
+  Input,
+  Dialogue,
+  DiggerMap,
+  UI,
+  Lighting,
+  PIXI
+} from './systems';
+
 import { HEIGHT, WIDTH } from './utils';
 
 class MyWorld extends World.with(
   DiggerMap,
   Input,
   Actions,
-  Lighting,
-  Renderer,
   Dialogue,
+  Lighting,
+  PIXI,
   UI
 ) {
   protected ts: number = 0;
   protected stats: Stats | null = null;
   protected initStats(): void {
     this.stats = new Stats();
-    this.stats.showPanel(2);
+    this.stats.showPanel(1);
     document.body.appendChild(this.stats.dom);
   }
 
@@ -27,14 +37,6 @@ class MyWorld extends World.with(
     this.stats?.begin();
     super.tick(d, ts);
     this.stats?.end();
-  }
-
-  /**
-   * Allows us to wrap tick() a little more cleanly for stats.js
-   */
-  public step(time: number): void {
-    this.tick(time - this.ts, time);
-    window.requestAnimationFrame(t => this.step(t));
   }
 
   public init(): void {
@@ -46,5 +48,4 @@ class MyWorld extends World.with(
 (async () => {
   const world = new MyWorld();
   await world.start();
-  world.step(0);
 })();

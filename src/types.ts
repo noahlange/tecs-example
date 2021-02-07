@@ -1,3 +1,5 @@
+export { T } from './utils/tiles';
+
 export interface Point {
   x: number;
   y: number;

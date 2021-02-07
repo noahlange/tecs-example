@@ -1,16 +1,10 @@
 import type { DataType } from 'tecs';
-import type { Point } from '../types';
+import type { Point } from '../../types';
 
 import * as ROT from 'rot-js';
-import type { Item } from '.';
+import type { Item } from '..';
 
-export const items: DataType<typeof Item>[] = [
-  {
-    glyph: { text: 'B', fg: [255, 255, 255] },
-    collision: { passable: true, allowLOS: true },
-    text: { title: 'Book', value: 'This is a book.' }
-  }
-];
+export const items: DataType<typeof Item>[] = [];
 
 export function getItem(bounds: [Point, Point]): DataType<typeof Item> {
   const [nw, se] = bounds;

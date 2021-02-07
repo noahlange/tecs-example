@@ -13,8 +13,7 @@ import {
 } from '../components';
 import { ID, UIMode } from '../types';
 import { getInteractionPos, getNewDirection, toCoordString } from '../utils';
-import { Core, Door } from '../entities';
-import { NPC } from '../entities/NPC';
+import { Core, Door, NPC, Chest } from '../entities';
 
 export class Actions extends System {
   public static type = 'actions';
@@ -26,19 +25,21 @@ export class Actions extends System {
   > = {};
 
   public tick(): void {
-    const game = this.world.query.ofType(Core).first();
+    const game = this.world.query.entities(Core).first();
 
     // bail if we're not in "interacting with the world" mode
     if (game?.$.game.mode === UIMode.DIALOGUE) {
       return;
     }
 
-    const mobs = this.world.query
-      .with(Collision, Position, Interactive)
-      .some(Glyph, Text, Talk)
+    const mobs = this.world.query.all
+      .components(Collision, Position, Interactive)
+      .some.components(Glyph, Collision, Text, Talk)
       .get();
 
-    for (const c of this.world.query.changed(Action, Position)) {
+    for (const c of this.world.query.all
+      .components(Action, Position)
+      .any.changed.components(Action, Position)) {
       const { $$, $ } = c;
 
       const adjacent = mobs.filter(
@@ -68,7 +69,11 @@ export class Actions extends System {
 
       switch ($.action.action) {
         case ID.INTERACT: {
-          if (interactive instanceof Door || interactive instanceof NPC) {
+          if (
+            interactive instanceof Door ||
+            interactive instanceof NPC ||
+            interactive instanceof Chest
+          ) {
             interactive.interact();
           }
           break;
@@ -94,10 +99,12 @@ export class Actions extends System {
   }
 
   public init(): void {
-    this.collisions = this.world.query
-      .with(Collision, Position)
-      .without(Interactive, Action)
-      .get()
+    const components = this.world.query.all
+      .components(Collision, Position)
+      .none.components(Interactive, Action)
+      .get();
+
+    this.collisions = components
       .filter(item => !item.$.collision.passable)
       .reduce((a, { $ }) => {
         return { ...a, [toCoordString($.position)]: $.collision.passable };

@@ -2,9 +2,9 @@ import * as ROT from 'rot-js';
 import type { DisplayOptions } from 'rot-js/lib/display/types';
 import { System } from 'tecs';
 
-import { Playable, Position, Renderable, Glyph } from '../components';
-import { HEIGHT, WIDTH, TILE } from '../utils';
-import { glyphs, tileMap } from '../utils/tiles';
+import { Playable, Position, Renderable, Glyph } from '../../components';
+import { HEIGHT, WIDTH, TILE } from '../../utils/index';
+import { glyphs, tileMap } from '../../utils/tiles';
 
 export class Renderer extends System {
   public static readonly type = 'renderer';
@@ -13,9 +13,10 @@ export class Renderer extends System {
   public display!: ROT.Display;
 
   public tick(): void {
-    const query = this.world.query
-      .changed(Glyph, Renderable, Position)
-      .some(Playable)
+    const query = this.world.query.all
+      .components(Glyph, Renderable, Position)
+      .any.changed.components(Glyph, Renderable, Position)
+      .some.components(Playable)
       .get();
 
     const results = query.sort((a, b) =>
