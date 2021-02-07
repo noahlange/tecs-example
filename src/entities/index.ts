@@ -11,8 +11,10 @@ import {
   UI
 } from '../components';
 
-export { Door } from './Door';
-export { Player } from './Player';
+export { Door } from './interactive/Door';
+export { Chest } from './interactive/Chest';
+export { Player } from './mobs/Player';
+export { NPC } from './mobs/NPC';
 export { Core } from './Core';
 
 export const Cell = Entity.with(Glyph, Position, Collision, Renderable);

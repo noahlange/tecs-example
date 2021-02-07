@@ -5,8 +5,8 @@ export const WIDTH = 60;
 export const HEIGHT = 40;
 export const TILE = 8;
 
-export const AMBIENT_LIGHT: RGBColor = [50, 50, 50];
-export const AMBIENT_DARK: RGBColor = [50, 50, 50];
+export const AMBIENT_LIGHT: RGBColor = [80, 80, 80];
+export const AMBIENT_DARK: RGBColor = [30, 30, 30];
 
 export function tileAt({ x, y }: Point): [number, number] {
   return [x * TILE, y * TILE];

@@ -10,6 +10,11 @@ canvas {
   z-index: 0;
 }
 
+main {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
 #ui {
   line-height: 0.75;
   position: relative;

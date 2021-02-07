@@ -2,6 +2,7 @@
   "name": "tecs-example",
   "dependencies": {
     "bondage": "^2.2.0",
+    "pixi.js": "^5.3.7",
     "preact": "^10.5.12",
     "rot-js": "^2.1.5",
     "stats.js": "^0.17.0",

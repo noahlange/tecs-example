@@ -46,9 +46,13 @@ export class UI extends System {
   }
 
   public tick(): void {
-    const updates = this.world.query.created(Text, UIText).get();
-    const player = this.world.query.ofType(Player).first();
-    const game = this.world.query.changed(Game).first();
+    const updates = this.world.query.all
+      .components(Text, UIText)
+      .any.changed.components(Text, UIText)
+      .get();
+
+    const player = this.world.query.entities(Player).first();
+    const game = this.world.query.changed.components(Game).first();
 
     if (player) {
       this.handlePlayerDialogue(player);

@@ -20,7 +20,7 @@ export class Dialogue extends System {
     if (file && this.runner) {
       this.runner.load(content);
       this.run = this.runner.run(start ?? 'Start');
-      const game = this.world.query.ofType(Core).first();
+      const game = this.world.query.entities(Core).first();
       game?.setMode(UIMode.DIALOGUE);
     }
   }
@@ -28,7 +28,7 @@ export class Dialogue extends System {
   public end(): void {
     this.run = null;
     this.done = true;
-    const game = this.world.query.ofType(Core).first();
+    const game = this.world.query.entities(Core).first();
     game?.setMode(UIMode.DEFAULT);
   }
 
@@ -54,7 +54,9 @@ export class Dialogue extends System {
   }
 
   public tick(): void {
-    const { $ } = this.world.query.changed(Talk).first() ?? { $: null };
+    const { $ } = this.world.query.changed.components(Talk).first() ?? {
+      $: null
+    };
     if ($?.talk.active && $?.talk.file) {
       if (!this.run) {
         this.start($.talk.file, $.talk.start);
@@ -63,7 +65,7 @@ export class Dialogue extends System {
     }
 
     if (this.run) {
-      for (const { $$ } of this.world.query.with(Action)) {
+      for (const { $$ } of this.world.query.components(Action)) {
         const actions = $$.action;
 
         switch (actions.action) {

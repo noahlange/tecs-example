@@ -1,7 +1,7 @@
 import * as ROT from 'rot-js';
 import { System } from 'tecs';
 
-import type { Point, RGBColor } from '../types';
+import type { Point, RGBColor } from '../../types';
 
 import {
   Collision,
@@ -9,11 +9,12 @@ import {
   LightSource,
   Glyph,
   Playable,
-  Renderable
-} from '../components';
+  Renderable,
+  Interactive
+} from '../../components';
 
-import { AMBIENT_DARK, AMBIENT_LIGHT, getGrid } from '../utils';
-import { Core } from '../entities';
+import { AMBIENT_DARK, AMBIENT_LIGHT, getGrid, timer } from '../../utils';
+import { Core } from '../../entities';
 
 type LightPoint = Point & { color: RGBColor };
 
@@ -52,7 +53,9 @@ export class Lighting extends System {
    */
   protected getLights(): LightPoint[] {
     const res: Record<string, LightPoint> = {};
-    const changed = this.world.query.changed(LightSource, Position);
+    const changed = this.world.query.all
+      .components(LightSource, Position)
+      .any.changed.components(LightSource, Position);
 
     for (const { $, id } of changed.get()) {
       const { x, y } = $.position;
@@ -76,7 +79,11 @@ export class Lighting extends System {
    */
   protected computeFOV(): void {
     // line-of-sight obstructions...
-    const results = this.world.query.changed(Collision, Position).get();
+    const results = this.world.query.all
+      .components(Collision, Position)
+      .any.changed.components(Collision, Position)
+      .get();
+
     for (const { id, $ } of results) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
@@ -97,7 +104,7 @@ export class Lighting extends System {
     // reset from last tick
     this.fovGrid = getGrid(this.width, this.height, null);
 
-    for (const { $ } of this.world.query.with(Playable, Position)) {
+    for (const { $ } of this.world.query.all.components(Playable, Position)) {
       this.fov.compute($.position.x, $.position.y, 10, (x, y, r, v) => {
         this.fovGrid[x][y] = v;
         this.repaint.push({ x, y });
@@ -137,7 +144,9 @@ export class Lighting extends System {
       }
     }
 
-    const query = this.world.query.with(Position, Renderable).some(Glyph);
+    const query = this.world.query.all
+      .components(Position, Renderable)
+      .some.components(Glyph, Interactive);
 
     /**
      * If we've done an initial paint, we only need to paint the changes. Note
@@ -145,7 +154,7 @@ export class Lighting extends System {
      * in FOV/lighting, but not at the component level. That's why we have to
      * track IDs.
      */
-    const results = !ids.length ? query.get() : query.findIn(ids);
+    const results = !ids.length ? query : query.ids(...ids);
 
     for (const { id, $, $$ } of results) {
       const { x, y } = $.position;
@@ -157,15 +166,21 @@ export class Lighting extends System {
 
       const light = data ? ROT.Color.add(AMBIENT_LIGHT, data) : AMBIENT_LIGHT;
 
-      $$.render.fg = ROT.Color.multiply(base, $.glyph?.fg ?? AMBIENT_DARK);
-      $$.render.bg = ROT.Color.multiply(base, light);
+      $$.render.fg = $.glyph?.fg
+        ? ROT.Color.interpolate(
+            ROT.Color.multiply(base, data ?? AMBIENT_LIGHT),
+            $.glyph?.fg
+          )
+        : ROT.Color.multiply(base, data ?? AMBIENT_LIGHT);
+      // $$.render.fg = ROT.Color.multiply(base, $.glyph?.fg ?? AMBIENT_DARK);
+      // $$.render.bg = ROT.Color.multiply(base, light);
+      $$.render.bg = ROT.Color.multiply(light, AMBIENT_LIGHT);
       $$.render.active = true;
     }
 
     this.firstPaint = false;
   }
 
-  // @timer('lighting')
   public tick(): void {
     this.computeFOV();
     this.computeLighting();
@@ -175,7 +190,8 @@ export class Lighting extends System {
   }
 
   public init(): void {
-    const core = this.world.query.ofType(Core).first();
+    const core = this.world.query.entities(Core).first();
+
     if (core) {
       const w = (this.width = core.$.game.width);
       const h = (this.height = core.$.game.height);
@@ -193,7 +209,7 @@ export class Lighting extends System {
         // same callback with a different return type
         (x: number, y: number): number =>
           this.passable[x][y] === LOS.VISIBLE ? 0 : 0.3,
-        { range: 10, passes: 2 }
+        { range: 10, passes: 1 }
       );
 
       this.lighting.setFOV(this.fov);

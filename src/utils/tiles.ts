@@ -1,21 +1,42 @@
 import type { Point } from '../types';
-import { tileAt } from './';
+import { tileAt } from '.';
+
+export enum T {
+  SPACE = ' ',
+  ASTERISK = '*',
+  AT = '@',
+  EXCLAMATION = '!',
+  DOUBLE_QUOTE = '"',
+  SINGLE_QUOTE = "'",
+  PLUS = '+',
+  HASH = '#',
+  DOLLAR = '$',
+  PERCENT = '%',
+  AMPERSAND = '&',
+  PAREN_LEFT = '(',
+  PAREN_RIGHT = ')',
+  CHEST = '\uE000',
+  CHEST_OPEN = '\uE001',
+  DOOR = '\uE002',
+  DOOR_OPEN = '\uE003',
+  WALL = '\uE004',
+  BLANK = '\uE005'
+}
 
 const tiles: Record<string, Point> = {
   // symbols
-  '@': { x: 0, y: 4 },
-  ' ': { x: 0, y: 2 },
-  '!': { x: 1, y: 2 },
-  '"': { x: 2, y: 2 },
-  '#': { x: 3, y: 2 },
-  $: { x: 4, y: 2 },
-  '%': { x: 5, y: 2 },
-  '&': { x: 6, y: 2 },
-  "'": { x: 7, y: 2 },
-  '(': { x: 8, y: 2 },
-  ')': { x: 9, y: 2 },
-  '*': { x: 10, y: 2 },
-  '+': { x: 11, y: 2 },
+  [T.AT]: { x: 0, y: 4 },
+  [T.EXCLAMATION]: { x: 1, y: 2 },
+  [T.DOUBLE_QUOTE]: { x: 2, y: 2 },
+  [T.SINGLE_QUOTE]: { x: 7, y: 2 },
+  [T.HASH]: { x: 3, y: 2 },
+  [T.DOLLAR]: { x: 4, y: 2 },
+  [T.PERCENT]: { x: 5, y: 2 },
+  [T.AMPERSAND]: { x: 6, y: 2 },
+  [T.PAREN_LEFT]: { x: 8, y: 2 },
+  [T.PAREN_RIGHT]: { x: 9, y: 2 },
+  [T.ASTERISK]: { x: 10, y: 2 },
+  [T.PLUS]: { x: 11, y: 2 },
   ',': { x: 12, y: 2 },
   '-': { x: 13, y: 2 },
   '.': { x: 14, y: 2 },
@@ -101,7 +122,14 @@ const tiles: Record<string, Point> = {
   '{': { x: 11, y: 7 },
   '|': { x: 12, y: 7 },
   '}': { x: 13, y: 7 },
-  '~': { x: 14, y: 7 }
+  '~': { x: 14, y: 7 },
+  [T.CHEST]: { x: 8, y: 13 },
+  [T.CHEST_OPEN]: { x: 9, y: 13 },
+  [T.DOOR]: { x: 3, y: 13 },
+  [T.DOOR_OPEN]: { x: 2, y: 13 },
+  [T.WALL]: { x: 12, y: 0 },
+  [T.SPACE]: { x: 1, y: 0 },
+  [T.BLANK]: { x: 14, y: 12 }
 };
 
 export const tileMap = Object.entries(tiles).reduce(
@@ -111,5 +139,16 @@ export const tileMap = Object.entries(tiles).reduce(
   {}
 );
 
+export const tileAtlas = Object.entries(tiles).reduce(
+  (a, [key, value]) => {
+    const [x, y] = tileAt(value);
+    return {
+      frames: { ...a.frames, [key]: { frame: { x, y, w: 8, h: 8 } } },
+      meta: a.meta
+    };
+  },
+  { frames: {}, meta: { scale: '1' } }
+);
+
 // https://opengameart.org/content/8x8-1bit-roguelike-tiles-bitmap-font
-export const glyphs = `data:image/png;base64,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`;
+export const glyphs = `data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIAAAACAAQMAAAD58POIAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAGUExURUdwTP///5+UokMAAAABdFJOUwBA5thmAAAE2UlEQVRIx22W0WscdRDHp02zrrpcrzXgKEsSj6UtIcI2F9YFx016HKVIHvqQvhxWFk9+KY2Eo8EmlPO3SREaxAcNvvgfyD3Wt0JBOKgv8V3si6BkH4TQB6Eppvdz5rcbe6n5kSy7n8x8Z3Z+85sNAK8zvXoP+mYPykXNa/We2Xy+91QD8jPqM72dHqDpPb0DxM+km9d2eoZvn34M2gKrQWaNH7V1sRr4fC3riguLWo1Ncy1bsaIAVqMPkMmDKULvIJZJ/DIjV29LjCfl9scF92S1emqLWK5auFxpbi/yjQbfL8DU4uJiqjRhbbzQqI0txueabOFGhQb7Vk82jUG3NhQWkOP6cOzCKHCB0Avt00kBOvlUsUcguToMzgY3rpAbejZ5jwEESfUtCD0t1UAB+vUggdLCKgXJggLRqAKmYgEufAASZRLwmDQIiSrJuJbXdyAlULFS4zOhozgVD0IFCj0nCrsWIKEDK/wHRcqjRGJ6PtzG0FlyFCpJmjgXhZ+oTIBnNTgKaXKIYorR5Sh4XB6aulmW5DS32mkvcR5Uvx1dvLjK4aNw7TbnoeppPQxTBhRmDFZ0ktaJUo1eHC5rBoXFkrVoryhIlWiEVuOiAMolyvpcTvFq1t6l/+eh6WB8Ls/zfq79+ZgTrSs1866SdRlTJAtCT6kGVwBDVACJ6vqeClqYIBYboZTDFWqRF6JnwYo652kkrgs6AiSDccKg39E+xLa1X1pVSHk/KvA7YicW4FqAfIWwqB91KeGydeO4josfyf5JlnqH9ynCm8pmxl2LXSX7ZoEYpLx7LyxEg9Zz6qzSXzkd36pFiwK/7lHAb8unSSdRsr6m2pHqVtHVUqD30zBSy75a4PdfkDRCHUbBspsgW4h/EjphRMu+M1NUbP2V9a7vYxSRLqNId2MZBIcA4RDw49QpAYLB008m9rMBotmfMDxFDE7sn34yBAB9LmXqlB5YnE8omhaLmfQysEXjsLYD5GSruYOl3WygVb67lEsUlQ3aj4xRqv+o3Tf8/qpTSZ2fRtjcSQuB1OlUhoBR7UfZoHQxfc1gaXfuIBsozaJGtqEIxodAbsqNK1YghzwAkxuT86/JZxnMzlrwx88CAjOxf/7PMo+Um2K6VgtqXpmHgGBr8ssLTXaxDuw5a977e2KfgZVkEEiM4bDTMD0tPVdUBy751CrOC2cDpEezRBdd3BqFFtxs3ZvKVHmi7smc0remplRhQbcCOKUvrPmHGo3PWxAljVuJ2yg68GGnAV9Mf3/l+vWHmxYEHwJs8HVszKYFMDICHRg5bFAet6Oj8DaMQtkYDF579ZQHjow13lSfwXdnTle4P4mnKAUJgxu1N9/4ofow4EWBWISXz79zdZIBDwrrcvXry5fSebIlB5fB1pONjW82hsKKOB2AOzTIWIy/C3B4lp5BQ5PGMd0owT/U0MEBHQF3qEqu1i9c7gTf0rAoawxoTKn/SKlxzOQovmJzZsA/PHfZIua9h0snTmTGNHg56rOzDObBglaj5dHeUfArDvwjLh3amzwiOqkG88d+1Vy04WNetl2oPM9NXjyguBMq2OEc3e37d+8+Pqs2gT+aRs5dj9f2DPb5HwJjNPnxg/vbD37TAiq6Q9qPxeCrkF1kvssBbnabzcdVFi3CVt3DsP8CPV/x40m4gNwAAAAASUVORK5CYII=`;

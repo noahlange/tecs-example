@@ -1,8 +1,6 @@
 import * as ROT from 'rot-js';
 
-import { Door, Item } from '../../entities';
-import { getItem } from '../../entities/items';
-import { NPC } from '../../entities/NPC';
+import { Door, Chest, NPC } from '../../entities';
 import { HEIGHT, WIDTH } from '../../utils';
 import { MapGen } from './MapGen';
 
@@ -17,11 +15,8 @@ export class DiggerMap extends MapGen {
     if (picked) {
       const [x, y] = picked.getCenter();
       this.world.create(NPC, {
-        text: { title: 'NPC' },
         // talk: { file: 'dialogue', start: 'Start' },
-        glyph: { text: '@', fg: [255, 0, 0] },
-        position: { x, y },
-        collision: { allowLOS: true }
+        position: { x, y }
       });
     }
   }
@@ -34,19 +29,14 @@ export class DiggerMap extends MapGen {
       const [x, y] = room.getCenter();
 
       if (ROT.RNG.getPercentage() > 75) {
-        const [t, r, b, l] = [
-          room.getTop(),
-          room.getRight(),
-          room.getBottom(),
-          room.getLeft()
-        ];
-        this.world.create(
-          Item,
-          getItem([
-            { x: r, y: t },
-            { x: l, y: b }
-          ])
-        );
+        const nw = { x: room.getLeft(), y: room.getTop() };
+        const se = { x: room.getRight(), y: room.getBottom() };
+        this.world.create(Chest, {
+          position: {
+            x: ROT.RNG.getUniformInt(nw.x, se.x),
+            y: ROT.RNG.getUniformInt(nw.y, se.y)
+          }
+        });
       }
 
       if (ROT.RNG.getPercentage() > 25) {
@@ -67,18 +57,7 @@ export class DiggerMap extends MapGen {
 
     for (const door of this.doors) {
       const [x, y] = door.split(' ');
-      this.world.create(Door, {
-        position: { x: +x, y: +y },
-        glyph: {
-          text: '-',
-          fg: [120, 80, 48],
-          bg: [30, 30, 30]
-        },
-        collision: {
-          passable: false,
-          allowLOS: false
-        }
-      });
+      this.world.create(Door, { position: { x: +x, y: +y } });
     }
 
     this.addNPC();
