@@ -70,10 +70,11 @@ export class Input extends System {
     const player = this.world.query.entities(Player).first();
 
     if (!player) {
+      this.inputs.push(input);
       return;
     }
 
-    const { action } = player.$$;
+    const { action } = player.$;
 
     let next;
 
@@ -94,7 +95,6 @@ export class Input extends System {
   public init(): void {
     window.addEventListener('keydown', e => {
       this.inputs.push({ key: e.key });
-      // this.world.tick(0, Date.now());
     });
     window.addEventListener('click', e => {
       this.inputs.push({ key: 'left-mouse', x: e.x, y: e.y });

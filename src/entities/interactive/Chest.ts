@@ -23,9 +23,9 @@ export class Chest extends Entity.with(
   };
 
   public interact(): void {
-    const { $$ } = this;
-    const next = !$$.container.open;
-    $$.container.open = next;
-    $$.glyph.text = next ? T.CHEST_OPEN : T.CHEST;
+    const { $ } = this;
+    const next = !$.container.open;
+    $.container.open = next;
+    $.glyph.text = next ? T.CHEST_OPEN : T.CHEST;
   }
 }

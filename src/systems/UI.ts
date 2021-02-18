@@ -32,13 +32,13 @@ export class UI extends System {
   };
 
   public handlePlayerDialogue(player: Player): void {
-    const { $$ } = player;
+    const { $ } = player;
     if (this.selected) {
-      $$.action.action = ID.DIALOGUE_CHOOSE;
-      $$.action.target = this.selected;
+      $.action.action = ID.DIALOGUE_CHOOSE;
+      $.action.target = this.selected;
       this.selected = null;
-    } else if ($$.action.action === ID.DIALOGUE_CHOOSE) {
-      if ($$.action.target !== null) {
+    } else if ($.action.action === ID.DIALOGUE_CHOOSE) {
+      if ($.action.target !== null) {
         this.options = [];
         this.dirty = true;
       }
@@ -46,13 +46,9 @@ export class UI extends System {
   }
 
   public tick(): void {
-    const updates = this.world.query.all
-      .components(Text, UIText)
-      .any.changed.components(Text, UIText)
-      .get();
-
+    const updates = this.world.query.components(Text, UIText).get();
     const player = this.world.query.entities(Player).first();
-    const game = this.world.query.changed.components(Game).first();
+    const game = this.world.query.components(Game).first();
 
     if (player) {
       this.handlePlayerDialogue(player);

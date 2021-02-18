@@ -27,6 +27,6 @@ export class NPC extends Entity.with(
   };
 
   public interact(): void {
-    this.$$.talk.active = true;
+    this.$.talk.active = true;
   }
 }

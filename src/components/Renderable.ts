@@ -7,6 +7,7 @@ import { Component } from 'tecs';
 export class Renderable extends Component {
   public static readonly type = 'render';
   public active: boolean = false;
+  public dirty: boolean = false;
   public fg: RGBColor | null = null;
   public bg: RGBColor | null = null;
 }

@@ -15,6 +15,7 @@ export { Door } from './interactive/Door';
 export { Chest } from './interactive/Chest';
 export { Player } from './mobs/Player';
 export { NPC } from './mobs/NPC';
+export { Goblin } from './mobs/Goblin';
 export { Core } from './Core';
 
 export const Cell = Entity.with(Glyph, Position, Collision, Renderable);

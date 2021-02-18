@@ -22,9 +22,9 @@ export function getGrid<T>(width: number, height: number, value?: T): T[][] {
     : new Array(width).fill(1).map(() => new Array(height));
 }
 
-export function getInteractionPos(point: Point, d: Direction): Point {
+export function getInteractionPos(point: Point & { d: Direction }): Point {
   let { x, y } = point;
-  switch (d) {
+  switch (point.d) {
     case Direction.N:
     case Direction.NE:
     case Direction.NW:
@@ -36,7 +36,7 @@ export function getInteractionPos(point: Point, d: Direction): Point {
       y += 1;
       break;
   }
-  switch (d) {
+  switch (point.d) {
     case Direction.NW:
     case Direction.W:
     case Direction.SW:

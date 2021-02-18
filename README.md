@@ -9,3 +9,5 @@ git clone https://github.com/noahlange/tecs-example.git
 cd tecs-example
 npm i && npm start
 ```
+
+Production builds are currently broken, courtesy of `bondage`'s `enbf-parser` dependency, which explodes. Long-term plan is to ditch bondage anyway.

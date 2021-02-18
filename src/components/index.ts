@@ -11,4 +11,5 @@ export { Renderable } from './Renderable';
 export { Talk } from './Talk';
 export { Text } from './Text';
 export { Game } from './Singletons';
+export { Stats } from './Stats';
 export { UI } from './UI';

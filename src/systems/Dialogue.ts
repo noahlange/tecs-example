@@ -54,7 +54,7 @@ export class Dialogue extends System {
   }
 
   public tick(): void {
-    const { $ } = this.world.query.changed.components(Talk).first() ?? {
+    const { $ } = this.world.query.components(Talk).first() ?? {
       $: null
     };
     if ($?.talk.active && $?.talk.file) {
@@ -65,8 +65,8 @@ export class Dialogue extends System {
     }
 
     if (this.run) {
-      for (const { $$ } of this.world.query.components(Action)) {
-        const actions = $$.action;
+      for (const { $ } of this.world.query.components(Action)) {
+        const actions = $.action;
 
         switch (actions.action) {
           case ID.DIALOGUE_CHOOSE: {

@@ -1,9 +1,6 @@
-import type { Entity } from 'tecs';
 import { System } from 'tecs';
 
-import type { Point } from '../types';
 import {
-  Collision,
   Glyph,
   Position,
   Interactive,
@@ -12,59 +9,36 @@ import {
   Talk
 } from '../components';
 import { ID, UIMode } from '../types';
-import { getInteractionPos, getNewDirection, toCoordString } from '../utils';
+import { getInteractionPos, getNewDirection } from '../utils';
 import { Core, Door, NPC, Chest } from '../entities';
 
 export class Actions extends System {
   public static type = 'actions';
 
   public collisions: Record<string, boolean> = {};
-  public mobs: Record<
-    string,
-    Entity<{ collision: Collision; position: Position }>
-  > = {};
+
+  protected queries = {
+    game: this.world.query.entities(Core),
+    movables: this.world.query.components(Action, Position),
+    mobs: this.world.query
+      .components(Position, Interactive)
+      .some.components(Glyph, Text, Talk)
+  };
 
   public tick(): void {
-    const game = this.world.query.entities(Core).first();
-
+    const game = this.queries.game.first();
     // bail if we're not in "interacting with the world" mode
     if (game?.$.game.mode === UIMode.DIALOGUE) {
       return;
     }
+    const mobs = this.queries.mobs.get();
 
-    const mobs = this.world.query.all
-      .components(Collision, Position, Interactive)
-      .some.components(Glyph, Collision, Text, Talk)
-      .get();
+    for (const { $ } of this.queries.movables) {
+      $.position.d = getNewDirection($.action.action) ?? $.position.d;
+      const { x, y } = getInteractionPos($.position);
 
-    for (const c of this.world.query.all
-      .components(Action, Position)
-      .any.changed.components(Action, Position)) {
-      const { $$, $ } = c;
-
-      const adjacent = mobs.filter(
-        mob =>
-          Math.abs(mob.$.position.x - $.position.x) <= 1 &&
-          Math.abs(mob.$.position.y - $.position.y) <= 1
-      );
-
-      const noCollision = ({ x, y }: Point): boolean => {
-        const key = toCoordString({ x, y });
-        return (
-          this.collisions[key] !== false &&
-          !adjacent
-            .filter(mob => !mob.$.collision.passable)
-            .find(mob => mob.$.position.x === x && mob.$.position.y === y)
-        );
-      };
-
-      const direction = getNewDirection($.action.action) ?? $.position.d;
-      $$.position.d = direction;
-
-      const next = getInteractionPos($.position, direction);
-
-      const interactive = adjacent
-        .filter(({ $ }) => $.position.x === next.x && $.position.y === next.y)
+      const interactive = mobs
+        .filter(({ $ }) => $.position.x === x && $.position.y === y)
         .shift();
 
       switch ($.action.action) {
@@ -76,38 +50,11 @@ export class Actions extends System {
           ) {
             interactive.interact();
           }
-          break;
-        }
-        case ID.MOVE_UP:
-        case ID.MOVE_DOWN:
-        case ID.MOVE_LEFT:
-        case ID.MOVE_RIGHT: {
-          if (direction) {
-            $$.position.d = direction;
-          }
-          if (noCollision(next)) {
-            $$.position.x = next.x;
-            $$.position.y = next.y;
-          }
+          // we did the thing
+          $.action.action = ID.NONE;
           break;
         }
       }
-
-      // unset action
-      $$.action.action = ID.NONE;
     }
-  }
-
-  public init(): void {
-    const components = this.world.query.all
-      .components(Collision, Position)
-      .none.components(Interactive, Action)
-      .get();
-
-    this.collisions = components
-      .filter(item => !item.$.collision.passable)
-      .reduce((a, { $ }) => {
-        return { ...a, [toCoordString($.position)]: $.collision.passable };
-      }, this.collisions);
   }
 }

@@ -20,7 +20,13 @@ export enum T {
   DOOR = '\uE002',
   DOOR_OPEN = '\uE003',
   WALL = '\uE004',
-  BLANK = '\uE005'
+  BLANK = '\uE005',
+  BAR_LEFT = '\uE006',
+  BAR_CENTER = '\uE007',
+  BAR_RIGHT = '\uE008',
+  BAR_FULL_LEFT = '\uE009',
+  BAR_FULL_CENTER = '\uE010',
+  BAR_FULL_RIGHT = '\uE011'
 }
 
 const tiles: Record<string, Point> = {
@@ -129,7 +135,13 @@ const tiles: Record<string, Point> = {
   [T.DOOR_OPEN]: { x: 2, y: 13 },
   [T.WALL]: { x: 12, y: 0 },
   [T.SPACE]: { x: 1, y: 0 },
-  [T.BLANK]: { x: 14, y: 12 }
+  [T.BLANK]: { x: 14, y: 12 },
+  [T.BAR_LEFT]: { x: 0, y: 15 },
+  [T.BAR_CENTER]: { x: 1, y: 15 },
+  [T.BAR_RIGHT]: { x: 2, y: 15 },
+  [T.BAR_FULL_LEFT]: { x: 3, y: 15 },
+  [T.BAR_FULL_CENTER]: { x: 4, y: 15 },
+  [T.BAR_FULL_RIGHT]: { x: 5, y: 15 }
 };
 
 export const tileMap = Object.entries(tiles).reduce(

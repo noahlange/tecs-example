@@ -52,11 +52,11 @@ export class Door extends Entity.with(
       return;
     }
 
-    const { $$ } = this;
-    const next = !$$.collision.passable;
-    $$.collision.passable = next;
-    $$.collision.allowLOS = next;
-    $$.glyph.text = next ? T.DOOR_OPEN : T.DOOR;
+    const { $ } = this;
+    const next = !$.collision.passable;
+    $.collision.passable = next;
+    $.collision.allowLOS = next;
+    $.glyph.text = next ? T.DOOR_OPEN : T.DOOR;
 
     const value = next ? openedText[this.count] : closedText[this.count];
     this.manager.create(UIMessage, { text: { title: '', value } });

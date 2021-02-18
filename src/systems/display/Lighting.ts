@@ -53,11 +53,9 @@ export class Lighting extends System {
    */
   protected getLights(): LightPoint[] {
     const res: Record<string, LightPoint> = {};
-    const changed = this.world.query.all
-      .components(LightSource, Position)
-      .any.changed.components(LightSource, Position);
+    const q = this.world.query.components(LightSource, Position).get();
 
-    for (const { $, id } of changed.get()) {
+    for (const { $, id } of q) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
       this.lights[id] = { x, y, color: $.light.color };
@@ -79,10 +77,8 @@ export class Lighting extends System {
    */
   protected computeFOV(): void {
     // line-of-sight obstructions...
-    const results = this.world.query.all
-      .components(Collision, Position)
-      .any.changed.components(Collision, Position)
-      .get();
+    // @todo - filter results
+    const results = this.world.query.components(Collision, Position).get();
 
     for (const { id, $ } of results) {
       const { x, y } = $.position;
@@ -104,7 +100,7 @@ export class Lighting extends System {
     // reset from last tick
     this.fovGrid = getGrid(this.width, this.height, null);
 
-    for (const { $ } of this.world.query.all.components(Playable, Position)) {
+    for (const { $ } of this.world.query.components(Playable, Position)) {
       this.fov.compute($.position.x, $.position.y, 10, (x, y, r, v) => {
         this.fovGrid[x][y] = v;
         this.repaint.push({ x, y });
@@ -144,7 +140,7 @@ export class Lighting extends System {
       }
     }
 
-    const query = this.world.query.all
+    const query = this.world.query
       .components(Position, Renderable)
       .some.components(Glyph, Interactive);
 
@@ -154,9 +150,10 @@ export class Lighting extends System {
      * in FOV/lighting, but not at the component level. That's why we have to
      * track IDs.
      */
-    const results = !ids.length ? query : query.ids(...ids);
 
-    for (const { id, $, $$ } of results) {
+    const results = !ids.length ? query.get() : query.ids(...ids).get();
+
+    for (const { id, $ } of results) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
 
@@ -166,16 +163,17 @@ export class Lighting extends System {
 
       const light = data ? ROT.Color.add(AMBIENT_LIGHT, data) : AMBIENT_LIGHT;
 
-      $$.render.fg = $.glyph?.fg
+      $.render.fg = $.glyph?.fg
         ? ROT.Color.interpolate(
             ROT.Color.multiply(base, data ?? AMBIENT_LIGHT),
             $.glyph?.fg
           )
         : ROT.Color.multiply(base, data ?? AMBIENT_LIGHT);
-      // $$.render.fg = ROT.Color.multiply(base, $.glyph?.fg ?? AMBIENT_DARK);
-      // $$.render.bg = ROT.Color.multiply(base, light);
-      $$.render.bg = ROT.Color.multiply(light, AMBIENT_LIGHT);
-      $$.render.active = true;
+      // $.render.fg = ROT.Color.multiply(base, $.glyph?.fg ?? AMBIENT_DARK);
+      // $.render.bg = ROT.Color.multiply(base, light);
+      $.render.bg = ROT.Color.multiply(light, AMBIENT_LIGHT);
+      $.render.active = true;
+      $.render.dirty = true;
     }
 
     this.firstPaint = false;

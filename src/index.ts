@@ -1,5 +1,3 @@
-import * as ROT from 'rot-js';
-
 import { World } from 'tecs';
 import { Core } from './entities';
 import Stats from 'stats.js';
@@ -7,18 +5,20 @@ import Stats from 'stats.js';
 import {
   Actions,
   Input,
-  Dialogue,
-  DiggerMap,
+  MapGen,
   UI,
   Lighting,
-  PIXI
+  PIXI,
+  Dialogue
 } from './systems';
 
 import { HEIGHT, WIDTH } from './utils';
+import { Collisions } from './systems/Collisions';
 
 class MyWorld extends World.with(
-  DiggerMap,
+  MapGen,
   Input,
+  Collisions,
   Actions,
   Dialogue,
   Lighting,

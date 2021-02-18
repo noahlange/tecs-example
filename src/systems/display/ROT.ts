@@ -13,9 +13,8 @@ export class Renderer extends System {
   public display!: ROT.Display;
 
   public tick(): void {
-    const query = this.world.query.all
+    const query = this.world.query
       .components(Glyph, Renderable, Position)
-      .any.changed.components(Glyph, Renderable, Position)
       .some.components(Playable)
       .get();
 

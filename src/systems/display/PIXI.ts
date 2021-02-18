@@ -21,12 +21,9 @@ export class Renderer extends System {
   public tick(delta: number, time?: number): void {
     // find all updated entities with Sprite and Position components
 
-    const query = this.world.query.all
-      .components(Position, Glyph)
-      .any.changed.components(Position, Glyph)
-      .get();
+    const query = this.world.query.components(Position, Glyph);
 
-    for (const { $, id } of query) {
+    for (const { $, id } of query.get()) {
       const glyph = $.glyph.text;
       const child = this.sprites[id];
       if (child.glyph !== glyph) {
@@ -38,10 +35,9 @@ export class Renderer extends System {
       child.bg.position = point;
     }
 
-    const q2 = this.world.query.all
+    const q2 = this.world.query.some
+      .components(Interactive)
       .components(Renderable, Glyph)
-      .any.changed.components(Renderable, Glyph)
-      .some.components(Interactive)
       .get();
 
     const results = q2.sort((a, b) => {
@@ -50,12 +46,18 @@ export class Renderer extends System {
     });
 
     for (const { id, $ } of results) {
+      if (!$.render.dirty) {
+        continue;
+      }
+
       const fg = $.render?.active ? $.render.fg : $.glyph.fg;
       const bg = $.render?.active ? $.render.bg : $.glyph.bg;
       const sprite = this.sprites[id];
 
       fg ? (sprite.fg.tint = toHex(fg) ?? 0xffffff) : void 0;
       bg ? (sprite.bg.tint = toHex(bg) ?? 0xffffff) : void 0;
+
+      $.render.dirty = false;
     }
 
     for (const { id } of this.world.query.entities(Player)) {
