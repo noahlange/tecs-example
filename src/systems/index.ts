@@ -1,6 +1,6 @@
 export { Actions } from './Actions';
 export { Input } from './Input';
-
+export { Collisions } from './Collisions';
 export { UI } from './UI';
 export { Dialogue } from './Dialogue';
 export { Lighting } from './display/Lighting';

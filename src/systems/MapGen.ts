@@ -7,6 +7,7 @@ import * as entities from '../entities';
 import { T } from '../utils/tiles';
 
 export class MapGen extends System {
+  public static readonly type = 'map';
   public static worker = new Worker(
     new URL('../workers/map/index.ts', import.meta.url)
   );

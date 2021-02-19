@@ -1,6 +1,8 @@
 import { World } from 'tecs';
-import { Core } from './entities';
 import Stats from 'stats.js';
+
+import * as Components from './components';
+import * as Entities from './entities';
 
 import {
   Actions,
@@ -9,11 +11,11 @@ import {
   UI,
   Lighting,
   PIXI,
-  Dialogue
+  Dialogue,
+  Collisions
 } from './systems';
 
 import { HEIGHT, WIDTH } from './utils';
-import { Collisions } from './systems/Collisions';
 
 class MyWorld extends World.with(
   MapGen,
@@ -40,7 +42,11 @@ class MyWorld extends World.with(
   }
 
   public init(): void {
-    this.create(Core, { game: { width: WIDTH, height: HEIGHT } });
+    const components = Object.values(Components);
+    const entities = Object.values(Entities);
+    this.register(...entities, ...components);
+
+    this.create(Entities.Core, { game: { width: WIDTH, height: HEIGHT } });
     this.initStats();
   }
 }

@@ -13,7 +13,7 @@ import {
   Interactive
 } from '../../components';
 
-import { AMBIENT_DARK, AMBIENT_LIGHT, getGrid, timer } from '../../utils';
+import { AMBIENT_DARK, AMBIENT_LIGHT, getGrid } from '../../utils';
 import { Core } from '../../entities';
 
 type LightPoint = Point & { color: RGBColor };
@@ -37,6 +37,7 @@ export class Lighting extends System {
   // grid coordinates that need to be repainted
   public repaint: Point[] = [];
   public firstPaint: boolean = true;
+  public loaded = false;
 
   // created in init()
   public fov!: InstanceType<typeof ROT.FOV.RecursiveShadowcasting>;
@@ -48,14 +49,23 @@ export class Lighting extends System {
   public width!: number;
   public height!: number;
 
+  protected queries = {
+    playable: this.world.query.components(Playable, Position).persist(),
+    fov: this.world.query.components(Collision, Position).persist(),
+    lights: this.world.query.components(LightSource, Position).persist(),
+    lit: this.world.query
+      .components(Position, Renderable)
+      .some.components(Glyph, Interactive)
+      .persist()
+  };
+
   /**
    * Get all light sources, adding colors from overlapping sources.
    */
   protected getLights(): LightPoint[] {
     const res: Record<string, LightPoint> = {};
-    const q = this.world.query.components(LightSource, Position).get();
 
-    for (const { $, id } of q) {
+    for (const { $, id } of this.queries.lights) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
       this.lights[id] = { x, y, color: $.light.color };
@@ -78,9 +88,8 @@ export class Lighting extends System {
   protected computeFOV(): void {
     // line-of-sight obstructions...
     // @todo - filter results
-    const results = this.world.query.components(Collision, Position).get();
 
-    for (const { id, $ } of results) {
+    for (const { id, $ } of this.queries.fov) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
       const passable =
@@ -100,7 +109,7 @@ export class Lighting extends System {
     // reset from last tick
     this.fovGrid = getGrid(this.width, this.height, null);
 
-    for (const { $ } of this.world.query.components(Playable, Position)) {
+    for (const { $ } of this.queries.playable) {
       this.fov.compute($.position.x, $.position.y, 10, (x, y, r, v) => {
         this.fovGrid[x][y] = v;
         this.repaint.push({ x, y });
@@ -140,10 +149,6 @@ export class Lighting extends System {
       }
     }
 
-    const query = this.world.query
-      .components(Position, Renderable)
-      .some.components(Glyph, Interactive);
-
     /**
      * If we've done an initial paint, we only need to paint the changes. Note
      * that the `changed()` query will exclude entities that have been updated
@@ -151,9 +156,11 @@ export class Lighting extends System {
      * track IDs.
      */
 
-    const results = !ids.length ? query.get() : query.ids(...ids).get();
+    for (const { id, $ } of this.queries.lit) {
+      if (ids.length && !ids.includes(id)) {
+        continue;
+      }
 
-    for (const { id, $ } of results) {
       const { x, y } = $.position;
       (this.idGrid[x][y] ??= new Set()).add(id);
 
@@ -174,9 +181,9 @@ export class Lighting extends System {
       $.render.bg = ROT.Color.multiply(light, AMBIENT_LIGHT);
       $.render.active = true;
       $.render.dirty = true;
-    }
 
-    this.firstPaint = false;
+      this.firstPaint = false;
+    }
   }
 
   public tick(): void {
@@ -189,7 +196,6 @@ export class Lighting extends System {
 
   public init(): void {
     const core = this.world.query.entities(Core).first();
-
     if (core) {
       const w = (this.width = core.$.game.width);
       const h = (this.height = core.$.game.height);
@@ -211,6 +217,8 @@ export class Lighting extends System {
       );
 
       this.lighting.setFOV(this.fov);
+
+      this.loaded = true;
     }
   }
 }

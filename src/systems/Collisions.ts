@@ -32,13 +32,15 @@ export class Collisions extends System {
   }
 
   protected queries = {
-    movers: this.world.query.components(Action, Position),
+    movers: this.world.query.components(Action, Position).persist(),
     collisions: this.world.query
       .components(Collision, Position)
-      .none.components(Interactive, Action),
+      .none.components(Interactive, Action)
+      .persist(),
     interactives: this.world.query
       .components(Collision, Position, Interactive)
       .some.components(Glyph, Collision, Text, Talk)
+      .persist()
   };
 
   public tick(): void {
@@ -51,7 +53,8 @@ export class Collisions extends System {
     if (movers.length) {
       const mobs = this.queries.interactives.get();
 
-      for (const { $ } of this.queries.movers) {
+      for (const entity of movers) {
+        const { $ } = entity;
         if (!actions.includes($.action.action)) {
           continue;
         }
@@ -84,7 +87,8 @@ export class Collisions extends System {
   }
 
   public init(): void {
-    for (const { $ } of this.queries.collisions) {
+    for (const res of this.queries.collisions) {
+      const { $ } = res;
       if (!$.collision.passable) {
         this.collisions[toCoordString($.position)] = false;
       }

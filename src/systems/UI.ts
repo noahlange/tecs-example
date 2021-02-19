@@ -62,6 +62,7 @@ export class UI extends System {
       if (update instanceof UIOption) {
         this.options.push({ title: '', text: $.text.value });
       } else {
+        // @ts-ignore: nominal vs. structural type
         if (update instanceof UIMessage) {
           this.options = [];
         }
