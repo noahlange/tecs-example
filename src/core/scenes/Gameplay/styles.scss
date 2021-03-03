@@ -1,0 +1,29 @@
+$font-family: 'Alagard';
+$font-size-base: 24px;
+
+* {
+  -webkit-font-smoothing: none;
+  box-sizing: content-box;
+}
+
+.ui.hud {
+  font-size: $font-size-base;
+  position: fixed;
+  color: white;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 64px;
+  user-select: none;
+
+  .log {
+    font-size: 18px;
+    background-color: rgba(0, 0, 0, 0.75);
+    color: white;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+  }
+}

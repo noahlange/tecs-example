@@ -8,6 +8,4 @@ interface DialogueNode {
   colorID: number;
 }
 
-const dialogue: Record<string, DialogueNode[]> = { dialogue: [] };
-
-export default dialogue;
+export const dialogue: Record<string, DialogueNode[]> = { dialogue: [] };

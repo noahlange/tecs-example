@@ -1,33 +1,55 @@
-export { T } from './utils/tiles';
+import type { DamageType, EffectType } from './utils/enums';
 
 export interface Point {
   x: number;
   y: number;
 }
 
-export type RGBColor = [number, number, number];
-
-export enum Direction {
-  N = 0,
-  NE = 1,
-  E = 2,
-  SE = 3,
-  S = 4,
-  SW = 5,
-  W = 6,
-  NW = 7
+export interface DamageDefinition {
+  value: string;
+  type: DamageType;
 }
 
-export enum ID {
-  NONE = 'none',
-  INTERACT = 'interact',
-  MOVE_LEFT = 'move_left',
-  MOVE_RIGHT = 'move_right',
-  MOVE_UP = 'move_up',
-  MOVE_DOWN = 'move_down',
-  DIALOGUE_START = 'dialogue_start',
-  DIALOGUE_NEXT = 'dialogue_next',
-  DIALOGUE_CHOOSE = 'dialogue_choose'
+export interface Size {
+  w: number;
+  h: number;
+}
+
+export interface BaseInputEvent {
+  name: string;
+  isKeyboard: boolean;
+}
+
+export interface MouseInputEvent extends BaseInputEvent {
+  x: number;
+  y: number;
+  type: string;
+  isKeyboard: false;
+}
+
+export interface KeyboardInputEvent extends BaseInputEvent {
+  isKeyboard: true;
+  key: string;
+  ctrl: boolean;
+  alt: boolean;
+  meta: boolean;
+}
+
+export type AnyInputEvent = MouseInputEvent | KeyboardInputEvent;
+
+export type Rect = Point & Size;
+
+export type RGBColor = [number, number, number];
+
+export interface InputEvent {
+  type: 'pointer' | 'keyboard';
+  key: string;
+  point?: Point;
+}
+
+export interface GameMessage {
+  type?: number;
+  text: string;
 }
 
 export interface UITextMessage {
@@ -35,8 +57,11 @@ export interface UITextMessage {
   title: string;
 }
 
-export enum UIMode {
-  DEFAULT = 'DEFAULT',
-  DIALOGUE = 'DIALOGUE',
-  MENU = 'MENU'
+export interface ItemEffect {
+  type: EffectType;
+  description: string;
+  value: number;
+  duration: number;
 }
+
+export * from './utils/enums';

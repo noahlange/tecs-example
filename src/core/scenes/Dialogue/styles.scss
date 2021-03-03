@@ -1,0 +1,51 @@
+.dialogue {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  .dialogue-text {
+    padding: 2rem;
+    background-color: black;
+  }
+
+  .dialogue-options {
+    padding: 2rem;
+    background-color: black;
+
+    button {
+      pointer-events: auto;
+      font-family: inherit;
+      font-size: inherit;
+      border: 0;
+      padding: 0;
+      line-height: 1;
+      outline: none;
+      display: block;
+      width: 100%;
+      text-align: left;
+      background-color: transparent;
+      color: white;
+      transition: 0.1s opacity;
+
+      &:hover {
+        cursor: pointer;
+        opacity: 0.875;
+      }
+
+      // @todo hover
+    }
+  }
+
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+}

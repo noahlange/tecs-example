@@ -12,11 +12,20 @@
     "jsxFragmentFactory": "Fragment",
     "importsNotUsedAsValues": "error",
     "forceConsistentCasingInFileNames": true,
-    "noUnusedLocals": true,
     "allowJs": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "baseUrl": "src",
+    "paths": {
+      "@utils": ["./utils/index.ts"],
+      "@lib": ["./lib/index.ts"],
+      "@types": ["./types.ts"],
+      "@utils/*": ["./utils/*"],
+      "@ecs/*": ["./ecs/*"],
+      "@core/*": ["./core/*"]
+    }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": [".ignore"]
 }

@@ -1,25 +1,43 @@
-import type { Point, RGBColor } from '../types';
-import { Direction, ID } from '../types';
+import type { Point, RGBColor, Size } from '@types';
 
-export const WIDTH = 60;
-export const HEIGHT = 40;
-export const TILE = 8;
+import { Array2D } from '@lib';
+import { Direction } from '@types';
 
+export const TILE_WIDTH = 16;
+export const TILE_HEIGHT = 16;
+
+export const RESOLUTION = 3;
 export const AMBIENT_LIGHT: RGBColor = [80, 80, 80];
 export const AMBIENT_DARK: RGBColor = [30, 30, 30];
 
+export const map: Size = { w: 16 * 4, h: 16 * 4 };
+export const view: Size = { w: 1280 / RESOLUTION, h: 720 / RESOLUTION };
+
 export function tileAt({ x, y }: Point): [number, number] {
-  return [x * TILE, y * TILE];
+  return [x * TILE_WIDTH, y * TILE_HEIGHT];
 }
 
-export function toCoordString({ x, y }: Point): string {
-  return x + ',' + y;
+export function getDistance(a: Point, b: Point): number {
+  return Math.sqrt((b.x - a.x) ** 2 + (b.y - a.y) ** 2);
 }
 
-export function getGrid<T>(width: number, height: number, value?: T): T[][] {
-  return value
-    ? new Array(width).fill(1).map(() => new Array(height).fill(value))
-    : new Array(width).fill(1).map(() => new Array(height));
+export function isWithin(a: Point, points: Point[]): boolean {
+  return points.some(p => p.x === a.x && p.y === a.y);
+}
+
+export function isSamePoint(a?: Point, b?: Point): boolean {
+  return a && b ? a.x === b.x && a.y === b.y : false;
+}
+
+export function add(...points: Point[]): Point {
+  let x = 0;
+  let y = 0;
+
+  for (const point of points) {
+    x += point.x;
+    y += point.y;
+  }
+  return { x, y };
 }
 
 export function getInteractionPos(point: Point & { d: Direction }): Point {
@@ -51,78 +69,28 @@ export function getInteractionPos(point: Point & { d: Direction }): Point {
   return { x, y };
 }
 
-export function getNewDirection(action: ID): Direction | null {
-  switch (action) {
-    case ID.MOVE_UP:
-      return Direction.N;
-    case ID.MOVE_DOWN:
-      return Direction.S;
-    case ID.MOVE_LEFT:
-      return Direction.W;
-    case ID.MOVE_RIGHT:
-      return Direction.E;
-    default:
-      return null;
-  }
-}
+export const getNewDirection = (() => {
+  const dirs = new Array2D<Direction>({ w: 3, h: 3 });
+  dirs.set({ x: 1, y: 0 }, Direction.N);
+  dirs.set({ x: 2, y: 1 }, Direction.E);
+  dirs.set({ x: 1, y: 2 }, Direction.S);
+  dirs.set({ x: 0, y: 1 }, Direction.W);
 
-/**
- * Adapted from https://github.com/norbornen/execution-time-decorator, released
- * under the terms of the MIT License. Decorate methods to log execution time.
- */
-
-export function timer(
-  name: string,
-  useGroups: boolean = true
-): MethodDecorator {
-  const times: number[] = [];
-  return (
-    target: any,
-    propertyKey: string | symbol,
-    propertyDescriptor: PropertyDescriptor
-  ): any => {
-    propertyDescriptor ??= Object.getOwnPropertyDescriptor(
-      target,
-      propertyKey
-    )!;
-
-    const close = (start: number): void => {
-      const diff = (performance.now() - start).toFixed(2);
-      times.push(+diff);
-      // first tick severely skews the average
-      const avg = times.slice(1).reduce((a, b) => a + b, 0) / times.length;
-      const timeText = avg
-        ? `${diff}ms (avg. ${avg.toFixed(2)}ms)`
-        : `${diff}ms`;
-
-      console.log(useGroups ? timeText : [name, timeText].join(': '));
-      if (useGroups) {
-        console.groupEnd();
-      }
-    };
-
-    const originalMethod = propertyDescriptor.value;
-
-    propertyDescriptor.value = function (...args: any[]) {
-      if (useGroups) {
-        console.group(name);
-      }
-      const start = performance.now();
-      const result = originalMethod.apply(this, args);
-
-      if (result instanceof Promise) {
-        return result
-          .catch(e => e)
-          .then(res => {
-            close(start);
-            return res;
-          });
-      } else {
-        close(start);
-        return result;
-      }
-    };
-
-    return propertyDescriptor;
+  return (point: Point): Direction | null => {
+    return (
+      dirs.get({
+        x: point.x + 1,
+        y: point.y + 1
+      }) ?? null
+    );
   };
-}
+})();
+
+export * from './actions';
+export * from './tests';
+export * from './tiles';
+export * from './dialogue';
+
+export { getTargetAOE } from './aoe';
+export { timer, roll } from './misc';
+export { Sprite as T } from './tiles';
