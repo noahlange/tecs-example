@@ -1,3 +1,8 @@
+/**
+ * Effectively a copy-paste of rot.js's lighting code with Array2D.
+ * https://github.com/ondras/rot.js/blob/master/src/lighting.ts
+ */
+
 import type { Point, RGBColor, Size } from '@types';
 import type { FOV } from 'malwoden';
 import { Array2D } from './Array2D';
