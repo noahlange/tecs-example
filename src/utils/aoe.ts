@@ -1,36 +1,36 @@
+import { Array2D } from '@lib';
 import type { Point } from '@types';
 import { AOE, Direction } from './enums';
 
 type WithDirection = Point & { d: Direction };
 
+// I'm sure that there's a more intelligent way to do this, but that would require me to be more intelligent.
 function getLinePoints(point: WithDirection, range: number): Point[] {
   let { x, y } = point;
   const res = [];
   while (range) {
     switch (point.d) {
       case Direction.N:
+      case Direction.NE:
+      case Direction.NW:
         res.push({ x, y: y-- });
         break;
-      case Direction.NW:
-        res.push({ x: x--, y: y-- });
-        break;
-      case Direction.W:
-        res.push({ x: x--, y });
-        break;
-      case Direction.SW:
-        res.push({ x: x--, y: y++ });
-        break;
+      case Direction.SE:
       case Direction.S:
+      case Direction.SW:
         res.push({ x, y: y++ });
         break;
-      case Direction.SE:
-        res.push({ x: x++, y: y++ });
-        break;
-      case Direction.E:
-        res.push({ x: x++, y: y });
-        break;
+    }
+    switch (point.d) {
       case Direction.NE:
-        res.push({ x: x++, y: y-- });
+      case Direction.E:
+      case Direction.SE:
+        res.push({ x: x++, y });
+        break;
+      case Direction.SW:
+      case Direction.W:
+      case Direction.NW:
+        res.push({ x: x--, y });
         break;
     }
     range--;
@@ -39,18 +39,18 @@ function getLinePoints(point: WithDirection, range: number): Point[] {
 }
 
 function getCirclePoints(center: Point, radius: number): Point[] {
-  const points = new Set<Point>();
+  const points = new Array2D<boolean>({ w: radius * 2, h: radius * 2 });
   let r = 0;
   while (r < radius) {
     r++;
     // make a square
     for (let x = -r + 1; x < r; x++) {
       for (let y = -r + 1; y < r; y++) {
-        points.add({ x, y });
+        points.set({ x, y }, true);
       }
     }
 
-    for (const point of points) {
+    for (const [point] of points.entries()) {
       // remove points whose distance from 0 is >r
       const d = Math.sqrt(point.x ** 2 + point.y ** 2);
       if (Math.round(d) >= r) {
@@ -59,7 +59,7 @@ function getCirclePoints(center: Point, radius: number): Point[] {
     }
   }
 
-  return Array.from(points).map(point => ({
+  return Array.from(points.keys()).map(point => ({
     x: point.x + center.x,
     y: point.y + center.y
   }));

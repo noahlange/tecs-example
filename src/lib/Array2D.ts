@@ -45,6 +45,12 @@ export class Array2D<T> {
     this.items.fill(value);
   }
 
+  public *keys(): Iterable<Point> {
+    for (const point of this.indices.values()) {
+      yield point;
+    }
+  }
+
   public *entries(): Iterable<[Point, T]> {
     for (const [index, point] of this.indices.entries()) {
       yield [point, this.items[index]];

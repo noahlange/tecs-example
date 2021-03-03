@@ -51,4 +51,4 @@ export const Book = Entity.with(
   Effects
 );
 
-export const Attack = Entity.with(AreaOfEffect);
+export const Attack = Entity.with(AreaOfEffect, Equippable, Position);

@@ -1,3 +1,4 @@
+import { HealthBar } from '@lib';
 import { Entity } from 'tecs';
 import {
   Actor,
@@ -33,7 +34,7 @@ export class Monster extends Entity.with(
   Combatant
 ) {
   public static readonly data = {
-    stats: { hp: 25, hpMax: 25 },
+    stats: { health: new HealthBar(25) },
     collision: { allowLOS: true, passable: false },
     view: { range: 5 }
   };

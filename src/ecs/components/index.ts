@@ -9,6 +9,7 @@ export { Faction } from './Faction';
 export { Item } from './Item';
 export { Inventory } from './Inventory';
 export { LightSource } from './LightSource';
+export { Overlay } from './Overlay';
 export { Playable } from './Playable';
 export { Pathfinder } from './Pathfinder';
 export { Position } from './Position';

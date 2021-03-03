@@ -1,4 +1,5 @@
 import type { AreaOfEffect, Equippable } from '@ecs/components';
+import type { Attack } from '@ecs/entities';
 import type { InventoryItem } from '@ecs/entities/types';
 import type { Point } from '@types';
 import type { EntityType } from 'tecs';
@@ -13,7 +14,8 @@ export enum Action {
   ITEM_DISCARD = 'item_discard',
   MENU_NAVIGATE = 'menu_navigate',
   COMBAT_ATTACK = 'combat_attack',
-  COMBAT_DEFEND = 'combat_defend'
+  COMBAT_DEFEND = 'combat_defend',
+  COMBAT_ATTACK_PAUSED = 'combat_attack_paused'
 }
 
 export interface ActionItem {
@@ -60,6 +62,11 @@ export interface UseAction extends ActionItem {
   target: InventoryItem;
 }
 
+export interface CombatAttackPaused extends ActionItem {
+  id: Action.COMBAT_ATTACK_PAUSED;
+  attack: InstanceType<typeof Attack>;
+}
+
 export interface InteractAction extends ActionItem {
   id: Action.INTERACT;
   target: string | null;
@@ -84,4 +91,5 @@ export type ActionType =
   | MenuNavigateAction
   | UseAction
   | CombatAttackAction
-  | CombatDefendAction;
+  | CombatDefendAction
+  | CombatAttackPaused;

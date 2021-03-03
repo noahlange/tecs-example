@@ -47,10 +47,7 @@ export enum AOE {
 
 export enum GameState {
   PAUSED = 0,
-  RUNNING = 1,
-  DIALOGUE = 2,
-  INVENTORY = 3,
-  MENU = 4
+  RUNNING = 1
 }
 
 export enum Faction {
@@ -86,7 +83,8 @@ export enum ItemType {
 export enum Tag {
   HAS_INVENTORY = 'has_inventory',
   IN_INVENTORY = 'in_inventory',
-  TO_UNRENDER = 'to_unrender',
+  TO_DESTROY = 'to_destroy',
+  IS_HIDDEN = 'is_hidden',
   IS_CONSUMABLE = 'is_consumable',
   IS_EQUIPPABLE = 'is_equippable'
 }

@@ -1,10 +1,10 @@
-import { Attribute } from '@lib';
+import { Attribute, HealthBar } from '@lib';
 import { Component } from 'tecs';
 
 export class Stats extends Component {
   public static readonly type = 'stats';
-  public hpMax: number = 100;
-  public hp: number = 100;
+  public maxHP: number = 100;
+  public health = new HealthBar(this.maxHP);
 
   public dex: Attribute = new Attribute();
   public agi: Attribute = new Attribute();

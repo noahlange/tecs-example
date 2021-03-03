@@ -2,7 +2,7 @@ import type { Scene } from '@lib';
 
 import * as Managers from './managers';
 import { ECS } from '../ecs/ECS';
-import type { GameState } from '../types';
+import { GameState } from '../types';
 
 interface GameManagers {
   renderer: Managers.Render;
@@ -35,8 +35,20 @@ export class Game {
     return this.$.scenes.state;
   }
 
+  public get paused(): boolean {
+    return this.$.scenes.state === GameState.PAUSED;
+  }
+
   public get scene(): Scene {
     return this.$.scenes.scene;
+  }
+
+  public run(state?: GameState): void {
+    this.$.scenes.state = state ?? GameState.RUNNING;
+  }
+
+  public pause(): void {
+    this.$.scenes.state = GameState.PAUSED;
   }
 
   public log(text: string): void {

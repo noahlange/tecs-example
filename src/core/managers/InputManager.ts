@@ -1,5 +1,6 @@
 import { Manager } from '@lib';
 import type { KeyboardInputEvent, MouseInputEvent } from '@types';
+import { debounce } from 'ts-debounce';
 
 /**
  * Standardize input events, send to command manager.
@@ -12,7 +13,12 @@ export class InputManager extends Manager {
     const { x, y } = this.game.$.renderer.getWorldPoint(e.data.global);
     return {
       name: e.type,
-      type: e.data.button === 2 ? 'right-click' : 'left-click',
+      type:
+        e.type === 'mousemove'
+          ? 'mouse-move'
+          : e.data.button === 2
+          ? 'right-click'
+          : 'left-click',
       x: x,
       y: y,
       isKeyboard: false
@@ -31,7 +37,10 @@ export class InputManager extends Manager {
   }
 
   protected handle = {
-    onMouseEvent: (e: PIXI.InteractionEvent) => {
+    onMoveEvent: debounce((e: PIXI.InteractionEvent) => {
+      this.game.$.commands.onInputEvent(this.toMouseInputEvent(e));
+    }, 64),
+    onClickEvent: (e: PIXI.InteractionEvent) => {
       this.game.$.commands.onInputEvent(this.toMouseInputEvent(e));
     },
     onKeyDown: (e: KeyboardEvent) => {
@@ -42,11 +51,10 @@ export class InputManager extends Manager {
   public init(): void {
     const view = this.game.$.renderer.app.stage;
     view.interactive = true;
-    // view.on('pointermove', this.handle.onMouseEvent);
-
+    view.on('pointermove', this.handle.onMoveEvent);
     this.game.$.renderer.app.stage.addListener(
       'pointerdown',
-      this.handle.onMouseEvent
+      this.handle.onClickEvent
     );
     window.document.addEventListener('keydown', this.handle.onKeyDown);
   }

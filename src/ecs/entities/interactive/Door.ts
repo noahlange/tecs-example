@@ -8,7 +8,6 @@ import {
   Position,
   Renderable
 } from '../../components';
-import { T } from '@utils';
 
 const openedText = [
   'you have opened the door',

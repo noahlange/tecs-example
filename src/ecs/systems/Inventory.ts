@@ -31,7 +31,7 @@ export class Inventory extends System {
 
   protected addItem(entity: InventoryEntity, item: InventoryItem): void {
     item.components.remove(Position);
-    item.tags.add(Tag.TO_UNRENDER, Tag.IN_INVENTORY);
+    item.tags.add(Tag.TO_DESTROY, Tag.IN_INVENTORY);
 
     const exists = entity.$.inventory.items.find(
       i => i.$.text.title === item.$.text.title
@@ -76,13 +76,13 @@ export class Inventory extends System {
     for (const effect of item.$.effects) {
       switch (effect.type) {
         case EffectType.HP_ADD:
-          $.stats.hp = Math.min($.stats.hpMax, $.stats.hp + effect.value);
+          $.stats.health.set($.stats.health.value + effect.value);
           break;
         case EffectType.HP_MAX: {
-          const isMax = $.stats.hp === $.stats.hpMax;
-          $.stats.hpMax += effect.value;
+          const isMax = $.stats.health.max === $.stats.health.value;
+          $.stats.health.setMax($.stats.health.max + effect.value);
           if (isMax) {
-            $.stats.hp = $.stats.hpMax;
+            $.stats.health.set($.stats.health.max);
           }
           break;
         }

@@ -17,7 +17,8 @@ import {
   Inventory,
   Scenes,
   Items,
-  Combat
+  Combat,
+  Overlays
 } from './systems';
 
 export class ECS extends World.with(
@@ -32,6 +33,7 @@ export class ECS extends World.with(
   Collisions,
   Movement,
   View,
+  Overlays,
   Renderer,
   Camera
 ) {

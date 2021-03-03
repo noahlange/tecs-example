@@ -14,6 +14,10 @@ export class Movement extends System {
   };
 
   public tick(): void {
+    if (this.world.game.paused) {
+      return;
+    }
+
     const movers = Array.from(this.queries.movers).filter(
       ({ $ }) => $.action.data.id === Action.MOVE
     );
@@ -21,9 +25,9 @@ export class Movement extends System {
     for (const { $ } of movers) {
       switch ($.action.data.id) {
         case Action.MOVE: {
-          const { x, y } = $.action.data.delta;
-          $.position.x += x;
-          $.position.y += y;
+          const { delta } = $.action.data;
+          $.position.x += delta.x;
+          $.position.y += delta.y;
           $.action.data = { id: Action.NONE };
           if ($.pathfinder) {
             $.pathfinder.destination = null;

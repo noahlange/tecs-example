@@ -6,12 +6,12 @@ import type { Item, Text } from '@ecs/components';
 import { ItemType } from '@types';
 import { h } from 'preact';
 
-import items from 'url:./assets/btn-items.png';
-import weapons from 'url:./assets/btn-weapons.png';
-import armor from 'url:./assets/btn-armor.png';
-import potions from 'url:./assets/btn-potions.png';
-import magic from 'url:./assets/btn-magic.png';
-import misc from 'url:./assets/btn-misc.png';
+import items from 'url:../../../assets/ui/btn-items.png';
+import weapons from 'url:../../../assets/ui/btn-weapons.png';
+import armor from 'url:../../../assets/ui/btn-armor.png';
+import potions from 'url:../../../assets/ui/btn-potions.png';
+import magic from 'url:../../../assets/ui/btn-magic.png';
+import misc from 'url:../../../assets/ui/btn-misc.png';
 
 import './styles.scss';
 

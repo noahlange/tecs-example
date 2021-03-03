@@ -1,18 +1,9 @@
-import type { Point } from '@types';
 import * as PIXI from 'pixi.js';
-import type { EntityType } from 'tecs';
 import { System } from 'tecs';
-import {
-  Sprite,
-  Pathfinder,
-  Position,
-  Renderable,
-  Stats,
-  Playable
-} from '../components';
+import { Sprite, Position, Renderable, Overlay } from '@ecs/components';
 
 import { Tag } from '@utils/enums';
-import { isSamePoint, TILE_HEIGHT, TILE_WIDTH, T } from '@utils';
+import { TILE_HEIGHT, TILE_WIDTH } from '@utils';
 import {
   getSpritesheetFromTexture,
   getTransformFromDirection,
@@ -20,26 +11,15 @@ import {
 } from '@utils/pixi';
 
 import { atlas } from '../../data/atlas';
-import { HealthBar } from '@lib';
 
-interface HealthBarData {
-  bar: HealthBar;
-  added: boolean;
-  container: PIXI.Container;
-}
 export class Renderer extends System {
   public static readonly type = 'renderer';
 
-  protected sprites: Record<string, { key: string; sprite: PIXI.Sprite }> = {};
-
   protected app!: PIXI.Application;
-  protected paths: Record<
-    string,
-    { target: Point; sprites: PIXI.Sprite[] }
-  > = {};
 
-  protected sheets: Record<string, PIXI.Spritesheet> = {};
-  protected bars: Record<string, HealthBarData> = {};
+  protected sprites: Record<string, { key: string; sprite: PIXI.Sprite }> = {};
+  protected overlays: Set<PIXI.Container> = new Set();
+  protected sheets!: Record<keyof typeof atlas, PIXI.Spritesheet>;
 
   protected containers!: {
     fg: PIXI.Container;
@@ -47,121 +27,51 @@ export class Renderer extends System {
   };
 
   protected $ = {
-    removals: this.world.query.tags(Tag.TO_UNRENDER).persist(),
-    paths: this.world.query.components(Pathfinder).persist(),
-    stats: this.world.query
-      .components(Position, Renderable, Stats)
-      .none.components(Playable)
-      .persist(),
+    removals: this.world.query.tags(Tag.TO_DESTROY).persist(),
     sprites: this.world.query
       .components(Position, Sprite)
       .some.components(Renderable)
-      .persist()
+      .persist(),
+    overlays: this.world.query.components(Overlay, Position).persist()
   };
 
-  public renderHP(
-    entity: EntityType<[typeof Position]>,
-    health: HealthBarData
-  ): void {
-    const container = health.container;
-    container.removeChildren();
+  public drawOverlays(): void {
+    for (const entity of this.$.overlays) {
+      const { $ } = entity;
+      const { x, y } = this.world.game.$.renderer.getScreenPoint($.position);
+      const container = new PIXI.Container();
 
-    const sprites = health.bar.sprites.map(sprite =>
-      PIXI.Sprite.from(this.sheets.gui.textures[sprite])
-    );
-
-    if (sprites.length) {
-      let x = -(sprites.length * TILE_WIDTH - TILE_WIDTH) / 2;
-
-      for (const sprite of sprites) {
-        sprite.position.x = x;
-        sprite.position.y = -16;
-        x += 16;
-      }
-
-      container.addChild(...sprites);
-      container.name = 'health';
-    }
-
-    if (!health.added) {
-      health.added = true;
-      this.containers.ui.addChild(container);
-    }
-
-    const { x, y } = this.world.game.$.renderer.getScreenPoint(
-      entity.$.position
-    );
-    container.position.x = x;
-    container.position.y = y;
-  }
-
-  public drawHealth(): void {
-    for (const entity of this.$.stats) {
-      const { hp, hpMax } = entity.$.stats;
-
-      const health = (this.bars[entity.id] ??= {
-        added: false,
-        bar: new HealthBar(hpMax),
-        container: new PIXI.Container()
+      const sprites = $.overlay.tiles.map(cell => {
+        const sprite = PIXI.Sprite.from(this.sheets.gui.textures[cell.texture]);
+        sprite.alpha = entity.$.overlay.alpha ?? 1;
+        sprite.position.set(
+          cell.position.x * TILE_WIDTH,
+          cell.position.y * TILE_HEIGHT
+        );
+        return sprite;
       });
 
-      health.bar.calculate(hp);
-      this.renderHP(entity, health);
+      container.addChild(...sprites);
+      container.position.set(x, y);
+
+      this.overlays.add(container);
+      this.containers.ui.addChild(container);
+
+      entity.destroy();
     }
   }
 
-  public drawPaths(): void {
-    const ids = [];
-
-    for (const { $, id } of this.$.paths) {
-      if (!$.pathfinder.destination || !$.pathfinder.path.length) {
-        continue;
+  protected clearOverlays(): void {
+    for (const overlay of this.overlays) {
+      if (overlay.parent) {
+        overlay.parent.removeChild(overlay);
+      } else {
+        this.containers.ui.removeChild(overlay);
       }
-
-      ids.push(id);
-      const renderPath = this.paths[id] ?? {
-        target: $.pathfinder.destination,
-        sprites: []
-      };
-
-      if ($.pathfinder.isVisible) {
-        if (
-          !renderPath.sprites.length ||
-          !isSamePoint(renderPath.target, $.pathfinder.destination)
-        ) {
-          for (const item of renderPath.sprites) {
-            item.destroy();
-          }
-
-          renderPath.sprites = $.pathfinder.path.map((point, i, path) => {
-            const { x, y } = this.world.game.$.renderer.getScreenPoint(point);
-            const sprite = PIXI.Sprite.from(
-              this.sheets.sprites.textures[T.PATH_DOT]
-            );
-
-            sprite.position.x = x;
-            sprite.position.y = y;
-            sprite.tint = 0xffffff;
-            sprite.alpha = 0.5 - i / path.length / 2;
-
-            return sprite;
-          });
-
-          this.containers.ui.addChild(...renderPath.sprites);
-        }
-
-        this.paths[id] = renderPath;
-      }
+      overlay.removeChildren();
+      overlay.destroy();
     }
-
-    for (const id in this.paths) {
-      if (!ids.includes(id)) {
-        for (const item of this.paths[id].sprites) {
-          item.destroy();
-        }
-        delete this.paths[id];
-      }
-    }
+    this.overlays.clear();
   }
 
   public updateSprites(): void {
@@ -187,7 +97,6 @@ export class Renderer extends System {
       const { sprite } = keySprite;
       if (!point.equals(sprite.position)) {
         sprite.position = point;
-        // sprite.bg.position = point;
       }
 
       sprite.zIndex = $.position.z;
@@ -217,16 +126,16 @@ export class Renderer extends System {
       if (s) {
         s.sprite.destroy();
         delete this.sprites[entity.id];
-        entity.tags.remove(Tag.TO_UNRENDER);
+        entity.destroy();
       }
     }
   }
 
   public tick(): void {
-    this.drawHealth();
+    this.clearOverlays();
     this.updateRemovals();
+    this.drawOverlays();
     this.updateSprites();
-    this.drawPaths();
   }
 
   protected addSprite(id: string, key: string): void {
@@ -262,6 +171,7 @@ export class Renderer extends System {
     this.containers.fg.name = 'fg';
     this.containers.ui.name = 'ui';
 
+    this.sheets = {};
     for (const key in atlas) {
       const value = atlas[key];
       const texture = await PIXI.Texture.fromURL(value.image);
@@ -275,6 +185,7 @@ export class Renderer extends System {
     }
 
     this.containers.ui.interactive = true;
+    this.containers.ui.zIndex = 10;
 
     this.app.stage.addChild(this.containers.fg, this.containers.ui);
   }

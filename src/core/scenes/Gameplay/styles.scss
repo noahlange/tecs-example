@@ -12,7 +12,7 @@ $font-size-base: 24px;
   color: white;
   left: 0;
   right: 0;
-  bottom: 0;
+  // bottom: 0;
   height: 64px;
   user-select: none;
 
@@ -25,5 +25,36 @@ $font-size-base: 24px;
     right: 0;
     bottom: 0;
     width: 360px;
+  }
+
+  .actions ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    position: fixed;
+    bottom: 16px;
+    left: 16px;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 64px;
+      width: 64px;
+      background-color: rgba(255, 0, 0, 0.25);
+      margin: 0 16px 0 0;
+      flex: 0 0 64px;
+      outline: none;
+      color: white;
+
+      &.border {
+        border: 2px solid rgba(255, 0, 0, 0.5);
+      }
+
+      &:hover {
+        background-color: rgba(255, 0, 0, 0.375);
+      }
+    }
   }
 }

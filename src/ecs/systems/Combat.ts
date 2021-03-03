@@ -43,13 +43,9 @@ export class Combat extends System {
       switch (entity.$.action.data.id) {
         case Action.COMBAT_ATTACK: {
           const set = attacks.get(entity.$.position) ?? new Set();
-          const target =
-            entity.$.action.data.target ?? getInteractionPos(entity.$.position);
-          const data = entity.$.action.data as CombatAttackAction & {
-            d: Direction;
-          };
+          const data = entity.$.action.data as CombatAttackAction;
           attacks.set(
-            target,
+            entity.$.action.data.target ?? getInteractionPos(entity.$.position),
             set.add({
               ...data,
               target: { d: entity.$.position.d, ...data.target }
@@ -84,10 +80,14 @@ export class Combat extends System {
               total += Math.max(0, value - r);
             }
             // sub from health
-            target.$.stats.hp = Math.max(0, target.$.stats.hp - total);
+            target.$.stats.health.set(
+              Math.max(0, target.$.stats.health.value - total)
+            );
+
             this.world.game.log(`${target.$.text.title} took ${total} damage`);
           }
         }
+        a.attack.destroy();
       }
     }
   }
