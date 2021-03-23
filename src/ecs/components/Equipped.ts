@@ -1,6 +1,6 @@
 import type { EquippableItem } from '../entities/types';
-import { EquipSlot } from '../../types';
-import type { DamageType } from '@utils/enums';
+import type { DamageType } from '@enums';
+import { EquipSlot } from '@enums';
 import { roll } from '@utils';
 
 export class Equipped {
@@ -21,9 +21,11 @@ export class Equipped {
 
   public get resist(): Map<DamageType, number> {
     return Object.values(this.slots).reduce((a, b) => {
-      for (const r of b?.$.equip.resist ?? []) {
-        const val = a.get(r.type) ?? 0;
-        a.set(r.type, val + roll(r.value));
+      if (b?.$.equip) {
+        for (const resistance of b.$.equip.resist ?? []) {
+          const val = a.get(resistance.type) ?? 0;
+          a.set(resistance.type, val + roll(resistance.value));
+        }
       }
       return a;
     }, new Map<DamageType, number>());

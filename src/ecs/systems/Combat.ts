@@ -1,5 +1,6 @@
 import type { CombatAttackAction } from '@utils';
-import type { Point, Direction, DamageType } from '@types';
+import type { Vector2 } from '@types';
+import type { Direction, DamageType } from '@enums';
 import type { CombatEntity } from '@ecs/entities/types';
 
 import { System } from 'tecs';
@@ -11,10 +12,10 @@ import {
   Equipped,
   Text
 } from '@ecs/components';
-import { Array2D } from '@lib';
+import { Vector2Array } from '@lib';
 import { Action, getInteractionPos, roll } from '@utils';
 
-type AttackData = CombatAttackAction & { target: Point & { d: Direction } };
+type AttackData = CombatAttackAction & { target: Vector2 & { d: Direction } };
 
 export class Combat extends System {
   public static readonly type = 'combat';
@@ -31,9 +32,9 @@ export class Combat extends System {
   };
 
   public tick(): void {
-    const size = this.world.game.$.map.size;
-    const combatants = new Array2D<CombatEntity>(size);
-    const attacks = new Array2D<Set<AttackData>>(size);
+    const size = this.world.game.$.map.bounds;
+    const combatants = new Vector2Array<CombatEntity>(size);
+    const attacks = new Vector2Array<Set<AttackData>>(size);
 
     for (const entity of this.$.combatants) {
       combatants.set(entity.$.position, entity);
@@ -43,9 +44,9 @@ export class Combat extends System {
       switch (entity.$.action.data.id) {
         case Action.COMBAT_ATTACK: {
           const set = attacks.get(entity.$.position) ?? new Set();
-          const data = entity.$.action.data as CombatAttackAction;
+          const data = entity.$.action.data;
           attacks.set(
-            entity.$.action.data.target ?? getInteractionPos(entity.$.position),
+            data.target ?? getInteractionPos(entity.$.position),
             set.add({
               ...data,
               target: { d: entity.$.position.d, ...data.target }
@@ -80,9 +81,9 @@ export class Combat extends System {
               total += Math.max(0, value - r);
             }
             // sub from health
-            target.$.stats.health.set(
-              Math.max(0, target.$.stats.health.value - total)
-            );
+            // target.$.stats.health.set(
+            //   Math.max(0, target.$.stats.health.value - total)
+            // );
 
             this.world.game.log(`${target.$.text.title} took ${total} damage`);
           }

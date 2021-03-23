@@ -3,7 +3,6 @@ export { Collisions } from './Collisions';
 export { Combat } from './Combat';
 export { Movement } from './Movement';
 export { Renderer } from './Renderer';
-export { StaticMap } from './StaticMap';
 export { Pathfinding } from './Pathfinding';
 export { View } from './View';
 export { Inventory } from './Inventory';

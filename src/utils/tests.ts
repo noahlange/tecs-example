@@ -1,15 +1,16 @@
 import type { EntityType } from 'tecs';
-import type { Equipped, Stats } from '../ecs/components';
+import type { Equipped, Stats } from '@ecs/components';
+import { Tag } from '@enums';
+
 import type {
   ConsumableItem,
   EquippableItem,
   InventoryEntity,
   InventoryItem
 } from '../ecs/entities/types';
-import { Tag } from '../types';
 
 export function isEquippable(item: InventoryItem): item is EquippableItem {
-  return item.tags.has(Tag.IS_EQUIPPABLE);
+  return item.tags.has(Tag.IS_EQUIPPABLE) && !!(item as EquippableItem).$.equip;
 }
 
 export function isConsumable(item: InventoryItem): item is ConsumableItem {

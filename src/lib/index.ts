@@ -1,9 +1,10 @@
-export { Manager } from '../core/lib/Manager';
+export { Manager } from './Manager';
 export { CollisionMap } from './CollisionMap';
-export { Scene } from '../core/lib/Scene';
+export { Scene } from './Scene';
 export { UIList } from './UIList';
-export { Array2D } from './Array2D';
-export { ShimFOV } from './ShimFOV';
+export { Vector2Array } from './Vector2Array';
+export { Chunk } from './Chunk';
 export { Lighting } from './Lighting';
 export { HealthBar } from './HealthBar';
-export { Attribute } from './Attribute';
+export { Rectangle } from './Rectangle';
+export { MapBuilder } from '../maps/MapBuilder';

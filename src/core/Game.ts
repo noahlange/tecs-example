@@ -1,8 +1,10 @@
 import type { Scene } from '@lib';
+import type { Compressed } from 'compress-json';
 
 import * as Managers from './managers';
 import { ECS } from '../ecs/ECS';
-import { GameState } from '../types';
+import { GameState } from '@enums';
+import { createNanoEvents } from 'nanoevents';
 
 interface GameManagers {
   renderer: Managers.Render;
@@ -17,6 +19,21 @@ export class Game {
   public ecs = new ECS();
 
   public $: GameManagers;
+
+  public async load(save: Compressed): Promise<void> {
+    this.ecs.load(save);
+    return this.start();
+  }
+
+  protected events = createNanoEvents();
+
+  public on(event: string, callback: (...args: any[]) => void): void {
+    this.events.on(event, callback);
+  }
+
+  public emit(event: string, data?: any): void {
+    this.events.emit(event, data);
+  }
 
   public async start(): Promise<void> {
     this.ecs.game = this;

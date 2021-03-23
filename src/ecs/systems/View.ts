@@ -1,11 +1,10 @@
-import type { Point, RGBColor } from '@types';
+import type { Vector2, Color } from '@types';
 import type { CollisionMap } from '@lib';
-
-import * as ROT from 'rot-js';
-import { Lighting } from '@lib';
 
 import { System } from 'tecs';
 import { FOV } from 'malwoden';
+
+import { Lighting, Vector2Array } from '@lib';
 
 import {
   Position,
@@ -22,8 +21,7 @@ import {
   AMBIENT_LIGHT as LIGHT,
   isSamePoint
 } from '@utils';
-
-import { Array2D } from '@lib';
+import { add, multiply } from '@utils/colors';
 
 enum Repaint {
   /**
@@ -48,11 +46,11 @@ export class View extends System {
   public static readonly type = 'view';
 
   // we need to track cells we'd like to "unpaint" after a
-  protected repaintGrid!: Array2D<Repaint>;
-  protected colorGrid!: Array2D<RGBColor>;
+  protected repaintGrid!: Vector2Array<Repaint>;
+  protected colorGrid!: Vector2Array<Color>;
 
   // we don't need to recalculate FOV if the view hasn't changed
-  protected lastPosition: Record<string, Point> = {};
+  protected lastPosition: Record<string, Vector2> = {};
 
   protected width!: number;
   protected height!: number;
@@ -123,15 +121,15 @@ export class View extends System {
     // reset...
     this.colorGrid.clear();
     this.lighting.clearLights();
-    const lights = new Array2D<RGBColor>({ w: this.width, h: this.height });
-    // find all the light sources...
+    const lights = new Vector2Array<Color>({
+      w: this.width,
+      h: this.height
+    });
 
+    // find all the light sources...
     for (const { $ } of this.queries.lights) {
       const prev = lights.get($.position);
-      lights.set(
-        $.position,
-        prev ? ROT.Color.add(prev, $.light.color) : $.light.color
-      );
+      lights.set($.position, prev ? add(prev, $.light.color) : $.light.color);
     }
 
     for (const [point, color] of lights.entries()) {
@@ -139,7 +137,7 @@ export class View extends System {
     }
 
     // ...and recolor
-    this.lighting.compute((point, color: RGBColor) => {
+    this.lighting.compute((point, color: Color) => {
       this.colorGrid.set(point, color);
     });
   }
@@ -147,7 +145,6 @@ export class View extends System {
   /**
    * Write appropriate color data to renderable entities.
    */
-
   protected repaint(): void {
     for (const { $ } of this.queries.renderable) {
       const r = this.repaintGrid.get($.position);
@@ -155,26 +152,24 @@ export class View extends System {
         continue;
       }
 
-      let data: RGBColor | null = null;
+      let data: Color | null = null;
 
       switch (r) {
         case Repaint.FULL:
           data = this.colorGrid.get($.position);
           break;
         case Repaint.DEBUG:
-          data = [255, 0, 0];
+          data = { r: 255, g: 0, b: 0, a: 1 };
           break;
       }
 
       const base = this.collisions.isVisible($.position) ? LIGHT : DARK;
-      const light = data ? ROT.Color.add(LIGHT, data) : LIGHT;
-      const mult = ROT.Color.multiply(base, data ?? LIGHT);
+      const light = data ? add(LIGHT, data) : LIGHT;
+      const mult = multiply(base, data ?? LIGHT);
 
-      $.render.fg = $.sprite?.tint
-        ? ROT.Color.interpolate(mult, $.sprite?.tint)
-        : mult;
-
-      $.render.bg = ROT.Color.multiply(light, LIGHT);
+      $.render.fg = { r: 255, g: 255, b: 255, a: 1 };
+      // $.render.fg = $.sprite?.tint ? mix(mult, $.sprite?.tint) : mult;
+      $.render.bg = multiply(light, LIGHT);
       $.render.dirty = true;
     }
   }
@@ -188,27 +183,32 @@ export class View extends System {
     this.colorGrid.clear();
   }
 
-  public init(): void {
+  public initMap(): void {
     const map = this.world.game.$.map;
-    const w = (this.width ??= map.width);
-    const h = (this.height ??= map.height);
-    this.collisions = map.collisions;
+    const w = (this.width ??= map.bounds.w);
+    const h = (this.height ??= map.bounds.h);
 
     // initially, we want to paint everything without lighting. we may light it during the tick, but we don't care at this point.
-    this.repaintGrid = new Array2D({ w, h }, Repaint.BASE);
-    this.colorGrid = new Array2D({ w, h });
+    this.repaintGrid = new Vector2Array({ w, h }, Repaint.BASE);
+    this.colorGrid = new Vector2Array({ w, h });
 
+    this.collisions = map.collisions;
     this.fov = new FOV.PreciseShadowcasting({
       lightPasses: point => this.collisions.isVisible(point),
       topology: 'four'
     });
 
     this.lighting = new Lighting(
-      { w, h },
+      map.bounds,
       point => (this.collisions.isVisible(point) ? 0 : 0.3),
       { range: 8, passes: 2 }
     );
 
     this.lighting.setFOV(this.fov);
+  }
+
+  public init(): void {
+    this.initMap();
+    this.world.game.on('initMap', () => this.initMap());
   }
 }

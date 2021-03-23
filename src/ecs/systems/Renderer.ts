@@ -1,23 +1,28 @@
+import type { EntityType } from 'tecs';
+
 import * as PIXI from 'pixi.js';
 import { System } from 'tecs';
 import { Sprite, Position, Renderable, Overlay } from '@ecs/components';
 
-import { Tag } from '@utils/enums';
-import { TILE_HEIGHT, TILE_WIDTH } from '@utils';
+import { Tag } from '@enums';
+
 import {
+  TILE_HEIGHT,
+  TILE_WIDTH,
   getSpritesheetFromTexture,
   getTransformFromDirection,
-  toHex
-} from '@utils/pixi';
+  AMBIENT_LIGHT
+} from '@utils';
 
-import { atlas } from '../../data/atlas';
+import { toHex } from '@utils/colors';
+
+import { atlas } from '../../assets/atlases';
 
 export class Renderer extends System {
   public static readonly type = 'renderer';
 
   protected app!: PIXI.Application;
 
-  protected sprites: Record<string, { key: string; sprite: PIXI.Sprite }> = {};
   protected overlays: Set<PIXI.Container> = new Set();
   protected sheets!: Record<keyof typeof atlas, PIXI.Spritesheet>;
 
@@ -27,10 +32,14 @@ export class Renderer extends System {
   };
 
   protected $ = {
-    removals: this.world.query.tags(Tag.TO_DESTROY).persist(),
+    removals: this.world.query
+      .tags(Tag.TO_UNRENDER)
+      .components(Sprite)
+      .persist(),
     sprites: this.world.query
       .components(Position, Sprite)
       .some.components(Renderable)
+      .none.tags(Tag.TO_UNRENDER)
       .persist(),
     overlays: this.world.query.components(Overlay, Position).persist()
   };
@@ -43,7 +52,7 @@ export class Renderer extends System {
 
       const sprites = $.overlay.tiles.map(cell => {
         const sprite = PIXI.Sprite.from(this.sheets.gui.textures[cell.texture]);
-        sprite.alpha = entity.$.overlay.alpha ?? 1;
+        sprite.alpha = entity.$.overlay.color.a ?? 1;
         sprite.position.set(
           cell.position.x * TILE_WIDTH,
           cell.position.y * TILE_HEIGHT
@@ -75,58 +84,54 @@ export class Renderer extends System {
   }
 
   public updateSprites(): void {
-    for (const { $, id } of this.$.sprites) {
-      if ($.render?.dirty === false) {
-        continue;
+    for (const entity of this.$.sprites) {
+      if (entity.$.sprite.pixi) {
+        if (entity.$.render?.dirty === false) {
+          continue;
+        }
       }
 
-      const keySprite = this.sprites[id];
+      const { sprite, position: pos } = entity.$;
 
-      if (!keySprite) {
-        continue;
+      if (!entity.$.sprite.pixi) {
+        this.addSprite(entity);
       }
 
-      if (keySprite.key !== $.sprite.key) {
-        this.addSprite(id, $.sprite.key);
+      const point = new PIXI.Point(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT);
+
+      const s = sprite.pixi!;
+
+      if (!point.equals(pos)) {
+        s.position = point;
       }
 
-      const point = new PIXI.Point(
-        $.position.x * TILE_WIDTH,
-        $.position.y * TILE_HEIGHT
-      );
-      const { sprite } = keySprite;
-      if (!point.equals(sprite.position)) {
-        sprite.position = point;
-      }
+      s.zIndex = pos.z;
 
-      sprite.zIndex = $.position.z;
-      const [scaleX, scaleY] = getTransformFromDirection($.position.d);
+      const [scaleX, scaleY] = getTransformFromDirection(pos.d);
       if (scaleX && scaleY) {
-        sprite.anchor.x = scaleX === 1 ? 0 : 1;
-        sprite.scale.x = scaleX;
-        sprite.scale.y = scaleY;
+        s.anchor.x = scaleX === 1 ? 0 : 1;
+        s.scale.x = scaleX;
+        s.scale.y = scaleY;
       }
 
-      if ($.render) {
-        const { fg } = $.render;
-        // const sprite = this.sprites[id];
-        fg ? (sprite.tint = toHex(fg) ?? 0xffffff) : void 0;
-        $.render.dirty = false;
+      if (entity.$.render) {
+        const { fg } = entity.$.render;
+        s.tint = toHex(fg ?? AMBIENT_LIGHT);
+        entity.$.render.dirty = false;
       } else {
-        sprite.tint = $.sprite.tint
-          ? toHex($.sprite.tint)
-          : keySprite.sprite.tint;
+        if (sprite.tint) {
+          s.tint = toHex(sprite.tint);
+        }
       }
     }
   }
 
   public updateRemovals(): void {
     for (const entity of this.$.removals) {
-      const s = this.sprites[entity.id];
-      if (s) {
-        s.sprite.destroy();
-        delete this.sprites[entity.id];
-        entity.destroy();
+      const sprite = entity.$.sprite.pixi;
+      if (sprite) {
+        entity.tags.remove(Tag.TO_UNRENDER);
+        sprite.destroy();
       }
     }
   }
@@ -138,23 +143,14 @@ export class Renderer extends System {
     this.updateSprites();
   }
 
-  protected addSprite(id: string, key: string): void {
+  protected addSprite(entity: EntityType<[typeof Sprite]>): void {
     for (const name in atlas) {
+      const key = entity.$.sprite.key;
       const spritesheet = this.sheets[name];
       const texture = spritesheet.textures[key];
       if (texture?.valid) {
-        const next = {
-          key,
-          sprite: PIXI.Sprite.from(spritesheet.textures[key])
-        };
-
-        if (this.sprites[id]?.sprite) {
-          this.containers.fg.removeChild(this.sprites[id].sprite);
-        }
-
-        this.containers.fg.addChild(next.sprite);
-        this.sprites[id] = next;
-        return;
+        entity.$.sprite.pixi ??= PIXI.Sprite.from(spritesheet.textures[key]);
+        this.containers.fg.addChild(entity.$.sprite.pixi);
       }
     }
   }
@@ -168,10 +164,11 @@ export class Renderer extends System {
       ui: new PIXI.Container()
     };
 
+    this.containers.fg.sortableChildren = true;
     this.containers.fg.name = 'fg';
     this.containers.ui.name = 'ui';
-
     this.sheets = {};
+
     for (const key in atlas) {
       const value = atlas[key];
       const texture = await PIXI.Texture.fromURL(value.image);
@@ -180,8 +177,8 @@ export class Renderer extends System {
     }
 
     // create all sprites and add to the stage
-    for (const { $, id } of this.world.query.components(Position, Sprite)) {
-      this.addSprite(id, $.sprite.key);
+    for (const entity of this.$.sprites) {
+      this.addSprite(entity);
     }
 
     this.containers.ui.interactive = true;

@@ -1,6 +1,6 @@
 import { h, render } from 'preact';
 
-import { OptionsResult, Runner, TextResult } from 'bondage';
+import { OptionsResult, Runner } from 'bondage';
 import type { ResultNode } from 'bondage';
 
 import { Player } from '@ecs/entities';
@@ -30,7 +30,7 @@ export class Dialogue extends Scene {
     const content = dialogue[file];
     if (file && this.runner) {
       this.runner.load(content);
-      this.run = this.runner.run(start ?? 'Start');
+      this.run = this.runner.run(start ?? 'start');
     }
   }
 
@@ -38,7 +38,9 @@ export class Dialogue extends Scene {
     if (input.isKeyboard) {
       switch (input.key) {
         case ' ':
-          this.next();
+          if (!this.pending) {
+            this.next();
+          }
           break;
         case '1':
         case '2':
@@ -49,10 +51,10 @@ export class Dialogue extends Scene {
         case '7':
         case '8':
         case '9':
-          this.choose(+input.key);
+          this.choose(+input.key - 1);
           break;
       }
-    } else if (input.name === 'pointerdown') {
+    } else if (input.name === 'left-click') {
       this.next();
     }
   }
@@ -60,6 +62,7 @@ export class Dialogue extends Scene {
   protected choose(index: number): void {
     this.pending?.select(index);
     this.pending = null;
+    this.next();
   }
 
   protected next(): void {
@@ -68,12 +71,13 @@ export class Dialogue extends Scene {
       this.end();
     } else if (next) {
       const result = next.value;
-      if (result instanceof TextResult) {
-        this.text = result.text;
-      }
+      this.text = result.text ?? this.text;
       if (result instanceof OptionsResult) {
-        this.text = result.text;
+        this.pending = result;
         this.options = result.options;
+      } else {
+        this.pending = null;
+        this.options = [];
       }
     }
   }
@@ -98,5 +102,7 @@ export class Dialogue extends Scene {
 
   public init(): void {
     this.runner = new Runner();
+    this.start('dialogue');
+    this.next();
   }
 }

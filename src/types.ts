@@ -1,8 +1,23 @@
-import type { DamageType, EffectType } from './utils/enums';
+import type { DataType, EntityClass } from 'tecs';
 
-export interface Point {
+import type { DamageType, EffectType, Tag } from './enums';
+
+export interface Prefab<T extends EntityClass = EntityClass> {
+  entity: T;
+  tags: Tag[];
+  data: DataType<T>;
+}
+
+export interface Vector2 {
   x: number;
   y: number;
+}
+
+export interface Color {
+  r: number;
+  g: number;
+  b: number;
+  a: number;
 }
 
 export interface DamageDefinition {
@@ -37,14 +52,17 @@ export interface KeyboardInputEvent extends BaseInputEvent {
 
 export type AnyInputEvent = MouseInputEvent | KeyboardInputEvent;
 
-export type Rect = Point & Size;
-
-export type RGBColor = [number, number, number];
+export interface Rect {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
 
 export interface InputEvent {
   type: 'pointer' | 'keyboard';
   key: string;
-  point?: Point;
+  point?: Vector2;
 }
 
 export interface GameMessage {
@@ -64,4 +82,8 @@ export interface ItemEffect {
   duration: number;
 }
 
-export * from './utils/enums';
+export interface StatBase {
+  name: string;
+  description: string;
+  value: number;
+}

@@ -1,18 +1,20 @@
 import type { AreaOfEffect, Equippable } from '@ecs/components';
 import type { Attack } from '@ecs/entities';
-import type { InventoryItem } from '@ecs/entities/types';
-import type { Point } from '@types';
+import type { InventoryEntity, InventoryItem } from '@ecs/entities/types';
+import type { Vector2 } from '@types';
 import type { EntityType } from 'tecs';
 
 export enum Action {
+  MENU_NAVIGATE = 'menu_navigate',
   NONE = 'none',
   INTERACT = 'interact',
   MOVE = 'move',
   SET_DESTINATION = 'set_destination',
   ITEM_PICK_UP = 'item_pick_up',
+  ITEM_DROP = 'item_drop',
   ITEM_USE = 'item_use',
-  ITEM_DISCARD = 'item_discard',
-  MENU_NAVIGATE = 'menu_navigate',
+  ITEM_EQUIP = 'item_equip',
+  ITEM_UNEQUIP = 'item_unequip',
   COMBAT_ATTACK = 'combat_attack',
   COMBAT_DEFEND = 'combat_defend',
   COMBAT_ATTACK_PAUSED = 'combat_attack_paused'
@@ -25,20 +27,20 @@ export interface ActionItem {
 
 export interface MoveAction extends ActionItem {
   id: Action.MOVE;
-  delta: Point;
-  point?: Point;
+  delta: Vector2;
+  point?: Vector2;
 }
 
 export interface DestinationAction extends ActionItem {
   id: Action.SET_DESTINATION;
-  target: Point;
+  target: Vector2;
   isActive: boolean;
   isVisible: boolean;
 }
 
 export interface CombatAttackAction extends ActionItem {
   id: Action.COMBAT_ATTACK;
-  target: Point;
+  target: Vector2;
   attack: EntityType<[typeof AreaOfEffect, typeof Equippable]>;
 }
 
@@ -53,13 +55,26 @@ export interface PickUpAction extends ActionItem {
 }
 
 export interface DiscardAction extends ActionItem {
-  id: Action.ITEM_DISCARD;
+  id: Action.ITEM_DROP;
   count?: number;
   target: InventoryItem;
 }
+
 export interface UseAction extends ActionItem {
   id: Action.ITEM_USE;
   target: InventoryItem;
+}
+
+export interface EquipAction extends ActionItem {
+  id: Action.ITEM_EQUIP;
+  target: InventoryItem;
+  actor: InventoryEntity;
+}
+
+export interface UnequipAction extends ActionItem {
+  id: Action.ITEM_UNEQUIP;
+  target: InventoryItem;
+  actor: InventoryEntity;
 }
 
 export interface CombatAttackPaused extends ActionItem {
@@ -92,4 +107,6 @@ export type ActionType =
   | UseAction
   | CombatAttackAction
   | CombatDefendAction
-  | CombatAttackPaused;
+  | CombatAttackPaused
+  | EquipAction
+  | UnequipAction;

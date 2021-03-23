@@ -11,6 +11,7 @@ export class Collisions extends System {
 
   protected $ = {
     movers: this.world.query.components(Actor, Position).persist(),
+    cells: this.world.query.components(Collision, Position).persist(),
     collisions: this.world.query
       .components(Collision, Position, Interactive)
       .persist()
@@ -26,9 +27,15 @@ export class Collisions extends System {
     }
   }
 
+  protected updateStaticCollisions(): void {
+    for (const e of this.$.cells) {
+      const c = e.$.collision as Collision;
+      this.collisions.set(e.$.position as Position, c.passable, c.allowLOS);
+    }
+  }
+
   public tick(): void {
     this.updateDynamicCollisions();
-
     for (const { $ } of this.$.movers) {
       switch ($.action.data.id) {
         case Action.MOVE: {

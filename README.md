@@ -1,8 +1,9 @@
 # tecs-example
 
-A simple roguelike using [rot.js](https://ondras.github.io/rot.js) to demonstrate the proper care and feeding of [tecs](https://github.com/noahlange/tecs).
+A roguelike to demonstrate the proper care and feeding of [tecs](https://github.com/noahlange/tecs). Primary dependencies include [PIXI](https://pixijs.io/) for graphics, [Preact](https://preactjs.com/) for the UI and [malwoden](https://malwoden.com/) for FOV calculations.
 
-I took quite a bit of inspiration from [Fritzy's](https://github.com/fritzy) [roguelike example](https://github.com/fritzy/ecs-js-example) for [ape-ecs](https://github.com/fritzy/ape-ecs).
+Takes extensive inspiration from ddmills' [sleepy](https://github.com/ddmills/sleepy)
+and Fritzy's [roguelike example](https://github.com/fritzy/ecs-js-example) for [ape-ecs](https://github.com/fritzy/ape-ecs).
 
 ```
 git clone https://github.com/noahlange/tecs-example.git

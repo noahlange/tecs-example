@@ -1,8 +1,9 @@
-import type { Point, Direction } from '@types';
-import { AOE } from '@types';
+import type { Vector2 } from '@types';
+import type { Direction } from '@enums';
+import { AOE } from '@enums';
 import { getTargetAOE } from '@utils';
 import { Component } from 'tecs';
-import { RNG } from 'rot-js';
+import { pick } from '@utils/random';
 
 export class AreaOfEffect extends Component {
   public static readonly type = 'aoe';
@@ -10,18 +11,18 @@ export class AreaOfEffect extends Component {
   public type: AOE = AOE.LINE;
   public range: number = 1;
 
-  public all(source: Point & { d: Direction }): Point[] {
+  public all(source: Vector2 & { d: Direction }): Vector2[] {
     return getTargetAOE(source, this.type, this.range);
   }
 
-  public pick(source: Point & { d: Direction }, count: number = 1): Point[] {
-    const res: Point[] = [];
+  public pick(
+    source: Vector2 & { d: Direction },
+    count: number = 1
+  ): Vector2[] {
+    const res: Vector2[] = [];
     const all = this.all(source);
     while (count--) {
-      const next = RNG.getItem(all);
-      if (next) {
-        res.push(next);
-      }
+      res.push(pick(all));
     }
     return res;
   }

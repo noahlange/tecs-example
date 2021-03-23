@@ -37,10 +37,10 @@ export class InputManager extends Manager {
   }
 
   protected handle = {
-    onMoveEvent: debounce((e: PIXI.InteractionEvent) => {
+    onMouseMove: debounce((e: PIXI.InteractionEvent) => {
       this.game.$.commands.onInputEvent(this.toMouseInputEvent(e));
     }, 64),
-    onClickEvent: (e: PIXI.InteractionEvent) => {
+    onClick: (e: PIXI.InteractionEvent) => {
       this.game.$.commands.onInputEvent(this.toMouseInputEvent(e));
     },
     onKeyDown: (e: KeyboardEvent) => {
@@ -51,10 +51,10 @@ export class InputManager extends Manager {
   public init(): void {
     const view = this.game.$.renderer.app.stage;
     view.interactive = true;
-    view.on('pointermove', this.handle.onMoveEvent);
+    view.on('pointermove', this.handle.onMouseMove);
     this.game.$.renderer.app.stage.addListener(
       'pointerdown',
-      this.handle.onClickEvent
+      this.handle.onClick
     );
     window.document.addEventListener('keydown', this.handle.onKeyDown);
   }

@@ -1,0 +1,42 @@
+[
+  {
+    "title": "start",
+    "tags": "",
+    "body": "Tom: Who is this Gatsby anyhow? Some big bootlegger?\n[[Where'd you hear that?|bootleggers]]",
+    "position": {
+      "x": 473,
+      "y": -31
+    },
+    "colorID": 0
+  },
+  {
+    "title": "bootleggers",
+    "tags": "",
+    "body": "Tom: I didn't hear it. I imagined it.\nTom: A lot of these newly rich people are just big bootleggers, you know.\n[[Not Gatsby.|not_gatsby]]",
+    "position": {
+      "x": 750,
+      "y": -30
+    },
+    "colorID": 0
+  },
+  {
+    "title": "not_gatsby",
+    "tags": "",
+    "body": "Tom: ...\nTom: Well, he certainly must have strained himself to get this menagerie together.\nDaisy: At least they are more interesting than the people we know.\nTom: You didn't look so interested.\nDaisy: Well, I was.\nTom: Did you notice Daisy's face when that girl asked her to put her under a cold shower?\n[[...|invitations]]",
+    "position": {
+      "x": 1007,
+      "y": -36
+    },
+    "colorID": 0
+  },
+  {
+    "title": "invitations",
+    "tags": "",
+    "body": "Daisy: Lots of people come who haven't been invited. That girl hadn't been invited.\nDaisy: They simply force their way in and he's too polite to object.\nTom: I'd like to know who he is and what he does. And I think I'll make a point of finding out.\nDaisy: I can tell you right now. He owned some drugstores, a lot of drugstores. He built them up himself.\nDaisy: Good night, Nick.",
+    "position": {
+      "x": 1267,
+      "y": -36
+    },
+    "colorID": 0
+  }
+]

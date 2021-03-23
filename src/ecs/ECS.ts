@@ -7,7 +7,6 @@ import * as Entities from './entities';
 import {
   AI,
   Collisions,
-  StaticMap,
   Pathfinding,
   Interact,
   View,
@@ -23,7 +22,6 @@ import {
 
 export class ECS extends World.with(
   Scenes,
-  StaticMap,
   Inventory,
   AI,
   Pathfinding,
@@ -52,9 +50,15 @@ export class ECS extends World.with(
   }
 
   public init(): void {
+    this.initStats();
+  }
+
+  public constructor() {
+    super();
     const components = Object.values(Components);
     const entities = Object.values(Entities);
     this.register(...entities, ...components);
-    this.initStats();
   }
 }
+
+export { Entities };

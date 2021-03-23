@@ -1,19 +1,19 @@
-import type { Point, Size } from '@types';
-import { Array2D } from './Array2D';
+import type { Vector2, Size } from '@types';
+import { Vector2Array } from './Vector2Array';
 
 export class CollisionMap {
-  protected collisions: Array2D<number>;
-  protected obstructions: Array2D<number>;
+  protected collisions: Vector2Array<number>;
+  protected obstructions: Vector2Array<number>;
 
   public readonly width: number;
   public readonly height: number;
 
-  protected getIndex(point: Point): number {
+  protected getIndex(point: Vector2): number {
     return point.x * this.height + point.y;
   }
 
   public set(
-    point: Point,
+    point: Vector2,
     isPassable: boolean,
     allowLOS: boolean = isPassable
   ): void {
@@ -21,19 +21,19 @@ export class CollisionMap {
     this.obstructions.set(point, allowLOS ? 0 : 1);
   }
 
-  public isVisible(point: Point): boolean {
+  public isVisible(point: Vector2): boolean {
     return this.obstructions.get(point) !== 1;
   }
 
-  public isPassable(point: Point): boolean {
+  public isPassable(point: Vector2): boolean {
     return this.collisions.get(point) !== 1;
   }
 
-  public contains(point: Point): boolean {
+  public contains(point: Vector2): boolean {
     return point.x < this.width && point.y < this.height;
   }
 
-  public get(point: Point): { blocksView: boolean; isPassable: boolean } {
+  public get(point: Vector2): { blocksView: boolean; isPassable: boolean } {
     return {
       blocksView: this.isVisible(point),
       isPassable: this.isPassable(point)
@@ -43,7 +43,7 @@ export class CollisionMap {
   public constructor(size: Size) {
     this.width = size.w;
     this.height = size.h;
-    this.collisions = new Array2D(size);
-    this.obstructions = new Array2D(size);
+    this.collisions = new Vector2Array(size);
+    this.obstructions = new Vector2Array(size);
   }
 }

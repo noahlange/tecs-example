@@ -2,8 +2,7 @@ import type { Scene } from '@lib';
 import type { Game } from '../Game';
 
 import { Manager } from '@lib';
-import { GameState } from '@types';
-import * as Scenes from '../scenes';
+import { GameState } from '@enums';
 
 interface SceneConstructor<T> {
   new (scene: Game): Scene<T>;
@@ -27,9 +26,5 @@ export class SceneManager extends Manager {
     if (scene) {
       this.scene = scene;
     }
-  }
-
-  public init(): void {
-    this.push(Scenes.Gameplay);
   }
 }

@@ -1,5 +1,5 @@
+import type { ItemType } from '@enums';
 import { Component } from 'tecs';
-import type { ItemType } from '../../types';
 
 export class Item extends Component {
   public static readonly type = 'item';

@@ -1,11 +1,12 @@
-import { Array2D } from '@lib';
-import type { Point } from '@types';
-import { AOE, Direction } from './enums';
+import type { Vector2 } from '@types';
 
-type WithDirection = Point & { d: Direction };
+import { Vector2Array } from '@lib';
+import { AOE, Direction } from '@enums';
+
+type WithDirection = Vector2 & { d: Direction };
 
 // I'm sure that there's a more intelligent way to do this, but that would require me to be more intelligent.
-function getLinePoints(point: WithDirection, range: number): Point[] {
+function getRayPoints(point: WithDirection, range: number): Vector2[] {
   let { x, y } = point;
   const res = [];
   while (range) {
@@ -38,8 +39,8 @@ function getLinePoints(point: WithDirection, range: number): Point[] {
   return res;
 }
 
-function getCirclePoints(center: Point, radius: number): Point[] {
-  const points = new Array2D<boolean>({ w: radius * 2, h: radius * 2 });
+export function getCirclePoints(center: Vector2, radius: number): Vector2[] {
+  const points = new Vector2Array<boolean>({ w: radius * 2, h: radius * 2 });
   let r = 0;
   while (r < radius) {
     r++;
@@ -65,20 +66,20 @@ function getCirclePoints(center: Point, radius: number): Point[] {
   }));
 }
 
-function getCrossPoints(source: WithDirection, range: number): Point[] {
+function getCrossPoints(source: WithDirection, range: number): Vector2[] {
   return [
-    ...getLinePoints({ ...source, d: source.d }, range),
-    ...getLinePoints({ ...source, d: (source.d + 2) % 8 }, range),
-    ...getLinePoints({ ...source, d: (source.d + 4) % 8 }, range),
-    ...getLinePoints({ ...source, d: (source.d + 6) % 8 }, range)
+    ...getRayPoints({ ...source, d: source.d }, range),
+    ...getRayPoints({ ...source, d: (source.d + 2) % 8 }, range),
+    ...getRayPoints({ ...source, d: (source.d + 4) % 8 }, range),
+    ...getRayPoints({ ...source, d: (source.d + 6) % 8 }, range)
   ];
 }
 
-function getHemispherePoints(center: WithDirection, radius: number): Point[] {
+function getHemispherePoints(center: WithDirection, radius: number): Vector2[] {
   const points = getCirclePoints(center, radius);
   const [cx, cy] = [center.x, center.y];
 
-  const filters: Record<Direction, (point: Point) => boolean> = {
+  const filters: Record<Direction, (point: Vector2) => boolean> = {
     [Direction.W]: p => p.y <= cy,
     [Direction.E]: p => p.y >= cy,
     [Direction.S]: p => p.x >= cx,
@@ -97,11 +98,11 @@ export function getTargetAOE(
   source: WithDirection,
   aoe: AOE,
   range: number
-): Point[] {
-  const points: Point[] = [];
+): Vector2[] {
+  const points: Vector2[] = [];
   switch (aoe) {
     case AOE.LINE:
-      return getLinePoints(source, range);
+      return getRayPoints(source, range);
     case AOE.CIRCLE:
       return getCirclePoints(source, range);
     case AOE.SEMICIRCLE:

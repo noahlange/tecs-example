@@ -1,5 +1,5 @@
+import type { ItemEffect } from '@types';
 import { Component } from 'tecs';
-import type { ItemEffect } from '../../types';
 
 export class Effects extends Component {
   public static readonly type = 'effects';

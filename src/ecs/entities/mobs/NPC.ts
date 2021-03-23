@@ -11,7 +11,6 @@ import {
   Faction,
   Equipped
 } from '../../components';
-import type { RGBColor } from '@types';
 import { T } from '@utils';
 
 export class NPC extends Entity.with(
@@ -28,7 +27,7 @@ export class NPC extends Entity.with(
 ) {
   public static readonly data = {
     text: { title: 'NPC' },
-    sprite: { key: T.PLAYER, tint: [255, 0, 0] as RGBColor },
+    sprite: { key: T.PLAYER, tint: { r: 255, g: 0, b: 0, a: 1 } },
     collision: { allowLOS: true }
   };
 

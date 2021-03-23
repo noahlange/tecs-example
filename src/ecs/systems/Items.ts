@@ -28,7 +28,7 @@ export class Items extends System {
     const items = new Set(this.$.items);
     for (const actor of this.$.actors) {
       switch (actor.$.action.data.id) {
-        case Action.ITEM_DISCARD: {
+        case Action.ITEM_DROP: {
           break;
         }
         case Action.INTERACT: {
@@ -43,6 +43,7 @@ export class Items extends System {
                 actor: actor,
                 target: item as InventoryItem
               };
+
               break;
             }
           }

@@ -1,5 +1,5 @@
 import { Component } from 'tecs';
-import { Direction } from '../../types';
+import { Direction } from '@enums';
 
 export class Position extends Component {
   public static readonly type = 'position';

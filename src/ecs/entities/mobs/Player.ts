@@ -1,6 +1,4 @@
 import type { EntityType } from 'tecs';
-import type { RGBColor } from '@types';
-
 import { Entity } from 'tecs';
 
 import {
@@ -35,14 +33,7 @@ export class Player extends Entity.with(
   Renderable,
   Text,
   View
-) {
-  public static readonly data = {
-    text: { title: 'Player' },
-    light: { color: [255, 255, 0] as RGBColor },
-    sprite: { key: 'player_01' },
-    view: { range: 10 }
-  };
-}
+) {}
 
 export type PlayerEntity = EntityType<
   [

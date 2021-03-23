@@ -1,18 +1,24 @@
-import type { EntityType } from 'tecs';
-import { System } from 'tecs';
+import { Player } from '@ecs/entities';
 
-import { Playable, Position } from '../components';
+import { System } from 'tecs';
+import { Gameplay } from '@core/scenes';
 
 export class Camera extends System {
   public static readonly type = 'camera';
 
-  protected player!: EntityType<[typeof Position, typeof Playable]>;
+  protected $ = {
+    player: this.world.query.entities(Player).persist()
+  };
+
+  protected player!: Player;
 
   public tick(): void {
-    this.world.game.$.renderer.follow(this.player.$.position);
-  }
-
-  public init(): void {
-    this.player = this.world.query.components(Playable, Position).find();
+    if (this.world.game.scene instanceof Gameplay) {
+      const player = this.player ?? this.$.player.first();
+      if (player) {
+        this.world.game.$.renderer.follow(player.$.position);
+        this.player = player;
+      }
+    }
   }
 }

@@ -2,9 +2,9 @@ import type { InventoryItem } from '@ecs/entities/types';
 import { h, render } from 'preact';
 
 import { Scene, UIList } from '@lib';
-import { ItemType } from '@types';
+import { ItemType } from '@enums';
 import { Player } from '@ecs/entities';
-import { Action } from '@utils';
+import { Action, isConsumable, isEquippable } from '@utils';
 
 import { InventoryUI } from './InventoryUI';
 
@@ -13,6 +13,32 @@ export class Inventory extends Scene {
   protected xList = new UIList<ItemType | null>();
   protected dirty: boolean = true;
   protected player!: Player;
+
+  protected handleInput(): void {
+    const next = this.game.$.commands.getNextEvent();
+    if (next?.isKeyboard) {
+      switch (next.key) {
+        case 'i':
+          this.end();
+          break;
+        case ' ':
+          this.use();
+          break;
+        case 'w':
+          this.up();
+          break;
+        case 'a':
+          this.left();
+          break;
+        case 's':
+          this.down();
+          break;
+        case 'd':
+          this.right();
+          break;
+      }
+    }
+  }
 
   protected refresh(): void {
     const items = this.player.$.inventory.items
@@ -25,6 +51,7 @@ export class Inventory extends Scene {
       .sort((a, b) => a.$.text.title.localeCompare(b.$.text.title));
 
     this.yList.setItems(items);
+    this.dirty = false;
   }
 
   protected left(): void {
@@ -48,11 +75,22 @@ export class Inventory extends Scene {
   protected use(): void {
     const target = this.yList.selected;
     if (target) {
-      this.player.$.action.data = {
-        id: Action.ITEM_USE,
-        target,
-        actor: this.player
-      };
+      console.log(target);
+      if (isEquippable(target)) {
+        this.player.$.action.data = {
+          id: target.$.equip.isEquipped
+            ? Action.ITEM_UNEQUIP
+            : Action.ITEM_EQUIP,
+          actor: this.player,
+          target
+        };
+      } else if (isConsumable(target)) {
+        this.player.$.action.data = {
+          id: Action.ITEM_USE,
+          target,
+          actor: this.player
+        };
+      }
       this.dirty = true;
     }
   }
@@ -80,30 +118,7 @@ export class Inventory extends Scene {
   public tick(): void {
     const wasDirty = this.dirty;
     this.dirty = false;
-    const next = this.game.$.commands.getNextEvent();
-
-    if (next?.isKeyboard) {
-      switch (next.key) {
-        case 'i':
-          this.end();
-          break;
-        case ' ':
-          this.use();
-          break;
-        case 'w':
-          this.up();
-          break;
-        case 'a':
-          this.left();
-          break;
-        case 's':
-          this.down();
-          break;
-        case 'd':
-          this.right();
-          break;
-      }
-    }
+    this.handleInput();
     if (wasDirty) {
       this.refresh();
     }

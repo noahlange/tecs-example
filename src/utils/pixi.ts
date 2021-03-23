@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
-import type { Color } from 'rot-js/lib/color';
-import { Direction } from './enums';
+import { Direction } from '@enums';
 
 export async function getSpritesheetFromTexture(
   texture: PIXI.Texture,
@@ -10,14 +9,6 @@ export async function getSpritesheetFromTexture(
     const spritesheet = new PIXI.Spritesheet(texture, atlas);
     spritesheet.parse(() => resolve(spritesheet));
   });
-}
-
-// https://stackoverflow.com/a/5623914
-export function toHex([r, g, b]: Color): number {
-  return parseInt(
-    ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1),
-    16
-  );
 }
 
 export function getTransformFromDirection(d: Direction): [number, number] {

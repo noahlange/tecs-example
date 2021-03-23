@@ -1,4 +1,4 @@
-import type { RGBColor } from '../../types';
+import type { Color } from '@types';
 import { Component } from 'tecs';
 
 /**
@@ -7,7 +7,6 @@ import { Component } from 'tecs';
 export class Renderable extends Component {
   public static readonly type = 'render';
   public dirty: boolean = false;
-  public fg: RGBColor | null = null;
-  public bg: RGBColor | null = null;
-  public order: number = 0;
+  public fg: Color | null = null;
+  public bg: Color | null = null;
 }

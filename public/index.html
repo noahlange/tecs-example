@@ -3,59 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <title>tecs</title>
-    <style>
-      @font-face {
-        font-family: SDS;
-        src: url('url:../src/assets/SDS_8x8.ttf');
-      }
-
-      html,
-      body {
-        font-family: Alagard;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      :root {
-        --width: 1280px;
-        --height: 720px;
-      }
-
-      body {
-        background: #000;
-      }
-
-      canvas {
-        width: var(--width);
-        height: var(--height);
-      }
-
-      canvas {
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
-        z-index: 0;
-        pointer-events: auto;
-      }
-
-      main {
-        margin: 5rem auto;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: row-reverse;
-        position: relative;
-        /* width: 1280px; */
-      }
-    </style>
+    <link rel="stylesheet" href="../src/assets/styles/index.scss" />
   </head>
   <body>
     <main>
       <div id="ui"></div>
       <div id="root"></div>
     </main>
-
     <script type="text/javascript" src="../src/index.ts"></script>
   </body>
 </html>

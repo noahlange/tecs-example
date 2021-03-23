@@ -3,7 +3,7 @@ import type { InventoryItem } from '@ecs/entities/types';
 import type { EntityType } from 'tecs';
 import type { Item, Text } from '@ecs/components';
 
-import { ItemType } from '@types';
+import { ItemType } from '@enums';
 import { h } from 'preact';
 
 import items from 'url:../../../assets/ui/btn-items.png';
@@ -13,7 +13,9 @@ import potions from 'url:../../../assets/ui/btn-potions.png';
 import magic from 'url:../../../assets/ui/btn-magic.png';
 import misc from 'url:../../../assets/ui/btn-misc.png';
 
-import './styles.scss';
+import { Equipment } from '@ecs/entities';
+import { WeaponStats } from './stats/Weapon';
+import { isEquippable } from '@utils';
 
 interface InventoryProps {
   items: InventoryItem[];
@@ -51,11 +53,17 @@ export function InventoryUI(props: InventoryProps): JSX.Element {
         </nav>
         <div>
           <ul>
-            {props.items.map(({ id, $ }, i) => {
+            {props.items.map((item, i) => {
+              const { $, id } = item;
               const isSelected = i === props.index;
+              const isEquipped = isEquippable(item) && item.$.equip.isEquipped;
               return (
                 <li className={`item ${isSelected ? 'selected' : ''}`} key={id}>
-                  <span>{$.text.title}</span>
+                  {isEquipped ? (
+                    <span style={{ color: 'red' }}>{$.text.title}</span>
+                  ) : (
+                    <span>{$.text.title}</span>
+                  )}
                   <span>{$.item.count}</span>
                 </li>
               );
@@ -70,6 +78,12 @@ export function InventoryUI(props: InventoryProps): JSX.Element {
           <div className="item-title">
             <h2>{props.selected?.$.text.title}</h2>
           </div>
+          {props.selected instanceof Equipment &&
+          props.selected.$.item.type === ItemType.WEAPON ? (
+            <WeaponStats
+              item={props.selected as InstanceType<typeof Equipment>}
+            />
+          ) : null}
           <div className="item-description">
             {props.selected?.$.item.description}
           </div>

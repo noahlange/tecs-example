@@ -6,10 +6,10 @@ import type {
   Text,
   Faction as FactionComponent
 } from '../components';
-import type { Faction } from '@types';
+import type { Faction } from '@enums';
 
 import { System } from 'tecs';
-import { AIState } from '@types';
+import { AIState } from '@enums';
 import { isSamePoint, isWithin } from '@utils';
 
 import { Playable, Position } from '../components';

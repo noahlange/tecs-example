@@ -1,5 +1,5 @@
+import { RNG } from '@utils';
 import Roll from 'roll';
-import { RNG } from 'rot-js';
 
 interface Roller {
   (str: string): number;
@@ -7,7 +7,7 @@ interface Roller {
 }
 
 export const roll: Roller = (() => {
-  const roller = new Roll(() => RNG.getUniform());
+  const roller = new Roll(() => RNG.float());
   return Object.assign((str: string) => roller.roll(str).result, { roller });
 })();
 

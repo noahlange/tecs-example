@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    "module": "esnext",
+    "module": "CommonJS",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "experimentalDecorators": true,
@@ -16,16 +16,17 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "baseUrl": "src",
     "paths": {
-      "@utils": ["./utils/index.ts"],
-      "@lib": ["./lib/index.ts"],
-      "@types": ["./types.ts"],
-      "@utils/*": ["./utils/*"],
-      "@ecs/*": ["./ecs/*"],
-      "@core/*": ["./core/*"]
+      "@utils": ["./src/utils/index.ts"],
+      "@utils/colors": ["./src/utils/colors.ts"],
+      "@utils/random": ["./src/utils/random.ts"],
+      "@lib": ["./src/lib/index.ts"],
+      "@types": ["./src/types.ts"],
+      "@enums": ["./src/enums.ts"],
+      "@ecs/*": ["./src/ecs/*"],
+      "@core/*": ["./src/core/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "utils"],
   "exclude": [".ignore"]
 }

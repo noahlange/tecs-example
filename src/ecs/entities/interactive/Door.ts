@@ -1,4 +1,3 @@
-import type { RGBColor } from '@types';
 import { Entity } from 'tecs';
 
 import {
@@ -39,7 +38,7 @@ export class Door extends Entity.with(
   Renderable
 ) {
   public static data = {
-    sprite: { key: 'door_01', tint: [60, 30, 20] as RGBColor },
+    sprite: { key: 'door_01', tint: { r: 60, g: 30, b: 20, a: 1 } },
     collision: { passable: false, allowLOS: false }
   };
 
