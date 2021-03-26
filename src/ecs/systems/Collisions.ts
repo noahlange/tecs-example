@@ -1,4 +1,4 @@
-import type { CollisionMap } from '../../lib/CollisionMap';
+import type { Collisions as CollisionMethods } from '../../lib/CollisionMap';
 
 import { System } from 'tecs';
 import { Position, Actor, Collision, Interactive } from '../components';
@@ -7,30 +7,23 @@ import { getNewDirection, Action } from '@utils';
 export class Collisions extends System {
   public static type = 'collisions';
 
-  protected collisions!: CollisionMap;
+  protected collisions!: CollisionMethods;
 
   protected $ = {
     movers: this.world.query.components(Actor, Position).persist(),
     cells: this.world.query.components(Collision, Position).persist(),
-    collisions: this.world.query
+    colliders: this.world.query
       .components(Collision, Position, Interactive)
       .persist()
   };
 
   protected updateDynamicCollisions(): void {
-    for (const entity of this.$.collisions) {
+    for (const entity of this.$.colliders) {
       this.collisions.set(
         entity.$.position,
-        entity.$.collision.passable,
-        entity.$.collision.allowLOS
+        entity.$.collision.allowLOS,
+        entity.$.collision.passable
       );
-    }
-  }
-
-  protected updateStaticCollisions(): void {
-    for (const e of this.$.cells) {
-      const c = e.$.collision as Collision;
-      this.collisions.set(e.$.position as Position, c.passable, c.allowLOS);
     }
   }
 

@@ -1,4 +1,3 @@
-import { MapGen } from '@core/scenes';
 import * as PIXI from 'pixi.js';
 
 window.LOAD_TEST = false;

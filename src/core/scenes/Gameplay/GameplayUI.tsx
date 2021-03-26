@@ -1,25 +1,28 @@
 import type { JSX } from 'preact';
 import type { Player } from '@ecs/entities';
-import type { GameMessage } from '@types';
 
 import type { GameState } from '@enums';
 import { h } from 'preact';
-import type { Chunk } from '@lib';
+import type { Area } from '@lib';
+import { toChunkPosition } from '@utils';
 
 interface GameplayUIProps {
   player: Player;
-  log: GameMessage[];
-  chunk: Chunk;
+  area: Area;
   state: GameState;
 }
 
 export function GameplayUI(props: GameplayUIProps): JSX.Element {
   const { position } = props.player.$;
+  const [chunk, pos] = toChunkPosition(position);
+
   return (
     <div className="ui hud">
       <div className="hp">
         <p>
-          Chunk: {props.chunk.x}, {props.chunk.y}
+          Chunk: {chunk.x}, {chunk.y}
+          <br />
+          Pos: {pos.x}, {pos.y}
         </p>
         <p>
           Pos: {position.x}, {position.y}
@@ -30,15 +33,6 @@ export function GameplayUI(props: GameplayUIProps): JSX.Element {
           <li>
             <button className="border">1</button>
           </li>
-        </ul>
-      </div>
-      <div className="log">
-        <ul>
-          {props.log.slice(-3).map(({ text }, i) => (
-            <li className={`log-item`} key={i}>
-              {text}
-            </li>
-          ))}
         </ul>
       </div>
     </div>

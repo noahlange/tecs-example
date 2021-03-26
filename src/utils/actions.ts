@@ -31,6 +31,12 @@ export interface MoveAction extends ActionItem {
   point?: Vector2;
 }
 
+export interface CombatAttackAction extends ActionItem {
+  id: Action.COMBAT_ATTACK;
+  target: Vector2;
+  attack: EntityType<[typeof AreaOfEffect, typeof Equippable]>;
+}
+
 export interface DestinationAction extends ActionItem {
   id: Action.SET_DESTINATION;
   target: Vector2;
@@ -38,14 +44,22 @@ export interface DestinationAction extends ActionItem {
   isVisible: boolean;
 }
 
-export interface CombatAttackAction extends ActionItem {
-  id: Action.COMBAT_ATTACK;
-  target: Vector2;
-  attack: EntityType<[typeof AreaOfEffect, typeof Equippable]>;
-}
-
 export interface CombatDefendAction extends ActionItem {
   id: Action.COMBAT_DEFEND;
+}
+
+export interface InteractAction extends ActionItem {
+  id: Action.INTERACT;
+  target: string | null;
+}
+
+export interface VoidAction extends ActionItem {
+  id: Action.NONE;
+}
+
+export interface MenuNavigateAction extends ActionItem {
+  id: Action.MENU_NAVIGATE;
+  key: string;
 }
 
 export interface PickUpAction extends ActionItem {
@@ -82,20 +96,6 @@ export interface CombatAttackPaused extends ActionItem {
   attack: InstanceType<typeof Attack>;
 }
 
-export interface InteractAction extends ActionItem {
-  id: Action.INTERACT;
-  target: string | null;
-}
-
-export interface VoidAction extends ActionItem {
-  id: Action.NONE;
-}
-
-export interface MenuNavigateAction extends ActionItem {
-  id: Action.MENU_NAVIGATE;
-  key: string;
-}
-
 export type ActionType =
   | PickUpAction
   | MoveAction
@@ -109,4 +109,14 @@ export type ActionType =
   | CombatDefendAction
   | CombatAttackPaused
   | EquipAction
-  | UnequipAction;
+  | UnequipAction
+  | MoveAction
+  | DestinationAction
+  | VoidAction
+  | InteractAction
+  | MenuNavigateAction
+  | MoveAction
+  | DestinationAction
+  | VoidAction
+  | InteractAction
+  | MenuNavigateAction;

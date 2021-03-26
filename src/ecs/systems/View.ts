@@ -1,16 +1,13 @@
-import type { Vector2, Color } from '@types';
-import type { CollisionMap } from '@lib';
+import type { Vector2, Color, Size } from '@types';
 
 import { System } from 'tecs';
 import { FOV } from 'malwoden';
-
-import { Lighting, Vector2Array } from '@lib';
+import { Lighting } from '@lib';
 
 import {
   Position,
   LightSource,
   Renderable,
-  Interactive,
   View as ViewComponent,
   Playable,
   Sprite
@@ -19,9 +16,16 @@ import {
 import {
   AMBIENT_DARK as DARK,
   AMBIENT_LIGHT as LIGHT,
-  isSamePoint
+  CHUNK_HEIGHT,
+  CHUNK_WIDTH,
+  isSamePoint,
+  toRelative,
+  fromRelative,
+  CHUNK_RADIUS
 } from '@utils';
-import { add, multiply } from '@utils/colors';
+
+import { Vector2Array } from '@lib';
+import { add, mix, multiply } from '@utils/colors';
 
 enum Repaint {
   /**
@@ -52,15 +56,11 @@ export class View extends System {
   // we don't need to recalculate FOV if the view hasn't changed
   protected lastPosition: Record<string, Vector2> = {};
 
-  protected width!: number;
-  protected height!: number;
+  protected center: Vector2 = { x: 0, y: 0 };
+  protected size!: Size;
 
-  // rot instances, instantiated during init()
   protected fov!: FOV.PreciseShadowcasting;
   protected lighting!: Lighting;
-
-  // protected lighting!: ROT.Lighting;
-  protected collisions!: CollisionMap;
 
   protected debug = false;
 
@@ -72,7 +72,7 @@ export class View extends System {
       .persist(),
     renderable: this.world.query
       .components(Position, Renderable)
-      .some.components(Sprite, Interactive)
+      .some.components(Sprite)
       .persist()
   };
 
@@ -99,17 +99,20 @@ export class View extends System {
         }
       }
       // recalculate FOV
-      $.view.visible = [];
-      this.fov.calculateCallback($.position, $.view.range, pos => {
-        $.view.visible.push(pos);
-        this.repaintGrid.set(
-          pos,
-          this.debug ? Repaint.DEBUG : $.player ? Repaint.FULL : Repaint.BASE
-        );
-      });
+      const rel = toRelative(this.center, $.position);
+      if (rel) {
+        $.view.visible = [];
+        this.fov.calculateCallback(rel, $.view.range, pos => {
+          $.view.visible.push(fromRelative(this.center, pos));
+          this.repaintGrid.set(
+            pos,
+            this.debug ? Repaint.DEBUG : $.player ? Repaint.FULL : Repaint.BASE
+          );
+        });
 
-      // and update last position
-      this.lastPosition[id] = { ...$.position };
+        // and update last position
+        this.lastPosition[id] = $.position;
+      }
     }
   }
 
@@ -121,15 +124,15 @@ export class View extends System {
     // reset...
     this.colorGrid.clear();
     this.lighting.clearLights();
-    const lights = new Vector2Array<Color>({
-      w: this.width,
-      h: this.height
-    });
+    const lights = new Vector2Array<Color>(this.size);
 
     // find all the light sources...
     for (const { $ } of this.queries.lights) {
-      const prev = lights.get($.position);
-      lights.set($.position, prev ? add(prev, $.light.color) : $.light.color);
+      const pos = toRelative(this.center, $.position);
+      if (pos) {
+        const prev = lights.get(pos);
+        lights.set(pos, prev ? add(prev, $.light.color) : $.light.color);
+      }
     }
 
     for (const [point, color] of lights.entries()) {
@@ -147,28 +150,35 @@ export class View extends System {
    */
   protected repaint(): void {
     for (const { $ } of this.queries.renderable) {
-      const r = this.repaintGrid.get($.position);
-      if (!r) {
+      const key = toRelative(this.center, $.position);
+
+      if (!key || !this.repaintGrid.has(key)) {
         continue;
       }
+
+      const r = this.repaintGrid.get(key);
 
       let data: Color | null = null;
 
       switch (r) {
-        case Repaint.FULL:
-          data = this.colorGrid.get($.position);
+        case Repaint.FULL: {
+          const rel = toRelative(this.center, $.position);
+          if (rel) {
+            data = this.colorGrid.get(rel);
+          }
           break;
+        }
         case Repaint.DEBUG:
           data = { r: 255, g: 0, b: 0, a: 1 };
           break;
       }
 
-      const base = this.collisions.isVisible($.position) ? LIGHT : DARK;
+      const visible = key && this.world.game.$.map.collisions.isVisible(key);
+      const base = visible ? LIGHT : DARK;
       const light = data ? add(LIGHT, data) : LIGHT;
       const mult = multiply(base, data ?? LIGHT);
 
-      $.render.fg = { r: 255, g: 255, b: 255, a: 1 };
-      // $.render.fg = $.sprite?.tint ? mix(mult, $.sprite?.tint) : mult;
+      $.render.fg = $.sprite?.tint ? mix(mult, $.sprite?.tint) : mult;
       $.render.bg = multiply(light, LIGHT);
       $.render.dirty = true;
     }
@@ -185,22 +195,26 @@ export class View extends System {
 
   public initMap(): void {
     const map = this.world.game.$.map;
-    const w = (this.width ??= map.bounds.w);
-    const h = (this.height ??= map.bounds.h);
+    this.size = {
+      width: CHUNK_WIDTH + CHUNK_RADIUS * 2,
+      height: CHUNK_HEIGHT + CHUNK_RADIUS * 2
+    };
+    this.center = { x: map.x, y: map.y };
 
     // initially, we want to paint everything without lighting. we may light it during the tick, but we don't care at this point.
-    this.repaintGrid = new Vector2Array({ w, h }, Repaint.BASE);
-    this.colorGrid = new Vector2Array({ w, h });
+    this.repaintGrid = new Vector2Array(this.size, Repaint.BASE);
+    this.colorGrid = new Vector2Array(this.size);
 
-    this.collisions = map.collisions;
     this.fov = new FOV.PreciseShadowcasting({
-      lightPasses: point => this.collisions.isVisible(point),
+      lightPasses: point =>
+        map.collisions.isVisible(fromRelative(this.center, point)),
       topology: 'four'
     });
 
     this.lighting = new Lighting(
-      map.bounds,
-      point => (this.collisions.isVisible(point) ? 0 : 0.3),
+      this.size,
+      point =>
+        map.collisions.isVisible(fromRelative(this.center, point)) ? 0 : 0.3,
       { range: 8, passes: 2 }
     );
 

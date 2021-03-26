@@ -1,6 +1,22 @@
-import { alea } from 'seedrandom';
+import seedrandom from 'seedrandom';
+import { Seeder } from '@lib';
 
-const random = alea('initial_seed');
+export let random = seedrandom.alea('initial_seed');
+
+export function setSeed(seed: string): void {
+  random = seedrandom.alea(seed);
+}
+
+export function useSeed(seed: string, callback: () => void): void {
+  // get current seed
+  const start = Seeder.seed ?? 'initial_seed';
+  // set new seed
+  Seeder.set(seed);
+  // do stuff
+  callback();
+  // replace old seed
+  Seeder.set(start);
+}
 
 export function getUniformInt(min: number, max: number): number {
   return Math.floor(random.quick() * (max - min) + min);

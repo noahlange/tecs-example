@@ -12,6 +12,26 @@ export const roll: Roller = (() => {
 })();
 
 /**
+ * Yield numbers from `0` → `count` (positive) or `count` → `0` (negative).
+ * @param d - direction; negative or positive/zero
+ * @param count - number of points to yield
+ */
+export function* iterateAcross(
+  d: number,
+  count: number
+): IterableIterator<number> {
+  if (d >= 0) {
+    for (let i = 0; i <= count; i++) {
+      yield i;
+    }
+  } else {
+    for (let i = count; i >= 0; i--) {
+      yield i;
+    }
+  }
+}
+
+/**
  * Adapted from https://github.com/norbornen/execution-time-decorator, released
  * under the terms of the MIT License. Decorate methods to log execution time.
  */

@@ -26,8 +26,8 @@ export interface DamageDefinition {
 }
 
 export interface Size {
-  w: number;
-  h: number;
+  width: number;
+  height: number;
 }
 
 export interface BaseInputEvent {

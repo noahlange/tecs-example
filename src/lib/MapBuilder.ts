@@ -17,6 +17,13 @@ export abstract class MapBuilder {
   protected width: number;
   protected height: number;
 
+  public *entries(): IterableIterator<[Vector2, TileType]> {
+    const curr = this.map.history[this.map.history.length - 1];
+    if (curr) {
+      yield* curr.entries();
+    }
+  }
+
   public get history(): Vector2Array<TileType>[] {
     return this.map.history;
   }
@@ -28,8 +35,8 @@ export abstract class MapBuilder {
   protected getRandomPoint(): Vector2 {
     const b = this.map.bounds;
     return {
-      x: getUniformInt(0, b.w),
-      y: getUniformInt(0, b.h)
+      x: getUniformInt(0, b.width),
+      y: getUniformInt(0, b.height)
     };
   }
 
@@ -44,12 +51,11 @@ export abstract class MapBuilder {
       }
     } while (pt === null);
 
-    return { x: this.map.bounds.cx, y: this.map.bounds.cy };
+    return this.map.bounds.center;
   }
 
   protected getBrushPoints(point: Vector2): Vector2[] {
     const points = [];
-
     if (this.brush === 1) {
       return [point];
     } else {

@@ -1,7 +1,13 @@
 import type { Vector2, Size } from '@types';
 import { Vector2Array } from './Vector2Array';
 
-export class CollisionMap {
+export interface Collisions {
+  isPassable(point: Vector2): boolean;
+  isVisible(point: Vector2): boolean;
+  set(point: Vector2, allowLOS: boolean, isPassable: boolean): void;
+}
+
+export class CollisionMap implements Collisions {
   protected collisions: Vector2Array<number>;
   protected obstructions: Vector2Array<number>;
 
@@ -41,8 +47,8 @@ export class CollisionMap {
   }
 
   public constructor(size: Size) {
-    this.width = size.w;
-    this.height = size.h;
+    this.width = size.width;
+    this.height = size.height;
     this.collisions = new Vector2Array(size);
     this.obstructions = new Vector2Array(size);
   }

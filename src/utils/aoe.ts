@@ -40,7 +40,10 @@ function getRayPoints(point: WithDirection, range: number): Vector2[] {
 }
 
 export function getCirclePoints(center: Vector2, radius: number): Vector2[] {
-  const points = new Vector2Array<boolean>({ w: radius * 2, h: radius * 2 });
+  const points = new Vector2Array<boolean>({
+    width: radius * 2,
+    height: radius * 2
+  });
   let r = 0;
   while (r < radius) {
     r++;

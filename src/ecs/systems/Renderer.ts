@@ -9,14 +9,23 @@ import { Tag } from '@enums';
 import {
   TILE_HEIGHT,
   TILE_WIDTH,
-  getSpritesheetFromTexture,
   getTransformFromDirection,
+  toRelative,
   AMBIENT_LIGHT
 } from '@utils';
 
+import { atlas } from '../../assets/atlases';
 import { toHex } from '@utils/colors';
 
-import { atlas } from '../../assets/atlases';
+async function getSpritesheetFromTexture(
+  texture: PIXI.Texture,
+  atlas: unknown
+): Promise<PIXI.Spritesheet> {
+  return new Promise(resolve => {
+    const spritesheet = new PIXI.Spritesheet(texture, atlas);
+    spritesheet.parse(() => resolve(spritesheet));
+  });
+}
 
 export class Renderer extends System {
   public static readonly type = 'renderer';
@@ -83,45 +92,85 @@ export class Renderer extends System {
     this.overlays.clear();
   }
 
+  public updatePosition(
+    entity: EntityType<[typeof Sprite, typeof Position]>
+  ): void {
+    const rel = toRelative(this.world.game.$.map, entity.$.position);
+    const pixi = entity.$.sprite.pixi;
+    if (rel && pixi) {
+      const point = new PIXI.Point(rel.x * TILE_WIDTH, rel.y * TILE_HEIGHT);
+      if (!point.equals(pixi.position)) {
+        pixi.position = point;
+      }
+      pixi.zIndex = entity.$.position.z ?? 0;
+    }
+  }
+
+  public updateTransform(
+    entity: EntityType<[typeof Sprite, typeof Position]>
+  ): void {
+    const { sprite, position } = entity.$;
+    if (sprite.pixi) {
+      const [scaleX, scaleY] = getTransformFromDirection(position.d);
+      if (scaleX && scaleY) {
+        sprite.pixi.anchor.x = scaleX === 1 ? 0 : 1;
+        sprite.pixi.scale.x = scaleX;
+        sprite.pixi.scale.y = scaleY;
+      }
+    }
+  }
+
   public updateSprites(): void {
     for (const entity of this.$.sprites) {
       if (entity.$.sprite.pixi) {
         if (entity.$.render?.dirty === false) {
           continue;
         }
-      }
-
-      const { sprite, position: pos } = entity.$;
-
-      if (!entity.$.sprite.pixi) {
+      } else {
         this.addSprite(entity);
       }
 
-      const point = new PIXI.Point(pos.x * TILE_WIDTH, pos.y * TILE_HEIGHT);
+      this.updatePosition(entity);
+      this.updateTransform(entity);
 
-      const s = sprite.pixi!;
-
-      if (!point.equals(pos)) {
-        s.position = point;
-      }
-
-      s.zIndex = pos.z;
-
-      const [scaleX, scaleY] = getTransformFromDirection(pos.d);
-      if (scaleX && scaleY) {
-        s.anchor.x = scaleX === 1 ? 0 : 1;
-        s.scale.x = scaleX;
-        s.scale.y = scaleY;
-      }
-
-      if (entity.$.render) {
-        const { fg } = entity.$.render;
-        s.tint = toHex(fg ?? AMBIENT_LIGHT);
-        entity.$.render.dirty = false;
-      } else {
-        if (sprite.tint) {
-          s.tint = toHex(sprite.tint);
+      const sprite = entity.$.sprite;
+      if (sprite.pixi) {
+        if (entity.$.render) {
+          const { fg } = entity.$.render;
+          const tint = entity.$.sprite.tint;
+          sprite.pixi.tint = toHex(tint ?? { r: 255, g: 255, b: 255, a: 1 });
+          // sprite.pixi.tint = toHex(fg ?? AMBIENT_LIGHT);
+          // entity.$.render.dirty = false;
+        } else {
+          if (sprite.tint) {
+            sprite.pixi.tint = toHex(sprite.tint);
+          }
         }
+      }
+    }
+  }
+
+  protected addSprite(
+    entity: EntityType<[typeof Sprite, typeof Position]>
+  ): void {
+    for (const name in atlas) {
+      const key = entity.$.sprite.key;
+      const spritesheet = this.sheets[name];
+      const texture = spritesheet.textures[key];
+      if (texture?.valid) {
+        const rel = toRelative(this.world.game.$.map, entity.$.position);
+
+        if (!rel) {
+          return;
+        }
+        entity.$.sprite.pixi ??= new PIXI.Sprite(spritesheet.textures[key]);
+        entity.$.sprite.pixi.position = new PIXI.Point(
+          rel.x * TILE_WIDTH,
+          rel.y * TILE_HEIGHT
+        );
+
+        this.containers.fg.addChild(entity.$.sprite.pixi);
+        return;
       }
     }
   }
@@ -130,9 +179,9 @@ export class Renderer extends System {
     for (const entity of this.$.removals) {
       const sprite = entity.$.sprite.pixi;
       if (sprite) {
-        entity.tags.remove(Tag.TO_UNRENDER);
         sprite.destroy();
       }
+      entity.destroy();
     }
   }
 
@@ -141,18 +190,6 @@ export class Renderer extends System {
     this.updateRemovals();
     this.drawOverlays();
     this.updateSprites();
-  }
-
-  protected addSprite(entity: EntityType<[typeof Sprite]>): void {
-    for (const name in atlas) {
-      const key = entity.$.sprite.key;
-      const spritesheet = this.sheets[name];
-      const texture = spritesheet.textures[key];
-      if (texture?.valid) {
-        entity.$.sprite.pixi ??= PIXI.Sprite.from(spritesheet.textures[key]);
-        this.containers.fg.addChild(entity.$.sprite.pixi);
-      }
-    }
   }
 
   // init functions can be async
@@ -165,6 +202,7 @@ export class Renderer extends System {
     };
 
     this.containers.fg.sortableChildren = true;
+
     this.containers.fg.name = 'fg';
     this.containers.ui.name = 'ui';
     this.sheets = {};
@@ -174,11 +212,6 @@ export class Renderer extends System {
       const texture = await PIXI.Texture.fromURL(value.image);
       texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
       this.sheets[key] = await getSpritesheetFromTexture(texture, value.atlas);
-    }
-
-    // create all sprites and add to the stage
-    for (const entity of this.$.sprites) {
-      this.addSprite(entity);
     }
 
     this.containers.ui.interactive = true;

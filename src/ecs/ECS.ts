@@ -5,33 +5,21 @@ import * as Components from './components';
 import * as Entities from './entities';
 
 import {
-  AI,
   Collisions,
   Pathfinding,
-  Interact,
   View,
   Renderer,
   Movement,
   Camera,
-  Inventory,
-  Scenes,
-  Items,
-  Combat,
-  Overlays
+  Scenes
 } from './systems';
 
 export class ECS extends World.with(
   Scenes,
-  Inventory,
-  AI,
   Pathfinding,
-  Interact,
-  Items,
-  Combat,
   Collisions,
   Movement,
   View,
-  Overlays,
   Renderer,
   Camera
 ) {

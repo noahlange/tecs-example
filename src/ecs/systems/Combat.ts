@@ -32,7 +32,7 @@ export class Combat extends System {
   };
 
   public tick(): void {
-    const size = this.world.game.$.map.bounds;
+    const size = { width: 0, height: 0 };
     const combatants = new Vector2Array<CombatEntity>(size);
     const attacks = new Vector2Array<Set<AttackData>>(size);
 

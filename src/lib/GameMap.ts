@@ -35,8 +35,8 @@ export class GameMap {
   public constructor(options: GameMapOptions) {
     this.tiles = new Vector2Array<TileType>(
       {
-        w: options.width,
-        h: options.height
+        width: options.width,
+        height: options.height
       },
       TileType.WALL
     );

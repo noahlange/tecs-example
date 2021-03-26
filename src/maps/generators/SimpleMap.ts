@@ -28,8 +28,8 @@ export class Builder extends MapBuilder {
   protected drawCorridors(): void {
     for (let i = 1; i <= this.rooms.length; i++) {
       const [curr, next] = [this.rooms[i - 1], this.rooms[i] ?? this.rooms[0]];
-      const { cx: nextX, cy: nextY } = next;
-      const { cx: currX, cy: currY } = curr;
+      const { x: nextX, y: nextY } = next.center;
+      const { x: currX, y: currY } = curr.center;
 
       if (RNG.flip()) {
         this.drawCorridor({ x: currX, y: currY }, { x: nextX, y: currY });

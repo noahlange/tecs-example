@@ -13,20 +13,19 @@ export class Rectangle {
   public x2: number;
   public y2: number;
 
-  public get w(): number {
+  public get width(): number {
     return Math.abs(this.x2 - this.x1);
   }
 
-  public get h(): number {
+  public get height(): number {
     return Math.abs(this.y2 - this.y1);
   }
 
-  public get cx(): number {
-    return Math.floor((this.x1 + this.x2) / 2);
-  }
-
-  public get cy(): number {
-    return Math.floor((this.y1 + this.y2) / 2);
+  public get center(): Vector2 {
+    return {
+      x: Math.floor((this.x1 + this.x2) / 2),
+      y: Math.floor((this.y1 + this.y2) / 2)
+    };
   }
 
   public intersects(rect: Rect): boolean {

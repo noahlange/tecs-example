@@ -34,8 +34,11 @@ export class Builder extends MapBuilder {
     if (this.rects.length > 0) {
       this.rects.pop();
     }
-    const [w, h] = [r.w, r.h];
-    const [halfWidth, halfHeight] = [Math.floor(w / 2), Math.floor(h / 2)];
+    const { width, height } = r;
+    const [halfWidth, halfHeight] = [
+      Math.floor(width / 2),
+      Math.floor(height / 2)
+    ];
 
     const h1 = { x1: r.x1, y1: r.y1, x2: r.x1 + (halfWidth - 1), y2: r.y2 };
     const h2 = { x1: r.x1 + halfWidth, y1: r.y1, x2: r.x2, y2: r.y2 };

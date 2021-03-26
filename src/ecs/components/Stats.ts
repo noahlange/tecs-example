@@ -1,16 +1,18 @@
-import { Attribute, HealthBar } from '@lib';
+import { HealthBar } from '@lib';
 import { Component } from 'tecs';
+import { Attribute } from '@enums';
+import { StatAttribute } from '../../rpg/StatAttribute';
 
 export class Stats extends Component {
   public static readonly type = 'stats';
   public maxHP: number = 100;
   public health = new HealthBar(this.maxHP);
 
-  public dex: Attribute = new Attribute();
-  public agi: Attribute = new Attribute();
-  public con: Attribute = new Attribute();
-  public int: Attribute = new Attribute();
-  public per: Attribute = new Attribute();
-  public cha: Attribute = new Attribute();
-  public arc: Attribute = new Attribute();
+  public [Attribute.DEX]: StatAttribute = new StatAttribute(Attribute.DEX);
+  public [Attribute.AGI]: StatAttribute = new StatAttribute(Attribute.AGI);
+  public [Attribute.CON]: StatAttribute = new StatAttribute(Attribute.CON);
+  public [Attribute.INT]: StatAttribute = new StatAttribute(Attribute.INT);
+  public [Attribute.PER]: StatAttribute = new StatAttribute(Attribute.PER);
+  public [Attribute.CHA]: StatAttribute = new StatAttribute(Attribute.CHA);
+  public [Attribute.MAG]: StatAttribute = new StatAttribute(Attribute.MAG);
 }

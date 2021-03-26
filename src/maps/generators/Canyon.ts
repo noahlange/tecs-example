@@ -1,7 +1,7 @@
 import { MapBuilder } from '@lib';
 import { TileType } from '@enums';
 import { float, getUniformInt } from '@utils/random';
-import type { MapBuilderOpts } from '../MapBuilder';
+import type { MapBuilderOpts } from '../../lib/MapBuilder';
 
 interface CanyonBuilderOpts extends MapBuilderOpts {
   roughness?: number;

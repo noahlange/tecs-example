@@ -1,13 +1,23 @@
 import type { Vector2, Size } from '@types';
 
 export class Vector2Array<T> {
+  public static from<T>(items: [Vector2, T][]): Vector2Array<T> {
+    const width = Math.max(...items.map(([pos]) => pos.x)) + 1;
+    const height = Math.max(...items.map(([pos]) => pos.y)) + 1;
+    const arr = new Vector2Array<T>({ width, height });
+    for (const [point, value] of items) {
+      arr.set(point, value);
+    }
+    return arr;
+  }
+
   protected items: T[];
 
   public readonly width: number;
   public readonly height: number;
 
   public clone(): Vector2Array<T> {
-    const res = new Vector2Array<T>({ w: this.width, h: this.height });
+    const res = new Vector2Array<T>({ width: this.width, height: this.height });
     res.items = this.items.slice();
     return res;
   }
@@ -71,8 +81,8 @@ export class Vector2Array<T> {
   }
 
   public constructor(size: Size, fill: T | null = null) {
-    this.width = size.w;
-    this.height = size.h;
+    this.width = size.width;
+    this.height = size.height;
     this.items = new Array(this.width * this.height);
     if (fill !== null) {
       this.fill(fill);

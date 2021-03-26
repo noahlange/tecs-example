@@ -1,10 +1,10 @@
 import type { Vector2 } from '@types';
 import { MapBuilder } from '@lib';
 import { TileType } from '@enums';
-import { getRandomNeighbor } from '@utils';
+import { CHUNK_HEIGHT, CHUNK_WIDTH, getRandomNeighbor } from '@utils';
 
 export class Builder extends MapBuilder {
-  public static tiles = 1200;
+  public static tiles = CHUNK_WIDTH * CHUNK_HEIGHT * 0.375;
 
   protected cleared: number = 0;
   protected current: Vector2 | null = null;
@@ -22,11 +22,10 @@ export class Builder extends MapBuilder {
   }
 
   public generate(): void {
-    const center = this.map.bounds;
-    this.current = { x: center.cx, y: center.cy };
+    this.current = this.map.bounds.center;
 
     while (this.cleared < Builder.tiles) {
-      this.lifetime = 1000;
+      this.lifetime = CHUNK_WIDTH * CHUNK_HEIGHT * 0.125;
       this.drawPoint(this.current);
       while (this.lifetime > 0) {
         const next = getRandomNeighbor(this.current!, this.map.bounds);

@@ -3,7 +3,7 @@ import type { Vector2 } from '@types';
 
 import { TileType } from '@enums';
 
-import type { MapBuilderOpts } from '../MapBuilder';
+import type { MapBuilderOpts } from '../../lib/MapBuilder';
 import { clamp, RNG } from '@utils';
 
 enum Algorithm {
