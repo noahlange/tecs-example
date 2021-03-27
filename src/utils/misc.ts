@@ -32,6 +32,27 @@ export function* iterateAcross(
 }
 
 /**
+ * Modify a system's effective tick rate, invoking its `tick` method once every `n` ticks.
+ * @param t
+ */
+export function rate(ticks: number): ClassDecorator {
+  const ticker = Symbol('ticker');
+  return (constructor: Function) => {
+    const originalMethod = constructor.prototype.tick;
+    constructor.prototype[ticker] = { count: 0, dt: 0 };
+    constructor.prototype.tick = function (dt: number, ts: number): void {
+      const tick = this[ticker];
+      tick.count++;
+      tick.dt += dt;
+      if (tick.count === ticks) {
+        tick.count = tick.dt = 0;
+        originalMethod.call(this, tick.dt, ts);
+      }
+    };
+  };
+}
+
+/**
  * Adapted from https://github.com/norbornen/execution-time-decorator, released
  * under the terms of the MIT License. Decorate methods to log execution time.
  */

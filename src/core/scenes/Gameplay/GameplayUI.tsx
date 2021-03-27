@@ -24,9 +24,6 @@ export function GameplayUI(props: GameplayUIProps): JSX.Element {
           <br />
           Pos: {pos.x}, {pos.y}
         </p>
-        <p>
-          Pos: {position.x}, {position.y}
-        </p>
       </div>
       <div class="actions">
         <ul>

@@ -56,8 +56,6 @@ export class MapGen extends Scene {
   }
 
   public init(): void {
-    this.game.$.map.chunk = new Chunk({ x: 0, y: 0 }, this.builder);
-    const count = 2500 / this.builder.history.length;
-    setInterval(() => this.getNextSnapshot(), count);
+    // @todo: reimplement
   }
 }
