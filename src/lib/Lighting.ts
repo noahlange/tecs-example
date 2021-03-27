@@ -20,9 +20,12 @@ interface LightingCallback {
 }
 
 interface LightingOptions {
-  passes: number;
-  emissionThreshold: number;
-  range: number;
+  width: number;
+  height: number;
+  fov: FOV.PreciseShadowcasting;
+  passes?: number;
+  emissionThreshold?: number;
+  range?: number;
 }
 
 /**
@@ -30,7 +33,11 @@ interface LightingOptions {
  */
 export class Lighting {
   protected _reflectivityCallback: ReflectivityCallback;
-  protected _options: LightingOptions;
+  protected _options: {
+    passes: number;
+    emissionThreshold: number;
+    range: number;
+  };
 
   protected _lights: Vector2Array<Color>;
   protected _fovCache: Vector2Array<Vector2Array<number>>;
@@ -50,7 +57,7 @@ export class Lighting {
   /**
    * Compute the lighting
    */
-  public compute(lightingCallback: LightingCallback): this {
+  public *compute(): IterableIterator<[Vector2, Color]> {
     const done = new Vector2Array<number>(this._size);
     const lit = new Vector2Array<Color>(this._size);
     let emitting = new Vector2Array<Color>(this._size);
@@ -72,12 +79,15 @@ export class Lighting {
     }
     for (const [point, light] of lit.entries()) {
       /* let the user know what and how is lit */
-      lightingCallback(point, {
-        r: Math.max(light.r, AMBIENT_LIGHT.r),
-        g: Math.max(light.g, AMBIENT_LIGHT.g),
-        b: Math.max(light.b, AMBIENT_LIGHT.b),
-        a: 1
-      });
+      yield [
+        point,
+        {
+          r: Math.max(Math.min(255, light.r), AMBIENT_LIGHT.r),
+          g: Math.max(Math.min(255, light.g), AMBIENT_LIGHT.g),
+          b: Math.max(Math.min(255, light.b), AMBIENT_LIGHT.b),
+          a: 1
+        }
+      ];
     }
     return this;
   }
@@ -187,15 +197,6 @@ export class Lighting {
   }
 
   /**
-   * Set the used Field-Of-View algo
-   */
-  public setFOV(fov: FOV.PreciseShadowcasting): this {
-    this._fov = fov;
-    this._fovCache = new Vector2Array(this._size);
-    return this;
-  }
-
-  /**
    * Set (or remove) a light source
    */
   public setLight({ x, y }: Vector2, color: Color): this {
@@ -215,11 +216,11 @@ export class Lighting {
   }
 
   public constructor(
-    size: Size,
-    reflectivityCallback: ReflectivityCallback,
-    options: Partial<LightingOptions> = {}
+    options: LightingOptions,
+    reflectivityCallback: ReflectivityCallback
   ) {
-    this._size = size;
+    const { width, height, ...rest } = options;
+    const size = (this._size = { width, height });
     this._reflectivityCallback = reflectivityCallback;
     this._options = Object.assign(
       {
@@ -227,9 +228,10 @@ export class Lighting {
         emissionThreshold: 100,
         range: 10
       },
-      options
+      rest
     );
 
+    this._fov = options.fov;
     this._lights = new Vector2Array(size);
     this._fovCache = new Vector2Array(size);
     this._reflectivityCache = new Vector2Array(size);

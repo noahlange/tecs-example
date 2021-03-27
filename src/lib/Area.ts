@@ -1,6 +1,5 @@
 import type { Game } from '@core/Game';
 import type { Vector2 } from '@types';
-import type { Collisions } from './CollisionMap';
 
 import { Pathfinding } from 'malwoden';
 
@@ -11,7 +10,8 @@ import {
   CHUNK_WIDTH,
   CHUNK_RADIUS,
   toChunkPosition,
-  iterateAcross
+  iterateAcross,
+  AMBIENT_LIGHT
 } from '@utils';
 
 import { Chunk } from './Chunk';
@@ -38,13 +38,11 @@ export class Area {
     isBlockedCallback: point => this.isPassable(point)
   });
 
-  public get collisions(): Collisions {
-    return {
-      isPassable: this.isPassable.bind(this),
-      isVisible: this.isVisible.bind(this),
-      set: this.setCollision.bind(this)
-    };
-  }
+  public collisions = {
+    isPassable: this.isPassable.bind(this),
+    isVisible: this.isVisible.bind(this),
+    set: this.setCollision.bind(this)
+  };
 
   public get x(): number {
     return this.cx;
@@ -114,11 +112,9 @@ export class Area {
         render: { dirty: true },
         sprite: {
           key: isWall ? 'wall_01_ew' : 'floor_02_06',
-          tint: null
+          tint: chunk.tints.get(point) ?? AMBIENT_LIGHT
         }
       });
-
-      chunk.collisions.set(point, !isWall, !isWall);
       chunk.entities.push(entity);
     }
   }
@@ -133,24 +129,16 @@ export class Area {
 
   public chunkAt(world: Vector2): [Chunk | null, Vector2] {
     const [chunk, position] = toChunkPosition(world);
-    const relativeX = chunk?.x - Math.floor(this.cx / CHUNK_WIDTH);
-    const relativeY = chunk?.y - Math.floor(this.cy / CHUNK_HEIGHT);
+    const chunkX = chunk?.x - this.cx + CHUNK_RADIUS;
+    const chunkY = chunk?.y - this.cy + CHUNK_RADIUS;
+
     return [
       this.chunks.get({
-        x: relativeX + CHUNK_RADIUS,
-        y: relativeY + CHUNK_RADIUS
+        x: chunkX,
+        y: chunkY
       }) ?? null,
       position
     ];
-  }
-
-  protected setCollision(
-    point: Vector2,
-    allowLOS: boolean,
-    isPassable: boolean
-  ): void {
-    const [chunk, pos] = this.chunkAt(point);
-    chunk?.collisions.set(pos, allowLOS, isPassable);
   }
 
   protected isVisible(pos: Vector2): boolean {
@@ -160,7 +148,16 @@ export class Area {
 
   protected isPassable(pos: Vector2): boolean {
     const [chunk, point] = this.chunkAt(pos);
-    return chunk?.collisions.isPassable(point) ?? false;
+    return chunk?.collisions.isVisible(point) ?? false;
+  }
+
+  protected setCollision(
+    point: Vector2,
+    allowLOS: boolean,
+    isPassable: boolean
+  ): void {
+    const [chunk, pos] = this.chunkAt(point);
+    chunk?.collisions.set(pos, allowLOS, isPassable);
   }
 
   public *entries(): IterableIterator<[Vector2, TileType]> {

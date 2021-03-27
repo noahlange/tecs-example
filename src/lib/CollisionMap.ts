@@ -1,13 +1,13 @@
 import type { Vector2, Size } from '@types';
 import { Vector2Array } from './Vector2Array';
 
-export interface Collisions {
+export interface CollisionMethods {
   isPassable(point: Vector2): boolean;
   isVisible(point: Vector2): boolean;
   set(point: Vector2, allowLOS: boolean, isPassable: boolean): void;
 }
 
-export class CollisionMap implements Collisions {
+export class CollisionMap implements CollisionMethods {
   protected collisions: Vector2Array<number>;
   protected obstructions: Vector2Array<number>;
 

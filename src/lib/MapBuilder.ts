@@ -17,11 +17,13 @@ export abstract class MapBuilder {
   protected width: number;
   protected height: number;
 
+  public set tiles(tiles: Vector2Array<TileType>) {
+    this.map.tiles = tiles;
+    this.map.history.push(tiles);
+  }
+
   public *entries(): IterableIterator<[Vector2, TileType]> {
-    const curr = this.map.history[this.map.history.length - 1];
-    if (curr) {
-      yield* curr.entries();
-    }
+    yield* this.map.tiles.entries();
   }
 
   public get history(): Vector2Array<TileType>[] {

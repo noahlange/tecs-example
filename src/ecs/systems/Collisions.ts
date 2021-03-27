@@ -1,4 +1,4 @@
-import type { Collisions as CollisionMethods } from '../../lib/CollisionMap';
+import type { CollisionMethods } from '@lib';
 
 import { System } from 'tecs';
 import { Position, Actor, Collision, Interactive } from '../components';

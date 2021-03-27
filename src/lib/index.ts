@@ -1,4 +1,4 @@
-export type { Collisions } from './CollisionMap';
+export type { CollisionMethods } from './CollisionMap';
 
 export { Vector2Array } from './Vector2Array';
 export { MapBuilder } from './MapBuilder';

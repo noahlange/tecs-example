@@ -10,8 +10,7 @@ import {
   TILE_HEIGHT,
   TILE_WIDTH,
   getTransformFromDirection,
-  toRelative,
-  AMBIENT_LIGHT
+  toRelative
 } from '@utils';
 
 import { atlas } from '../../assets/atlases';
@@ -135,17 +134,13 @@ export class Renderer extends System {
 
       const sprite = entity.$.sprite;
       if (sprite.pixi) {
-        if (entity.$.render) {
-          const { fg } = entity.$.render;
-          const tint = entity.$.sprite.tint;
-          sprite.pixi.tint = toHex(tint ?? { r: 255, g: 255, b: 255, a: 1 });
-          // sprite.pixi.tint = toHex(fg ?? AMBIENT_LIGHT);
-          // entity.$.render.dirty = false;
-        } else {
-          if (sprite.tint) {
-            sprite.pixi.tint = toHex(sprite.tint);
-          }
+        // if (entity.$.render) {
+        //   sprite.pixi.tint = toHex(entity.$.render.fg ?? AMBIENT_DARK);
+        // } else {
+        if (sprite.tint) {
+          sprite.pixi.tint = toHex(sprite.tint);
         }
+        // }
       }
     }
   }

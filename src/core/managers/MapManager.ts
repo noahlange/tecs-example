@@ -2,7 +2,7 @@ import type { Pathfinding } from 'malwoden';
 import type { Entity } from 'tecs';
 import type { TileType } from '@enums';
 import type { Vector2 } from '@types';
-import type { Collisions } from '@lib';
+import type { CollisionMethods } from '@lib';
 
 import { Manager, Area } from '@lib';
 
@@ -19,7 +19,7 @@ export class MapManager extends Manager {
     return this.area.y;
   }
 
-  public get collisions(): Collisions {
+  public get collisions(): CollisionMethods {
     return this.area.collisions;
   }
 

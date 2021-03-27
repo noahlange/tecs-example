@@ -119,7 +119,6 @@ export class View extends System {
   /**
    * Compute lighting each tick
    */
-
   protected computeLighting(): void {
     // reset...
     this.colorGrid.clear();
@@ -131,6 +130,7 @@ export class View extends System {
       const pos = toRelative(this.center, $.position);
       if (pos) {
         const prev = lights.get(pos);
+        // we'll need to add colors if we're stacking lights
         lights.set(pos, prev ? add(prev, $.light.color) : $.light.color);
       }
     }
@@ -140,9 +140,9 @@ export class View extends System {
     }
 
     // ...and recolor
-    this.lighting.compute((point, color: Color) => {
+    for (const [point, color] of this.lighting.compute()) {
       this.colorGrid.set(point, color);
-    });
+    }
   }
 
   /**
@@ -174,13 +174,16 @@ export class View extends System {
       }
 
       const visible = key && this.world.game.$.map.collisions.isVisible(key);
-      const base = visible ? LIGHT : DARK;
-      const light = data ? add(LIGHT, data) : LIGHT;
-      const mult = multiply(base, data ?? LIGHT);
-
-      $.render.fg = $.sprite?.tint ? mix(mult, $.sprite?.tint) : mult;
-      $.render.bg = multiply(light, LIGHT);
-      $.render.dirty = true;
+      if (visible) {
+        const light = data ? add(LIGHT, data) : LIGHT;
+        const mult = multiply(LIGHT, data ?? LIGHT);
+        $.render.fg = $.sprite?.tint ? mix(mult, $.sprite?.tint) : mult;
+        $.render.bg = multiply(light, LIGHT);
+        $.render.dirty = true;
+      } else {
+        $.render.fg = DARK;
+        $.render.dirty = true;
+      }
     }
   }
 
@@ -199,6 +202,7 @@ export class View extends System {
       width: CHUNK_WIDTH + CHUNK_RADIUS * 2,
       height: CHUNK_HEIGHT + CHUNK_RADIUS * 2
     };
+    // center chunk
     this.center = { x: map.x, y: map.y };
 
     // initially, we want to paint everything without lighting. we may light it during the tick, but we don't care at this point.
@@ -208,17 +212,15 @@ export class View extends System {
     this.fov = new FOV.PreciseShadowcasting({
       lightPasses: point =>
         map.collisions.isVisible(fromRelative(this.center, point)),
-      topology: 'four'
+      topology: 'four',
+      cartesianRange: true
     });
 
     this.lighting = new Lighting(
-      this.size,
+      { ...this.size, range: 8, passes: 2, fov: this.fov },
       point =>
-        map.collisions.isVisible(fromRelative(this.center, point)) ? 0 : 0.3,
-      { range: 8, passes: 2 }
+        map.collisions.isVisible(fromRelative(this.center, point)) ? 0 : 0.3
     );
-
-    this.lighting.setFOV(this.fov);
   }
 
   public init(): void {
