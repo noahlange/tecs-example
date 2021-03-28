@@ -30,7 +30,7 @@ export class Overlays extends System {
     paths: this.world.query.components(Pathfinder).persist(),
     aoe: this.world.query
       .components(Position, Equippable, AreaOfEffect)
-      .none.tags(Tag.TO_UNRENDER)
+      .none.tags(Tag.TO_DESTROY)
       .persist(),
     stats: this.world.query
       .components(Position, Stats)

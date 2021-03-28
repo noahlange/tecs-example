@@ -1,7 +1,7 @@
 import type { Vector2Array } from '@lib';
 import { Builder } from '../../../maps/generators/Canyon';
 import { Cell as CellEntity } from '@ecs/entities';
-import { Scene, Chunk } from '@lib';
+import { Scene } from '@lib';
 
 import { TileType } from '@enums';
 

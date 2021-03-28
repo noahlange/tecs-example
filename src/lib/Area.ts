@@ -1,17 +1,15 @@
 import type { Game } from '@core/Game';
 import type { Vector2 } from '@types';
+import type { TileType } from '@enums';
 
 import { Pathfinding } from 'malwoden';
 
-import { TileType } from '@enums';
-import { Cell } from '@ecs/entities';
 import {
   CHUNK_HEIGHT,
   CHUNK_WIDTH,
   CHUNK_RADIUS,
   toChunkPosition,
-  iterateAcross,
-  AMBIENT_LIGHT
+  iterateAcross
 } from '@utils';
 
 import { Chunk } from './Chunk';
@@ -38,6 +36,11 @@ export class Area {
     isBlockedCallback: point => this.isPassable(point)
   });
 
+  public getSpawn(chunk: Vector2): Vector2 {
+    const c = this.chunks.get(chunk);
+    return c.map.getSpawn();
+  }
+
   public collisions = {
     isPassable: this.isPassable.bind(this),
     isVisible: this.isVisible.bind(this),
@@ -52,7 +55,8 @@ export class Area {
     return this.cy;
   }
 
-  protected updateChunks(from: Vector2, to: Vector2): void {
+  protected async updateChunks(from: Vector2, to: Vector2): Promise<void> {
+    const tasks: Promise<unknown>[] = [];
     // determine which axis we're working on
     const [dx, dy] = [to.x - from.x, to.y - from.y];
     // return the corresponding axis and max value
@@ -73,7 +77,7 @@ export class Area {
         if (chunk) {
           // if this is the "starting" row, unload the chunk
           if (pos[xy] === start) {
-            chunk?.unload();
+            chunk.unload();
             this.chunks.delete(pos);
             // don't create a new chunk, we'll be moving an existing one here
             continue;
@@ -89,6 +93,7 @@ export class Area {
 
         // we've either moved a chunk out of its current space or haven't created one yet; make a new chunk
         chunk = new Chunk({
+          game: this.game,
           width: CHUNK_WIDTH,
           height: CHUNK_HEIGHT,
           x: (to.x + pos.x - CHUNK_RADIUS) * CHUNK_WIDTH,
@@ -96,27 +101,13 @@ export class Area {
         });
 
         this.chunks.set(pos, chunk);
-        // chunk generation is async, but we don't want to wait for that to finish before moving on
-        this.loadChunk(chunk);
+        // chunk generation is async, but we don't need to wait for that to finish before moving on to another chunk
+        tasks.push(chunk.generate('DrunkardsWalk'));
       }
     }
-  }
+    await Promise.all(tasks);
 
-  protected async loadChunk(chunk: Chunk): Promise<void> {
-    await chunk.load();
-    for (const [point, tile] of chunk.map.entries()) {
-      const isWall = tile === TileType.WALL;
-      const entity = this.game.ecs.create(Cell, {
-        position: { x: chunk.x + point.x, y: chunk.y + point.y },
-        collision: { passable: !isWall, allowLOS: !isWall },
-        render: { dirty: true },
-        sprite: {
-          key: isWall ? 'wall_01_ew' : 'floor_02_06',
-          tint: chunk.tints.get(point) ?? AMBIENT_LIGHT
-        }
-      });
-      chunk.entities.push(entity);
-    }
+    this.game.emit('init.area', this);
   }
 
   public set center(next: Vector2) {
@@ -124,7 +115,6 @@ export class Area {
     this.cx = next.x;
     this.cy = next.y;
     this.updateChunks(curr, next);
-    this.game.emit('initMap');
   }
 
   public chunkAt(world: Vector2): [Chunk | null, Vector2] {
@@ -172,6 +162,5 @@ export class Area {
     this.game = game;
     this.cx = options.x;
     this.cy = options.y;
-    this.center = { x: 0, y: 0 };
   }
 }

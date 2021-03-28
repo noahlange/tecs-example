@@ -75,12 +75,7 @@ export const getNewDirection = (() => {
   dirs.set({ x: 0, y: 1 }, Direction.W);
 
   return (point: Vector2): Direction | null => {
-    return (
-      dirs.get({
-        x: point.x + 1,
-        y: point.y + 1
-      }) ?? null
-    );
+    return dirs.get({ x: point.x + 1, y: point.y + 1 }) ?? null;
   };
 })();
 
@@ -93,6 +88,6 @@ export * from './tests';
 export * as RNG from './random';
 
 export { getTargetAOE, getCirclePoints } from './aoe';
-export { timer, roll, iterateAcross } from './misc';
+export { timer, roll, iterateAcross, on, once } from './misc';
 export { Sprite as T } from './tiles';
 export { getRandomNeighbor } from './geometry';

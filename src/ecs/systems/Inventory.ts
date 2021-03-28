@@ -34,7 +34,7 @@ export class Inventory extends System {
 
   protected addItem(entity: InventoryEntity, item: InventoryItem): void {
     item.components.remove(Position);
-    item.tags.add(Tag.TO_UNRENDER, Tag.IN_INVENTORY);
+    item.tags.add(Tag.TO_DESTROY, Tag.IN_INVENTORY);
 
     const exists = entity.$.inventory.items.find(
       i => i.$.text.title === item.$.text.title

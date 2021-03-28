@@ -88,8 +88,10 @@ export enum ItemType {
 export enum Tag {
   HAS_INVENTORY = 'has_inventory',
   IN_INVENTORY = 'in_inventory',
-  TO_UNRENDER = 'to_unrender',
+  TO_DESTROY = 'to_destroy',
   IS_HIDDEN = 'is_hidden',
+  IS_INACTIVE = 'is_inactive',
+  IS_IMPERMANENT = 'is_impermanent',
   IS_CONSUMABLE = 'is_consumable',
   IS_EQUIPPABLE = 'is_equippable'
 }

@@ -1,5 +1,6 @@
 import type { Scene } from '@lib';
 import type { Compressed } from 'compress-json';
+import type { Events } from '@types';
 
 import * as Managers from './managers';
 import { ECS } from '../ecs/ECS';
@@ -25,14 +26,24 @@ export class Game {
     return this.start();
   }
 
-  protected events = createNanoEvents();
+  protected events = createNanoEvents<Events>();
 
-  public on(event: string, callback: (...args: any[]) => void): void {
+  public on<E extends keyof Events>(event: E, callback: Events[E]): void {
     this.events.on(event, callback);
   }
 
-  public emit(event: string, data?: any): void {
-    this.events.emit(event, data);
+  public once<E extends keyof Events>(event: E, callback: Events[E]): void {
+    const unregister = this.events.on(event, (...args) => {
+      callback(...args);
+      unregister();
+    });
+  }
+
+  public emit<E extends keyof Events>(
+    event: E,
+    ...data: Parameters<Events[E]>
+  ): void {
+    this.events.emit(event, ...data);
   }
 
   public async start(): Promise<void> {

@@ -1,6 +1,11 @@
+import type { Area } from '@lib';
 import type { DataType, EntityClass } from 'tecs';
 
 import type { DamageType, EffectType, Tag } from './enums';
+
+export interface Events {
+  'init.area': (area: Area) => void;
+}
 
 export interface Prefab<T extends EntityClass = EntityClass> {
   entity: T;

@@ -1,4 +1,5 @@
 import type { Vector2, Color, Size } from '@types';
+import type { Area } from '@lib';
 
 import { System } from 'tecs';
 import { FOV } from 'malwoden';
@@ -56,8 +57,8 @@ export class View extends System {
   // we don't need to recalculate FOV if the view hasn't changed
   protected lastPosition: Record<string, Vector2> = {};
 
-  protected center: Vector2 = { x: 0, y: 0 };
-  protected size!: Size;
+  protected area: Area | null = null;
+  protected size: Size = { width: 0, height: 0 };
 
   protected fov!: FOV.PreciseShadowcasting;
   protected lighting!: Lighting;
@@ -99,11 +100,11 @@ export class View extends System {
         }
       }
       // recalculate FOV
-      const rel = toRelative(this.center, $.position);
+      const rel = this.toRelative($.position);
       if (rel) {
         $.view.visible = [];
         this.fov.calculateCallback(rel, $.view.range, pos => {
-          $.view.visible.push(fromRelative(this.center, pos));
+          $.view.visible.push(this.fromRelative(pos));
           this.repaintGrid.set(
             pos,
             this.debug ? Repaint.DEBUG : $.player ? Repaint.FULL : Repaint.BASE
@@ -127,7 +128,7 @@ export class View extends System {
 
     // find all the light sources...
     for (const { $ } of this.queries.lights) {
-      const pos = toRelative(this.center, $.position);
+      const pos = this.toRelative($.position);
       if (pos) {
         const prev = lights.get(pos);
         // we'll need to add colors if we're stacking lights
@@ -150,7 +151,7 @@ export class View extends System {
    */
   protected repaint(): void {
     for (const { $ } of this.queries.renderable) {
-      const key = toRelative(this.center, $.position);
+      const key = this.toRelative($.position);
 
       if (!key || !this.repaintGrid.has(key)) {
         continue;
@@ -162,9 +163,8 @@ export class View extends System {
 
       switch (r) {
         case Repaint.FULL: {
-          const rel = toRelative(this.center, $.position);
-          if (rel) {
-            data = this.colorGrid.get(rel);
+          if (key) {
+            data = this.colorGrid.get(key);
           }
           break;
         }
@@ -188,43 +188,48 @@ export class View extends System {
   }
 
   public tick(): void {
-    this.computeFOV();
-    this.computeLighting();
-    this.repaint();
-    // only paint explicitly-indicated tiles next tick
-    this.repaintGrid.clear();
-    this.colorGrid.clear();
+    if (this.area) {
+      this.computeFOV();
+      this.computeLighting();
+      this.repaint();
+      // only paint explicitly-indicated tiles next tick
+      this.repaintGrid.clear();
+      this.colorGrid.clear();
+    }
   }
 
-  public initMap(): void {
-    const map = this.world.game.$.map;
+  public fromRelative(point: Vector2): Vector2 {
+    return fromRelative(this.area!, point);
+  }
+
+  public toRelative(point: Vector2): Vector2 | null {
+    return toRelative(this.area!, point);
+  }
+
+  public initArea(area: Area): void {
+    this.area = area;
     this.size = {
       width: CHUNK_WIDTH + CHUNK_RADIUS * 2,
       height: CHUNK_HEIGHT + CHUNK_RADIUS * 2
     };
-    // center chunk
-    this.center = { x: map.x, y: map.y };
 
     // initially, we want to paint everything without lighting. we may light it during the tick, but we don't care at this point.
     this.repaintGrid = new Vector2Array(this.size, Repaint.BASE);
     this.colorGrid = new Vector2Array(this.size);
 
     this.fov = new FOV.PreciseShadowcasting({
-      lightPasses: point =>
-        map.collisions.isVisible(fromRelative(this.center, point)),
+      lightPasses: point => area.collisions.isVisible(this.fromRelative(point)),
       topology: 'four',
       cartesianRange: true
     });
 
     this.lighting = new Lighting(
       { ...this.size, range: 8, passes: 2, fov: this.fov },
-      point =>
-        map.collisions.isVisible(fromRelative(this.center, point)) ? 0 : 0.3
+      point => (area.collisions.isVisible(this.fromRelative(point)) ? 0 : 0.3)
     );
   }
 
   public init(): void {
-    this.initMap();
-    this.world.game.on('initMap', () => this.initMap());
+    this.world.game.on('init.area', area => this.initArea(area));
   }
 }

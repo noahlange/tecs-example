@@ -1,5 +1,6 @@
 import type { ActionType } from '@utils';
 import type { KeyboardInputEvent, Vector2 } from '@types';
+import type { Area } from '@lib';
 
 import { Scene } from '@lib';
 
@@ -38,37 +39,39 @@ export class Gameplay extends Scene {
     return { id: Action.NONE };
   }
 
-  protected addPlayer(): void {
+  protected addPlayer(area: Area): void {
+    console.log('add');
     this.player = this.game.ecs.create(Player, {
       ...player.data,
       position: {
         ...player.data.position,
-        ...this.game.$.map.getSpawn()
+        ...area.getSpawn({ x: 0, y: 0 })
       }
     });
   }
 
   public tick(): void {
-    this.player ??= this.game.ecs.query.entities(Player).find();
-    const next = this.game.$.commands.getNextEvent();
-    if (next?.isKeyboard) {
-      this.player.$.action.data = this.getKeyboardAction(
-        next as KeyboardInputEvent
+    if (this.player) {
+      const next = this.game.$.commands.getNextEvent();
+      if (next?.isKeyboard) {
+        this.player.$.action.data = this.getKeyboardAction(
+          next as KeyboardInputEvent
+        );
+      }
+
+      render(
+        h(GameplayUI, {
+          player: this.player,
+          area: this.game.$.map.area,
+          state: this.game.state
+        }),
+        document.getElementById('ui')!
       );
     }
-
-    render(
-      h(GameplayUI, {
-        player: this.player,
-        area: this.game.$.map.area,
-        state: this.game.state
-      }),
-      document.getElementById('ui')!
-    );
   }
 
   public init(): void {
-    this.game.emit('initMap');
-    this.addPlayer();
+    this.game.once('init.area', area => this.addPlayer(area));
+    this.game.$.map.area.center = { x: 0, y: 0 };
   }
 }

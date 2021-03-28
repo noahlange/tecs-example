@@ -27,10 +27,6 @@ export class MapManager extends Manager {
     return this.area.paths;
   }
 
-  public getSpawn(): Vector2 {
-    return { x: 0, y: 0 };
-  }
-
   public getPath(start: Vector2, end: Vector2): Vector2[] {
     const path = this.area.paths.compute(start, end) ?? [];
     return path.slice(1).concat(end);

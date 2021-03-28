@@ -12,11 +12,7 @@ import { AMBIENT_LIGHT } from '@utils';
 import { add } from '@utils/colors';
 
 interface ReflectivityCallback {
-  (x: Vector2): number;
-}
-
-interface LightingCallback {
-  (point: Vector2, color: Color): void;
+  (point: Vector2): number;
 }
 
 interface LightingOptions {

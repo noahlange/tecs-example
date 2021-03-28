@@ -1,6 +1,6 @@
 import { TileType } from '@enums';
 import { Lighting } from '@lib';
-import type { Vector2, Color } from '@types';
+import type { Vector2, Color, Prefab } from '@types';
 import { CHUNK_HEIGHT, CHUNK_WIDTH } from '@utils';
 
 import * as RNG from '@utils/random';
@@ -18,6 +18,7 @@ export interface GeneratorPayload {
 export interface GeneratorResponse {
   tiles: [Vector2, TileType][];
   tints: [Vector2, Color][];
+  prefabs: Prefab[];
 }
 
 self.onmessage = async (e: MessageEvent<GeneratorPayload>) => {
@@ -54,10 +55,12 @@ self.onmessage = async (e: MessageEvent<GeneratorPayload>) => {
       }
     }
   }
+  // generate tracker ID for prefabs so we don't recreate extant entities
 
   // @ts-ignore
   postMessage({
     tiles: Array.from(tiles.entries()),
-    tints: Array.from(lighting.compute())
+    tints: Array.from(lighting.compute()),
+    prefabs: []
   });
 };

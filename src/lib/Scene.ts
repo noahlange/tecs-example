@@ -1,7 +1,7 @@
 import type { Game } from '@core/Game';
 
 export abstract class Scene<T = {}> {
-  protected game: Game;
+  public game: Game;
 
   public abstract tick(d: number, ts: number): void;
 

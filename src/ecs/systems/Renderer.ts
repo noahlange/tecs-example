@@ -41,13 +41,13 @@ export class Renderer extends System {
 
   protected $ = {
     removals: this.world.query
-      .tags(Tag.TO_UNRENDER)
+      .tags(Tag.TO_DESTROY)
       .components(Sprite)
       .persist(),
     sprites: this.world.query
       .components(Position, Sprite)
       .some.components(Renderable)
-      .none.tags(Tag.TO_UNRENDER)
+      .none.tags(Tag.TO_DESTROY)
       .persist(),
     overlays: this.world.query.components(Overlay, Position).persist()
   };
