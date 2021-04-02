@@ -1,115 +1,53 @@
-import { RNG } from '@utils';
-import Roll from 'roll';
-
-interface Roller {
-  (str: string): number;
-  roller: Roll;
-}
-
-export const roll: Roller = (() => {
-  const roller = new Roll(() => RNG.float());
-  return Object.assign((str: string) => roller.roll(str).result, { roller });
-})();
-
 /**
  * Yield numbers from `0` → `count` (positive) or `count` → `0` (negative).
- * @param d - direction; negative or positive/zero
- * @param count - number of points to yield
+ * @param d - direction; negative (right to left) or positive/zero (left to right)
+ * @param range - [ min, max ]
  */
 export function* iterateAcross(
   d: number,
-  count: number
+  range: [number, number]
 ): IterableIterator<number> {
+  const min = Math.min(...range);
+  const max = Math.max(...range);
   if (d >= 0) {
-    for (let i = 0; i <= count; i++) {
+    for (let i = min; i <= max; i++) {
       yield i;
     }
   } else {
-    for (let i = count; i >= 0; i--) {
+    for (let i = max; i >= min; i--) {
       yield i;
     }
   }
 }
 
-/**
- * Modify a system's effective tick rate, invoking its `tick` method once every `n` ticks.
- * @param t
- */
-export function rate(ticks: number): ClassDecorator {
-  const ticker = Symbol('ticker');
-  return (constructor: Function) => {
-    const originalMethod = constructor.prototype.tick;
-    constructor.prototype[ticker] = { count: 0, dt: 0 };
-    constructor.prototype.tick = function (dt: number, ts: number): void {
-      const tick = this[ticker];
-      tick.count++;
-      tick.dt += dt;
-      if (tick.count === ticks) {
-        tick.count = tick.dt = 0;
-        originalMethod.call(this, tick.dt, ts);
-      }
-    };
-  };
+export function keys<T, K extends keyof T>(object: T): K[] {
+  return Object.keys(object) as K[];
 }
 
-/**
- * Adapted from https://github.com/norbornen/execution-time-decorator, released
- * under the terms of the MIT License. Decorate methods to log execution time.
- */
+export function values<T, K extends keyof T>(object: T): T[K][] {
+  return Object.values(object);
+}
 
-export function timer(
-  name: string,
-  useGroups: boolean = true
-): MethodDecorator {
-  const times: number[] = [];
-  return (
-    target: any,
-    propertyKey: string | symbol,
-    propertyDescriptor: PropertyDescriptor
-  ): any => {
-    propertyDescriptor ??= Object.getOwnPropertyDescriptor(
-      target,
-      propertyKey
-    )!;
+export function entries<T, K extends keyof T>(object: T): [K, T[K]][] {
+  return Object.entries(object) as [K, T[K]][];
+}
 
-    const close = (start: number): void => {
-      const diff = (performance.now() - start).toFixed(2);
-      times.push(+diff);
-      // first tick severely skews the average
-      const avg = times.slice(1).reduce((a, b) => a + b, 0) / times.length;
-      const timeText = avg
-        ? `${diff}ms (avg. ${avg.toFixed(2)}ms)`
-        : `${diff}ms`;
-
-      console.log(useGroups ? timeText : [name, timeText].join(': '));
-
-      if (useGroups) {
-        console.groupEnd();
-      }
-    };
-
-    const originalMethod = propertyDescriptor.value;
-
-    propertyDescriptor.value = function (...args: any[]) {
-      if (useGroups) {
-        console.group(name);
-      }
-      const start = performance.now();
-      const result = originalMethod.apply(this, args);
-
-      if (result instanceof Promise) {
-        return result
-          .catch(e => e)
-          .then(res => {
-            close(start);
-            return res;
-          });
-      } else {
-        close(start);
-        return result;
-      }
-    };
-
-    return propertyDescriptor;
+export function asyncWorker(
+  worker: Worker,
+  persist: boolean = false
+): { run<I, O>(data: I): Promise<O> } {
+  return {
+    async run<I, O>(data: I): Promise<O> {
+      return new Promise((resolve, reject) => {
+        worker.onerror = reject;
+        worker.onmessage = res => {
+          if (!persist) {
+            worker.terminate();
+          }
+          resolve(res.data);
+        };
+        worker.postMessage(data);
+      });
+    }
   };
 }

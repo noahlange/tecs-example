@@ -15,3 +15,5 @@ export enum Sprite {
   DOOR_OPEN = '\ue014',
   PATH_DOT = '\ue015'
 }
+
+export { Sprite as T };

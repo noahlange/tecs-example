@@ -7,8 +7,11 @@ export interface CollisionMethods {
   set(point: Vector2, allowLOS: boolean, isPassable: boolean): void;
 }
 
+const BLOCKED = 1;
+const CLEARED = 0;
+
 export class CollisionMap implements CollisionMethods {
-  protected collisions: Vector2Array<number>;
+  protected obstacles: Vector2Array<number>;
   protected obstructions: Vector2Array<number>;
 
   public readonly width: number;
@@ -23,16 +26,16 @@ export class CollisionMap implements CollisionMethods {
     isPassable: boolean,
     allowLOS: boolean = isPassable
   ): void {
-    this.collisions.set(point, isPassable ? 0 : 1);
-    this.obstructions.set(point, allowLOS ? 0 : 1);
+    this.obstacles.set(point, isPassable ? CLEARED : BLOCKED);
+    this.obstructions.set(point, allowLOS ? CLEARED : BLOCKED);
   }
 
   public isVisible(point: Vector2): boolean {
-    return this.obstructions.get(point) !== 1;
+    return this.obstructions.is(point, CLEARED);
   }
 
   public isPassable(point: Vector2): boolean {
-    return this.collisions.get(point) !== 1;
+    return this.obstacles.is(point, CLEARED);
   }
 
   public contains(point: Vector2): boolean {
@@ -41,7 +44,7 @@ export class CollisionMap implements CollisionMethods {
 
   public get(point: Vector2): { blocksView: boolean; isPassable: boolean } {
     return {
-      blocksView: this.isVisible(point),
+      blocksView: !this.isVisible(point),
       isPassable: this.isPassable(point)
     };
   }
@@ -49,7 +52,7 @@ export class CollisionMap implements CollisionMethods {
   public constructor(size: Size) {
     this.width = size.width;
     this.height = size.height;
-    this.collisions = new Vector2Array(size);
+    this.obstacles = new Vector2Array(size);
     this.obstructions = new Vector2Array(size);
   }
 }

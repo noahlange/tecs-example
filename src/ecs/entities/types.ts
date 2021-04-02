@@ -24,8 +24,8 @@ export type EquipEntity = EntityType<
 >;
 
 export type ConsumableItem = EntityType<
-  [typeof Item, typeof Text, typeof Effects],
-  [typeof Sprite]
+  [typeof Item, typeof Text],
+  [typeof Effects, typeof Sprite]
 >;
 
 export type EquippableItem = EntityType<

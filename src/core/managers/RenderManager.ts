@@ -5,8 +5,6 @@ import { Manager } from '@lib';
 import { view, RESOLUTION, TILE_HEIGHT, TILE_WIDTH, toRelative } from '@utils';
 
 export class RenderManager extends Manager {
-  protected tileWidth = TILE_WIDTH;
-  protected tileHeight = TILE_HEIGHT;
   protected camera: Vector2 = { x: 0, y: 0 };
   protected pixi!: PIXI.Application;
 
@@ -17,15 +15,15 @@ export class RenderManager extends Manager {
   public getScreenPoint(point: Vector2): Vector2 {
     const next = toRelative(this.game.$.map, point) ?? point;
     return {
-      x: next.x * this.tileWidth,
-      y: next.y * this.tileHeight
+      x: next.x * TILE_WIDTH,
+      y: next.y * TILE_HEIGHT
     };
   }
 
   public getWorldPoint(point: Vector2): Vector2 {
     return {
-      x: Math.floor((point.x + this.app.stage.pivot.x) / this.tileWidth),
-      y: Math.floor((point.y + this.app.stage.pivot.y) / this.tileHeight)
+      x: Math.floor((point.x + this.app.stage.pivot.x) / TILE_WIDTH),
+      y: Math.floor((point.y + this.app.stage.pivot.y) / TILE_HEIGHT)
     };
   }
 

@@ -1,6 +1,5 @@
 import type { Pathfinding } from 'malwoden';
 import type { Entity } from 'tecs';
-import type { TileType } from '@enums';
 import type { Vector2 } from '@types';
 import type { CollisionMethods } from '@lib';
 
@@ -30,10 +29,6 @@ export class MapManager extends Manager {
   public getPath(start: Vector2, end: Vector2): Vector2[] {
     const path = this.area.paths.compute(start, end) ?? [];
     return path.slice(1).concat(end);
-  }
-
-  public *entries(): IterableIterator<[Vector2, TileType]> {
-    yield* this.area.entries();
   }
 
   public init(): void {

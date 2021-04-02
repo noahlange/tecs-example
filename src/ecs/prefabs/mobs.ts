@@ -1,11 +1,12 @@
+import type { Prefab } from '@types';
 import { Monster, Player } from '@ecs/entities';
 import { AIType, Faction } from '@enums';
 import { HealthBar } from '@lib';
-import type { Prefab } from '@types';
 import { T } from '@utils';
 
 export const enemies: Prefab[] = [
   {
+    id: 'enemy01',
     entity: Monster,
     tags: [],
     data: {
@@ -17,6 +18,7 @@ export const enemies: Prefab[] = [
     }
   },
   {
+    id: 'enemy02',
     entity: Monster,
     tags: [],
     data: {
@@ -30,6 +32,7 @@ export const enemies: Prefab[] = [
 ];
 
 export const player: Prefab<typeof Player> = {
+  id: 'player01',
   entity: Player,
   tags: [],
   data: {

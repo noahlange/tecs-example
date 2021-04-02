@@ -3,7 +3,7 @@ import type { Rectangle, Vector2Array } from '@lib';
 import { TileType } from '@enums';
 
 import { GameMap } from './GameMap';
-import { getUniformInt } from '@utils/random';
+import { RNG } from '@utils';
 
 export interface MapBuilderOpts {
   brush?: number;
@@ -22,6 +22,10 @@ export abstract class MapBuilder {
     this.map.history.push(tiles);
   }
 
+  public get tiles(): Vector2Array<TileType> {
+    return this.map.tiles;
+  }
+
   public *entries(): IterableIterator<[Vector2, TileType]> {
     yield* this.map.tiles.entries();
   }
@@ -37,12 +41,14 @@ export abstract class MapBuilder {
   protected getRandomPoint(): Vector2 {
     const b = this.map.bounds;
     return {
-      x: getUniformInt(0, b.width),
-      y: getUniformInt(0, b.height)
+      x: RNG.int.between(0, b.width),
+      y: RNG.int.between(0, b.height)
     };
   }
 
   public getSpawn(): Vector2 {
+    const { width, height } = this.map.bounds;
+    let i = 0;
     let pt: Vector2 | null = null;
     do {
       pt = this.getRandomPoint();
@@ -51,7 +57,8 @@ export abstract class MapBuilder {
       } else {
         pt = null;
       }
-    } while (pt === null);
+      i++;
+    } while (pt === null && i < width * height);
 
     return this.map.bounds.center;
   }

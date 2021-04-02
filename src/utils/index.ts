@@ -1,21 +1,6 @@
-import type { Vector2, Size, Color } from '@types';
-
+import type { Vector2 } from '@types';
 import { Vector2Array } from '@lib';
 import { Direction } from '@enums';
-
-export const TILE_WIDTH = 16;
-export const TILE_HEIGHT = 16;
-
-export const CHUNK_WIDTH = 16;
-export const CHUNK_HEIGHT = 16;
-export const CHUNK_RADIUS = 1;
-
-export const RESOLUTION = 3;
-
-export const AMBIENT_LIGHT: Color = { r: 80, g: 80, b: 80, a: 1 };
-export const AMBIENT_DARK: Color = { r: 30, g: 30, b: 30, a: 1 };
-
-export const view: Size = { width: 1920 / 2, height: 1080 / 2 };
 
 export function isWithin(a: Vector2, points: Vector2[]): boolean {
   return points.some(p => p.x === a.x && p.y === a.y);
@@ -79,15 +64,16 @@ export const getNewDirection = (() => {
   };
 })();
 
+export { getTargetAOE, getCirclePoints } from './aoe';
+export { roll } from './random';
+export * as RNG from './random';
+export { Sprite as T } from './tiles';
+
 export * from './actions';
 export * from './tiles';
 export * from './dialogue';
-export * from './pixi';
+export * from './constants';
 export * from './tests';
-
-export * as RNG from './random';
-
-export { getTargetAOE, getCirclePoints } from './aoe';
-export { timer, roll, iterateAcross, on, once } from './misc';
-export { Sprite as T } from './tiles';
-export { getRandomNeighbor } from './geometry';
+export * from './decorators';
+export * from './misc';
+export * from './geometry';

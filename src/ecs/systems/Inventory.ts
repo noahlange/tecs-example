@@ -1,14 +1,18 @@
 import type { EntityType } from 'tecs';
 import { System } from 'tecs';
-import { Action } from '@utils';
+import { Action, getInteractionPos, isWithin } from '@utils';
 import {
   Actor,
+  Effects,
+  Equippable,
   Equipped,
   Inventory as InventoryComponent,
+  Item,
   Position,
   Renderable,
   Sprite,
-  Stats
+  Stats,
+  Text
 } from '../components';
 
 import type {
@@ -26,6 +30,10 @@ export class Inventory extends System {
   public static readonly type = 'inventory';
 
   protected $ = {
+    items: this.world.query
+      .components(Item, Position, Text)
+      .some.components(Equippable, Effects)
+      .persist(),
     hasInventory: this.world.query
       .components(Actor, InventoryComponent, Position, Equipped)
       .some.components(Stats, Sprite, Renderable)
@@ -36,9 +44,8 @@ export class Inventory extends System {
     item.components.remove(Position);
     item.tags.add(Tag.TO_DESTROY, Tag.IN_INVENTORY);
 
-    const exists = entity.$.inventory.items.find(
-      i => i.$.text.title === item.$.text.title
-    );
+    const id = item.$.item.id;
+    const exists = entity.$.inventory.items.find(i => i.$.item.id === id);
 
     if (exists) {
       exists.$.item.count += 1;
@@ -92,7 +99,7 @@ export class Inventory extends System {
     item: ConsumableItem
   ): void {
     // consumable, apply effects
-    for (const effect of item.$.effects) {
+    for (const effect of item.$.effects ?? []) {
       switch (effect.type) {
         case EffectType.HP_ADD:
           $.stats.health.value += effect.value;
@@ -120,24 +127,29 @@ export class Inventory extends System {
   }
 
   public tick(): void {
+    const items = new Set(this.$.items);
     for (const entity of this.$.hasInventory) {
       const { $ } = entity;
+      const pos = getInteractionPos($.position);
 
       // perform action...
       switch ($.action.data.id) {
         // add item to inventory
+        case Action.INTERACT:
         case Action.ITEM_PICK_UP: {
-          this.addItem(entity, $.action.data.target);
+          for (const item of items) {
+            if (isWithin(item.$.position, [$.position, pos])) {
+              this.addItem(entity, item);
+            }
+          }
           break;
         }
-
         // drop item on the ground
         case Action.ITEM_DROP: {
           const { target } = $.action.data;
           target.components.add(Position, { ...$.position });
           break;
         }
-
         case Action.ITEM_UNEQUIP:
         case Action.ITEM_EQUIP: {
           const { target } = $.action.data;
@@ -150,7 +162,6 @@ export class Inventory extends System {
           }
           break;
         }
-
         // use or equip item
         case Action.ITEM_USE: {
           const { target } = $.action.data;

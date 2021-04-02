@@ -1,6 +1,6 @@
 import { Rectangle, MapBuilder } from '@lib';
 import { TileType } from '@enums';
-import { flip, getUniformInt } from '@utils/random';
+import { RNG } from '@utils';
 
 export class Builder extends MapBuilder {
   public static MIN_ROOM_SIZE: number = 8;
@@ -45,7 +45,7 @@ export class Builder extends MapBuilder {
     const v1 = { x1: r.x1, y1: r.y1, x2: r.x2, y2: r.y1 + halfHeight - 1 };
     const v2 = { x1: r.x1, y1: r.y1 + halfHeight, x2: r.x2, y2: r.y2 };
 
-    const isVertical = flip();
+    const isVertical = RNG.flip();
     const rects = isVertical ? [h1, h2] : [v1, v2];
 
     for (const r of rects) {
@@ -81,10 +81,10 @@ export class Builder extends MapBuilder {
 
     for (let i = 0; i < this.rooms.length - 1; i++) {
       const [room, next] = [this.rooms[i], this.rooms[i + 1]];
-      const rx = getUniformInt(1, Math.abs(room.x1 - room.x2) - 1);
-      const ry = getUniformInt(1, Math.abs(room.y1 - room.y2) - 1);
-      const nx = getUniformInt(1, Math.abs(next.x1 - next.x2) - 1);
-      const ny = getUniformInt(1, Math.abs(next.y1 + next.y2) - 1);
+      const rx = RNG.int.between(1, Math.abs(room.x1 - room.x2) - 1);
+      const ry = RNG.int.between(1, Math.abs(room.y1 - room.y2) - 1);
+      const nx = RNG.int.between(1, Math.abs(next.x1 - next.x2) - 1);
+      const ny = RNG.int.between(1, Math.abs(next.y1 + next.y2) - 1);
       this.connect(room.x1 + rx, room.y1 + ry, next.x1 + nx, next.y1 + ny);
       this.map.snapshot();
     }

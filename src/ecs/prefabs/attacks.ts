@@ -4,6 +4,7 @@ import type { Prefab } from '@types';
 
 export const attacks: Prefab[] = [
   {
+    id: 'attack01',
     entity: Attack,
     tags: [],
     data: {

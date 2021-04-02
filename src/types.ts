@@ -8,6 +8,7 @@ export interface Events {
 }
 
 export interface Prefab<T extends EntityClass = EntityClass> {
+  id: string;
   entity: T;
   tags: Tag[];
   data: DataType<T>;

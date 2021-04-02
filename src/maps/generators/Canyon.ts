@@ -1,6 +1,6 @@
 import { MapBuilder } from '@lib';
 import { TileType } from '@enums';
-import { float, getUniformInt } from '@utils/random';
+import { RNG } from '@utils';
 import type { MapBuilderOpts } from '../../lib/MapBuilder';
 
 interface CanyonBuilderOpts extends MapBuilderOpts {
@@ -20,16 +20,16 @@ export class Builder extends MapBuilder {
       this.drawRectangle({ x1: x, y1: y, x2: x + w, y2: y }, TileType.FLOOR);
 
       while (y < this.height) {
-        const rough = float();
+        const rough = RNG.float();
         if (rough <= this.roughness) {
-          w += getUniformInt(-2, 2);
+          w += RNG.int.between(-2, 2);
           w = Math.max(3, w);
           w = Math.min(this.width - 3, w);
         }
 
-        const windy = float();
+        const windy = RNG.float();
         if (windy <= this.windiness) {
-          x += getUniformInt(-2, 2);
+          x += RNG.int.between(-2, 2);
           x = Math.max(3, x);
           x = Math.min(x, this.width - 3);
         }

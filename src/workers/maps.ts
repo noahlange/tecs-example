@@ -1,9 +1,11 @@
+import type { Vector2, Color, Prefab } from '@types';
 import { TileType } from '@enums';
 import { Lighting } from '@lib';
-import type { Vector2, Color, Prefab } from '@types';
-import { CHUNK_HEIGHT, CHUNK_WIDTH } from '@utils';
+import { RNG, fromChunkPosition } from '@utils';
 
-import * as RNG from '@utils/random';
+import * as generators from '../maps/generators';
+import * as prefabbed from '../ecs/prefabs';
+
 import { FOV } from 'malwoden';
 
 export interface GeneratorPayload {
@@ -11,18 +13,16 @@ export interface GeneratorPayload {
   y: number;
   width: number;
   height: number;
-  // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-  builder: keyof typeof import('../maps/generators');
+  builder: keyof typeof generators;
 }
 
 export interface GeneratorResponse {
   tiles: [Vector2, TileType][];
-  tints: [Vector2, Color][];
+  lights: [Vector2, Color][];
   prefabs: Prefab[];
 }
 
 self.onmessage = async (e: MessageEvent<GeneratorPayload>) => {
-  const generators = await import('../maps/generators');
   const { builder, x, y, ...options } = e.data;
 
   RNG.setSeed(`${x},${y}`);
@@ -39,28 +39,51 @@ self.onmessage = async (e: MessageEvent<GeneratorPayload>) => {
   });
 
   const lighting = new Lighting(
-    { width: CHUNK_WIDTH, height: CHUNK_HEIGHT, fov, range: 8, passes: 1 },
+    { ...options, fov, range: 8, passes: 1 },
     point => (tiles.is(point, TileType.WALL) ? 0 : 0.3)
   );
 
   // add lights
+  const lights = [];
   for (const [point, tile] of tiles.entries()) {
     if (RNG.float() < 0.0625 && tile === TileType.FLOOR) {
-      // without a proper cross-chunk lighting implementation, we'll have to manually avoid light spill-over.
-      if (point.x > 3 && point.x < CHUNK_WIDTH - 3) {
-        if (point.y > 3 && point.y < CHUNK_HEIGHT - 3) {
-          const val = RNG.getUniformInt(50, 125);
-          lighting.setLight(point, { r: val, g: val, b: 0, a: 1 });
-        }
-      }
+      const val = RNG.int.between(25, 75);
+      const val2 = RNG.int.between(25, 75);
+      const val3 = RNG.int.between(25, 75);
+      const color = { r: val, g: val2, b: val3, a: 1 };
+      lighting.setLight(point, color);
+      lights.push([point, color]);
     }
   }
+
   // generate tracker ID for prefabs so we don't recreate extant entities
+  const prefabs: Prefab[] = [
+    ...prefabbed.weapons,
+    ...prefabbed.items,
+    ...prefabbed.consumables
+  ];
+
+  const shuffled = RNG.shuffle(prefabs.slice());
+
+  const res = [];
+  for (let i = 0; i < 5; i++) {
+    const prefab = shuffled.shift();
+    if (prefab) {
+      prefab.data = Object.assign(prefab.data, {
+        position: fromChunkPosition({ x, y }, gen.getSpawn())
+      });
+      res.push(prefab);
+    }
+  }
 
   // @ts-ignore
   postMessage({
     tiles: Array.from(tiles.entries()),
-    tints: Array.from(lighting.compute()),
-    prefabs: []
+    lights,
+    prefabs: res.map(item => ({
+      id: item.id,
+      data: item.data,
+      tags: item.tags
+    }))
   });
 };

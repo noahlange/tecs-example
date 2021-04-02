@@ -8,6 +8,8 @@ import {
   Collisions,
   Pathfinding,
   View,
+  Interact,
+  Inventory,
   Renderer,
   Movement,
   Camera,
@@ -19,6 +21,8 @@ export class ECS extends World.with(
   Pathfinding,
   Collisions,
   Movement,
+  Interact,
+  Inventory,
   View,
   Renderer,
   Camera

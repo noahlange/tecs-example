@@ -3,7 +3,6 @@ import type { Vector2 } from '@types';
 import { TileType } from '@enums';
 import { Rectangle, MapBuilder } from '@lib';
 import { RNG } from '@utils';
-import { getUniformInt } from '@utils/random';
 
 export class Builder extends MapBuilder {
   protected rooms: Rectangle[] = [];
@@ -18,7 +17,6 @@ export class Builder extends MapBuilder {
 
     for (let i = min; i <= max; i++) {
       const target = isVertical ? { x: point, y: i } : { x: i, y: point };
-
       for (const p of this.getBrushPoints(target)) {
         this.map.add(p, TileType.FLOOR);
       }
@@ -28,15 +26,15 @@ export class Builder extends MapBuilder {
   protected drawCorridors(): void {
     for (let i = 1; i <= this.rooms.length; i++) {
       const [curr, next] = [this.rooms[i - 1], this.rooms[i] ?? this.rooms[0]];
-      const { x: nextX, y: nextY } = next.center;
-      const { x: currX, y: currY } = curr.center;
+      const { x: x2, y: y2 } = next.center;
+      const { x: x1, y: y1 } = curr.center;
 
       if (RNG.flip()) {
-        this.drawCorridor({ x: currX, y: currY }, { x: nextX, y: currY });
-        this.drawCorridor({ x: nextX, y: currY }, { x: nextX, y: nextY });
+        this.drawCorridor({ x: x1, y: y1 }, { x: x2, y: y1 });
+        this.drawCorridor({ x: x2, y: y1 }, { x: x2, y: y2 });
       } else {
-        this.drawCorridor({ x: currX, y: currY }, { x: currX, y: nextY });
-        this.drawCorridor({ x: currX, y: nextY }, { x: nextX, y: nextY });
+        this.drawCorridor({ x: x1, y: y1 }, { x: x1, y: y2 });
+        this.drawCorridor({ x: x1, y: y2 }, { x: x2, y: y2 });
       }
 
       this.map.snapshot();
@@ -49,10 +47,10 @@ export class Builder extends MapBuilder {
     const MAX_SIZE = 10;
 
     for (let i = 0; i < MAX_ROOMS; i++) {
-      const w = getUniformInt(MIN_SIZE, MAX_SIZE);
-      const h = getUniformInt(MIN_SIZE, MAX_SIZE);
-      const x1 = getUniformInt(1, this.width - w - 1) - 1;
-      const y1 = getUniformInt(1, this.height - h - 1) - 1;
+      const w = RNG.int.between(MIN_SIZE, MAX_SIZE);
+      const h = RNG.int.between(MIN_SIZE, MAX_SIZE);
+      const x1 = RNG.int.between(1, this.width - w - 1) - 1;
+      const y1 = RNG.int.between(1, this.height - h - 1) - 1;
       const r = new Rectangle({ x1, y1, x2: x1 + w, y2: y1 + h });
 
       const collision = {

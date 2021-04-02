@@ -19,7 +19,6 @@
     "paths": {
       "@utils": ["./src/utils/index.ts"],
       "@utils/colors": ["./src/utils/colors.ts"],
-      "@utils/random": ["./src/utils/random.ts"],
       "@lib": ["./src/lib/index.ts"],
       "@types": ["./src/types.ts"],
       "@enums": ["./src/enums.ts"],
@@ -27,6 +26,6 @@
       "@core/*": ["./src/core/*"]
     }
   },
-  "include": ["src/**/*", "utils"],
+  "include": ["src/**/*"],
   "exclude": [".ignore"]
 }

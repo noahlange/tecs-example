@@ -4,6 +4,7 @@ import type { Prefab } from '@types';
 
 export const armor: Prefab[] = [
   {
+    id: 'armor01',
     entity: Equipment,
     tags: [Tag.IS_EQUIPPABLE],
     data: {
@@ -14,6 +15,7 @@ export const armor: Prefab[] = [
         damage: []
       },
       item: {
+        id: 'armor01',
         type: ItemType.ARMOR,
         description: '"I put on my robe and wizard hat."'
       },

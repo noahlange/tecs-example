@@ -10,6 +10,7 @@ import { player } from '@ecs/prefabs';
 import { Action } from '@utils';
 import { GameplayUI } from './GameplayUI';
 import { h, render } from 'preact';
+import { Inventory } from '..';
 
 const deltaKey: Record<string, Vector2> = {
   w: { x: 0, y: -1 },
@@ -17,6 +18,8 @@ const deltaKey: Record<string, Vector2> = {
   s: { x: 0, y: 1 },
   d: { x: 1, y: 0 }
 };
+
+const START = { x: 0, y: 0 };
 
 export class Gameplay extends Scene {
   protected player!: Player;
@@ -31,6 +34,10 @@ export class Gameplay extends Scene {
         const delta = deltaKey[input.key];
         return { id: Action.MOVE, delta };
       }
+      case 'i': {
+        this.game.$.scenes.push(Inventory);
+        return { id: Action.NONE };
+      }
       case ' ': {
         // we'll define the target later on
         return { id: Action.INTERACT, target: null };
@@ -40,12 +47,11 @@ export class Gameplay extends Scene {
   }
 
   protected addPlayer(area: Area): void {
-    console.log('add');
     this.player = this.game.ecs.create(Player, {
       ...player.data,
       position: {
         ...player.data.position,
-        ...area.getSpawn({ x: 0, y: 0 })
+        ...area.getSpawn(START)
       }
     });
   }
@@ -72,6 +78,6 @@ export class Gameplay extends Scene {
 
   public init(): void {
     this.game.once('init.area', area => this.addPlayer(area));
-    this.game.$.map.area.center = { x: 0, y: 0 };
+    this.game.$.map.area.center = START;
   }
 }

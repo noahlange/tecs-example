@@ -16,12 +16,6 @@ export class Vector2Array<T> {
   public readonly width: number;
   public readonly height: number;
 
-  public clone(): Vector2Array<T> {
-    const res = new Vector2Array<T>({ width: this.width, height: this.height });
-    res.items = this.items.slice();
-    return res;
-  }
-
   protected getIndex(point: Vector2): number {
     return point.x * this.height + point.y;
   }
@@ -35,11 +29,6 @@ export class Vector2Array<T> {
   public is(point: Vector2, value: T): boolean {
     const index = this.getIndex(point);
     return this.items[index] === value;
-  }
-
-  public set(point: Vector2, value: T): void {
-    const i = this.getIndex(point);
-    this.items[i] = value;
   }
 
   public has(point: Vector2): boolean {
@@ -56,6 +45,11 @@ export class Vector2Array<T> {
     return this.items[this.getIndex(point)];
   }
 
+  public set(point: Vector2, value: T): void {
+    const i = this.getIndex(point);
+    this.items[i] = value;
+  }
+
   public clear(): void {
     this.items = new Array(this.width * this.height);
   }
@@ -64,9 +58,21 @@ export class Vector2Array<T> {
     this.items.fill(value);
   }
 
+  public clone(): Vector2Array<T> {
+    const res = new Vector2Array<T>({ width: this.width, height: this.height });
+    res.items = this.items.slice();
+    return res;
+  }
+
   public *keys(): Iterable<Vector2> {
     for (const [point] of this.entries()) {
       yield point;
+    }
+  }
+
+  public *values(): Iterable<T> {
+    for (const [, value] of this.entries()) {
+      yield value;
     }
   }
 
@@ -78,6 +84,17 @@ export class Vector2Array<T> {
         yield [this.getPoint(i), v];
       }
     }
+  }
+
+  public toString(): string {
+    let str = '';
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        str += this.get({ x, y }) ?? ' ';
+      }
+      str += '\n';
+    }
+    return str;
   }
 
   public constructor(size: Size, fill: T | null = null) {

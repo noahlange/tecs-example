@@ -121,11 +121,7 @@ export class Renderer extends System {
 
   public updateSprites(): void {
     for (const entity of this.$.sprites) {
-      if (entity.$.sprite.pixi) {
-        if (entity.$.render?.dirty === false) {
-          continue;
-        }
-      } else {
+      if (!entity.$.sprite.pixi) {
         this.addSprite(entity);
       }
 
@@ -154,7 +150,6 @@ export class Renderer extends System {
       const texture = spritesheet.textures[key];
       if (texture?.valid) {
         const rel = toRelative(this.world.game.$.map, entity.$.position);
-
         if (!rel) {
           return;
         }

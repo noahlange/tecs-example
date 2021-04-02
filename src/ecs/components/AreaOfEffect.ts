@@ -1,9 +1,8 @@
 import type { Vector2 } from '@types';
 import type { Direction } from '@enums';
 import { AOE } from '@enums';
-import { getTargetAOE } from '@utils';
+import { RNG, getTargetAOE } from '@utils';
 import { Component } from 'tecs';
-import { pick } from '@utils/random';
 
 export class AreaOfEffect extends Component {
   public static readonly type = 'aoe';
@@ -22,7 +21,7 @@ export class AreaOfEffect extends Component {
     const res: Vector2[] = [];
     const all = this.all(source);
     while (count--) {
-      res.push(pick(all));
+      res.push(RNG.pick(all));
     }
     return res;
   }

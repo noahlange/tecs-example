@@ -1,10 +1,10 @@
-import { MapBuilder } from '@lib';
+import { MapBuilder, Rectangle } from '@lib';
 import type { Vector2 } from '@types';
 
 import { TileType } from '@enums';
 
 import type { MapBuilderOpts } from '../../lib/MapBuilder';
-import { clamp, RNG } from '@utils';
+import { clamp, getRandomNeighbor, RNG } from '@utils';
 
 enum Algorithm {
   INWARDS = 0,
@@ -46,27 +46,17 @@ export class DiffusionLimitedAggregation extends MapBuilder {
   }
 
   protected getRandomNeighbor(point: Vector2): Vector2 {
-    const neighbors = RNG.shuffle(deltas.slice(1));
-    do {
-      const delta = neighbors.shift()!;
-      const next = { x: point.x + delta.x, y: point.y + delta.y };
-      if (
-        next.x >= 2 &&
-        next.y >= 2 &&
-        next.x <= this.width - 2 &&
-        next.y <= this.height - 2
-      ) {
-        return next;
-      }
-    } while (neighbors.length > 0);
-    return point;
+    return getRandomNeighbor(
+      point,
+      new Rectangle({ x1: 2, y1: 2, x2: this.width - 2, y2: this.height - 2 })
+    );
   }
 
   protected algos = {
     [Algorithm.INWARDS]: () => {
       const digger = {
-        x: RNG.getUniformInt(1, this.width - 3) + 1,
-        y: RNG.getUniformInt(1, this.height - 3) + 1
+        x: RNG.int.between(1, this.width - 3) + 1,
+        y: RNG.int.between(1, this.height - 3) + 1
       };
 
       const prev = { x: digger.x, y: digger.y };

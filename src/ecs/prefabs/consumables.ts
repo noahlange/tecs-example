@@ -2,13 +2,15 @@ import { Potion } from '@ecs/entities';
 import { EffectType, ItemType, Tag } from '@enums';
 import type { Prefab } from '@types';
 
-export const items: Prefab[] = [
+export const consumables: Prefab[] = [
   {
+    id: 'item01',
     entity: Potion,
     tags: [Tag.IS_CONSUMABLE],
     data: {
       text: { title: 'Potion of Minor Health' },
       item: {
+        id: 'item01',
         type: ItemType.CONSUMABLE,
         description: "This is a health potion. It's super great."
       },
@@ -21,11 +23,13 @@ export const items: Prefab[] = [
     }
   },
   {
+    id: 'item02',
     entity: Potion,
     tags: [Tag.IS_CONSUMABLE],
     data: {
       text: { title: 'Potion of Fortify Health' },
       item: {
+        id: 'item02',
         type: ItemType.CONSUMABLE,
         description: 'This is a health potion. It will make you big and stronk.'
       },

@@ -4,6 +4,7 @@ import type { Prefab } from '@types';
 
 export const weapons: Prefab[] = [
   {
+    id: 'weapon01',
     entity: Equipment,
     tags: [Tag.IS_EQUIPPABLE],
     data: {
@@ -13,6 +14,7 @@ export const weapons: Prefab[] = [
         damage: [{ value: '3d4', type: DamageType.SHARP }]
       },
       item: {
+        id: 'weapon01',
         type: ItemType.WEAPON,
         description: 'A sword.'
       },
@@ -20,6 +22,7 @@ export const weapons: Prefab[] = [
     }
   },
   {
+    id: 'weapon02',
     entity: Equipment,
     tags: [Tag.IS_EQUIPPABLE],
     data: {
@@ -29,6 +32,7 @@ export const weapons: Prefab[] = [
         damage: [{ value: '3d4', type: DamageType.BLUNT }]
       },
       item: {
+        id: 'weapon02',
         type: ItemType.WEAPON,
         description:
           'A mace. Great for inflicting blunt-force trauma; less effective if used as an aerosolized pepper spray.'

@@ -37,7 +37,7 @@ export class Builder extends MapBuilder {
   // returns a random partition. if no rectangles exist, returns the initial partition
   protected getRandomRect(): Rectangle {
     if (this.rects.length) {
-      const i = RNG.getUniformInt(1, this.rects.length) - 1;
+      const i = RNG.int.between(1, this.rects.length) - 1;
       if (this.rects[i]) {
         return this.rects[i];
       }
@@ -56,11 +56,11 @@ export class Builder extends MapBuilder {
     const rWidth = Math.abs(res.x1 - res.x2);
     const rHeight = Math.abs(res.y1 - res.y2);
 
-    const w = Math.max(3, RNG.getUniformInt(1, Math.min(rWidth, 16)) - 1) + 1;
-    const h = Math.max(3, RNG.getUniformInt(1, Math.min(rHeight, 16)) - 1) + 1;
+    const w = Math.max(3, RNG.int.between(1, Math.min(rWidth, 16)) - 1) + 1;
+    const h = Math.max(3, RNG.int.between(1, Math.min(rHeight, 16)) - 1) + 1;
 
-    res.x1 += RNG.getUniformInt(1, 6) - 1;
-    res.y1 += RNG.getUniformInt(1, 6) - 1;
+    res.x1 += RNG.int.between(1, 6) - 1;
+    res.y1 += RNG.int.between(1, 6) - 1;
     res.x2 = res.x1 + w;
     res.y2 = res.y1 + h;
 
@@ -70,35 +70,35 @@ export class Builder extends MapBuilder {
   protected subdivide(rect: Rectangle): void {
     const w = Math.abs(rect.x2 - rect.x1);
     const h = Math.abs(rect.y1 - rect.y2);
-    const halfW = Math.round(Math.max(w / 2, 1));
-    const halfH = Math.round(Math.max(h / 2, 1));
+    const hw = Math.round(Math.max(w / 2, 1));
+    const hh = Math.round(Math.max(h / 2, 1));
 
     this.rects.push(
       // northwest
       new Rectangle({
         x1: rect.x1,
         y1: rect.y1,
-        x2: rect.x1 + halfW,
-        y2: rect.y1 + halfH
+        x2: rect.x1 + hw,
+        y2: rect.y1 + hh
       }),
       // southwest
       new Rectangle({
         x1: rect.x1,
-        y1: rect.y1 + halfH,
-        x2: rect.x1 + halfW,
+        y1: rect.y1 + hh,
+        x2: rect.x1 + hw,
         y2: rect.y1 + h
       }),
       // northeast
       new Rectangle({
-        x1: rect.x1 + halfW,
+        x1: rect.x1 + hw,
         y1: rect.y1,
         x2: rect.x1 + w,
-        y2: rect.y1 + halfH
+        y2: rect.y1 + hh
       }),
       // southeast
       new Rectangle({
-        x1: rect.x1 + halfW,
-        y1: rect.y1 + halfH,
+        x1: rect.x1 + hw,
+        y1: rect.y1 + hh,
         x2: rect.x1 + w,
         y2: rect.y1 + h
       })
@@ -133,15 +133,15 @@ export class Builder extends MapBuilder {
 
   protected drawCorridors(): void {
     for (let i = 0; i < this.rooms.length - 1; i++) {
-      const [room, next] = [this.rooms[i], this.rooms[i + 1]];
+      const [curr, next] = [this.rooms[i], this.rooms[i + 1]];
       const x1 =
-        room.x1 + (RNG.getUniformInt(1, Math.abs(room.x1 - room.x2)) - 1);
+        curr.x1 + (RNG.int.between(1, Math.abs(curr.x1 - curr.x2)) - 1);
       const y1 =
-        room.y1 + (RNG.getUniformInt(1, Math.abs(room.y1 - room.y2)) - 1);
+        curr.y1 + (RNG.int.between(1, Math.abs(curr.y1 - curr.y2)) - 1);
       const x2 =
-        next.x1 + (RNG.getUniformInt(1, Math.abs(next.x1 - next.x2)) - 1);
+        next.x1 + (RNG.int.between(1, Math.abs(next.x1 - next.x2)) - 1);
       const y2 =
-        next.y1 + (RNG.getUniformInt(1, Math.abs(next.y1 - next.y2)) - 1);
+        next.y1 + (RNG.int.between(1, Math.abs(next.y1 - next.y2)) - 1);
       this.drawCorridor({ x1, y1, x2, y2 });
     }
   }
