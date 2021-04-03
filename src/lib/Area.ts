@@ -179,6 +179,10 @@ export class Area {
       chunk.create();
     }
 
+    for (const chunk of this.chunks.values()) {
+      chunk.update();
+    }
+
     this.game.emit('init.area', this);
   }
 

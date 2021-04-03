@@ -44,6 +44,7 @@ export class Chunk {
   protected point: Vector2;
 
   public entities: Entity[] = [];
+  public cells: Vector2Array<InstanceType<typeof Cell>>;
 
   public get x(): number {
     return this.point.x;
@@ -53,7 +54,16 @@ export class Chunk {
     return this.point.y;
   }
 
+  public update(): void {
+    for (const [point, entity] of this.cells.entries()) {
+      entity.$.sprite.tint = this.tints.get(point) ?? AMBIENT_DARK;
+    }
+  }
+
   public unload(): void {
+    for (const cell of this.cells.values()) {
+      cell.tags.add(Tag.TO_DESTROY);
+    }
     for (const e of this.entities) {
       e.tags.add(
         e.tags.has(Tag.IS_IMPERMANENT)
@@ -64,6 +74,7 @@ export class Chunk {
       );
     }
     this.entities = [];
+    this.cells = new Vector2Array(size);
   }
 
   public getSpawn(): Vector2 {
@@ -104,7 +115,7 @@ export class Chunk {
         },
         [Tag.IS_IMPERMANENT]
       );
-      this.entities.push(entity);
+      this.cells.set(point, entity);
     }
   }
 
@@ -126,7 +137,6 @@ export class Chunk {
       height: CHUNK_HEIGHT,
       builder
     });
-    // debugger;
 
     this.tiles = new Vector2Array<TileType>(size);
 
@@ -158,6 +168,7 @@ export class Chunk {
     this.tiles = new Vector2Array({ width, height });
     this.tints = new Vector2Array({ width, height });
     this.lights = new Vector2Array({ width, height });
+    this.cells = new Vector2Array({ width, height });
     this.bounds = new Rectangle({
       x1: 0,
       x2: width,
