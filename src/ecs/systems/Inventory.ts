@@ -1,17 +1,13 @@
 import type { EntityType } from 'tecs';
 import { System } from 'tecs';
 import { Action, getInteractionPos, isWithin } from '@utils';
+import { Equippable, Stats } from '../components';
 import {
   Actor,
-  Effects,
-  Equippable,
   Equipped,
   Inventory as InventoryComponent,
   Item,
   Position,
-  Renderable,
-  Sprite,
-  Stats,
   Text
 } from '../components';
 
@@ -24,19 +20,14 @@ import type {
 } from '../entities/types';
 
 import { Tag, EffectType } from '@enums';
-import { hasStats, hasEquip, isConsumable, isEquippable } from '@utils';
 
 export class Inventory extends System {
   public static readonly type = 'inventory';
 
   protected $ = {
-    items: this.world.query
-      .components(Item, Position, Text)
-      .some.components(Equippable, Effects)
-      .persist(),
+    items: this.world.query.components(Item, Position, Text).persist(),
     hasInventory: this.world.query
       .components(Actor, InventoryComponent, Position, Equipped)
-      .some.components(Stats, Sprite, Renderable)
       .persist()
   };
 
@@ -153,19 +144,21 @@ export class Inventory extends System {
         case Action.ITEM_UNEQUIP:
         case Action.ITEM_EQUIP: {
           const { target } = $.action.data;
-          if (hasEquip(entity) && isEquippable(target)) {
-            if ($.action.data.id === Action.ITEM_EQUIP) {
-              this.equipItem(entity, target);
-            } else {
-              this.unequipItem(entity, target);
-            }
+          if (
+            entity.has(Equipped) &&
+            target.has(Equippable) &&
+            target.is(Tag.IS_EQUIPPABLE)
+          ) {
+            $.action.data.id === Action.ITEM_EQUIP
+              ? this.equipItem(entity, target)
+              : this.unequipItem(entity, target);
           }
           break;
         }
         // use or equip item
         case Action.ITEM_USE: {
           const { target } = $.action.data;
-          if (hasStats(entity!) && isConsumable(target)) {
+          if (entity.has(Stats) && target.is(Tag.IS_CONSUMABLE)) {
             this.consumeItem(entity, target);
           }
           break;
@@ -173,7 +166,7 @@ export class Inventory extends System {
       }
 
       $.inventory.items = $.inventory.items.filter(item =>
-        item.tags.has(Tag.IN_INVENTORY)
+        item.is(Tag.IN_INVENTORY)
       );
     }
   }

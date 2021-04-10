@@ -11,3 +11,4 @@ export { Camera } from './Camera';
 export { Scenes } from './Scenes';
 export { Items } from './Items';
 export { Overlays } from './Overlays';
+export { LightingSystem as Lighting } from './Lighting';

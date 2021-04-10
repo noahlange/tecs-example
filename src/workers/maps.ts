@@ -1,18 +1,16 @@
 import type { Vector2, Color, Prefab } from '@types';
 import { TileType } from '@enums';
-import { Lighting } from '@lib';
 import { RNG, fromChunkPosition } from '@utils';
 
 import * as generators from '../maps/generators';
 import * as prefabbed from '../ecs/prefabs';
-
-import { FOV } from 'malwoden';
 
 export interface GeneratorPayload {
   x: number;
   y: number;
   width: number;
   height: number;
+  seed: string;
   builder: keyof typeof generators;
 }
 
@@ -23,25 +21,15 @@ export interface GeneratorResponse {
 }
 
 self.onmessage = async (e: MessageEvent<GeneratorPayload>) => {
-  const { builder, x, y, ...options } = e.data;
+  const { builder, seed, x, y, ...options } = e.data;
 
-  RNG.setSeed(`${x},${y}`);
+  RNG.setSeed(seed);
   const Generator = generators[builder];
   const gen = new Generator(options);
   gen.generate();
 
   // compute lights
   const tiles = gen.history[gen.history.length - 1];
-  const fov = new FOV.PreciseShadowcasting({
-    lightPasses: point => tiles.is(point, TileType.FLOOR),
-    returnAll: true,
-    topology: 'four'
-  });
-
-  const lighting = new Lighting(
-    { ...options, fov, range: 8, passes: 1 },
-    point => (tiles.is(point, TileType.WALL) ? 0 : 0.3)
-  );
 
   // add lights
   const lights = [];
@@ -51,7 +39,6 @@ self.onmessage = async (e: MessageEvent<GeneratorPayload>) => {
       const val2 = RNG.int.between(25, 75);
       const val3 = RNG.int.between(25, 75);
       const color = { r: val, g: val2, b: val3, a: 1 };
-      lighting.setLight(point, color);
       lights.push([point, color]);
     }
   }

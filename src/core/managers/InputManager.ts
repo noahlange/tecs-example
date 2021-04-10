@@ -1,5 +1,9 @@
 import { Manager } from '@lib';
-import type { KeyboardInputEvent, MouseInputEvent } from '@types';
+import type {
+  AnyInputEvent,
+  KeyboardInputEvent,
+  MouseInputEvent
+} from '@types';
 import { debounce } from 'ts-debounce';
 
 /**
@@ -8,6 +12,17 @@ import { debounce } from 'ts-debounce';
 export class InputManager extends Manager {
   protected x: number = 0;
   protected y: number = 0;
+
+  protected commands: any[] = [];
+  protected events: AnyInputEvent[] = [];
+
+  public onInputEvent(e: AnyInputEvent): void {
+    this.events.push(e);
+  }
+
+  public getNextEvent(): AnyInputEvent | undefined {
+    return this.events.shift();
+  }
 
   protected toMouseInputEvent(e: PIXI.InteractionEvent): MouseInputEvent {
     const { x, y } = this.game.$.renderer.getWorldPoint(e.data.global);
@@ -38,13 +53,13 @@ export class InputManager extends Manager {
 
   protected handle = {
     onMouseMove: debounce((e: PIXI.InteractionEvent) => {
-      this.game.$.commands.onInputEvent(this.toMouseInputEvent(e));
+      this.onInputEvent(this.toMouseInputEvent(e));
     }, 64),
     onClick: (e: PIXI.InteractionEvent) => {
-      this.game.$.commands.onInputEvent(this.toMouseInputEvent(e));
+      this.onInputEvent(this.toMouseInputEvent(e));
     },
     onKeyDown: (e: KeyboardEvent) => {
-      this.game.$.commands.onInputEvent(this.toKeyboardInputEvent(e));
+      this.onInputEvent(this.toKeyboardInputEvent(e));
     }
   };
 

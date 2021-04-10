@@ -11,6 +11,7 @@ import {
   Interact,
   Inventory,
   Renderer,
+  Lighting,
   Movement,
   Camera,
   Scenes
@@ -24,6 +25,7 @@ export class ECS extends World.with(
   Interact,
   Inventory,
   View,
+  Lighting,
   Renderer,
   Camera
 ) {

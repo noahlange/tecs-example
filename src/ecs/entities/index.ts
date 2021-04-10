@@ -49,5 +49,4 @@ export const Equipment = Entity.with(
 export { Door } from './interactive/Door';
 export { Chest } from './interactive/Chest';
 export { Player } from './mobs/Player';
-export { NPC } from './mobs/NPC';
 export { Monster } from './mobs/Monster';

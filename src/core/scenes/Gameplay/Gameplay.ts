@@ -1,11 +1,8 @@
 import type { ActionType } from '@utils';
 import type { KeyboardInputEvent, Vector2 } from '@types';
-import type { Area } from '@lib';
 
 import { Scene } from '@lib';
-
 import { Player } from '@ecs/entities';
-import { player } from '@ecs/prefabs';
 
 import { Action } from '@utils';
 import { GameplayUI } from './GameplayUI';
@@ -19,11 +16,13 @@ const deltaKey: Record<string, Vector2> = {
   d: { x: 1, y: 0 }
 };
 
-const START = { x: 0, y: 0 };
-
 export class Gameplay extends Scene {
-  protected player!: Player;
+  protected player: Player | null = null;
   protected point: Vector2 | null = null;
+
+  protected $ = {
+    player: this.game.ecs.query.entities(Player).persist()
+  };
 
   protected getKeyboardAction(input: KeyboardInputEvent): ActionType {
     switch (input.key) {
@@ -46,19 +45,10 @@ export class Gameplay extends Scene {
     return { id: Action.NONE };
   }
 
-  protected addPlayer(area: Area): void {
-    this.player = this.game.ecs.create(Player, {
-      ...player.data,
-      position: {
-        ...player.data.position,
-        ...area.getSpawn(START)
-      }
-    });
-  }
-
   public tick(): void {
+    this.player ??= this.$.player.first();
     if (this.player) {
-      const next = this.game.$.commands.getNextEvent();
+      const next = this.game.$.input.getNextEvent();
       if (next?.isKeyboard) {
         this.player.$.action.data = this.getKeyboardAction(
           next as KeyboardInputEvent
@@ -74,10 +64,5 @@ export class Gameplay extends Scene {
         document.getElementById('ui')!
       );
     }
-  }
-
-  public init(): void {
-    this.game.once('init.area', area => this.addPlayer(area));
-    this.game.$.map.area.center = START;
   }
 }

@@ -10,7 +10,8 @@ import {
   TILE_HEIGHT,
   TILE_WIDTH,
   getTransformFromDirection,
-  toRelative
+  toRelative,
+  AMBIENT_DARK
 } from '@utils';
 
 import { atlas } from '../../assets/atlases';
@@ -30,7 +31,6 @@ export class Renderer extends System {
   public static readonly type = 'renderer';
 
   protected app!: PIXI.Application;
-
   protected overlays: Set<PIXI.Container> = new Set();
   protected sheets!: Record<keyof typeof atlas, PIXI.Spritesheet>;
 
@@ -128,15 +128,14 @@ export class Renderer extends System {
       this.updatePosition(entity);
       this.updateTransform(entity);
 
-      const sprite = entity.$.sprite;
-      if (sprite.pixi) {
-        // if (entity.$.render) {
-        //   sprite.pixi.tint = toHex(entity.$.render.fg ?? AMBIENT_DARK);
-        // } else {
-        if (sprite.tint) {
-          sprite.pixi.tint = toHex(sprite.tint);
+      const pixi = entity.$.sprite.pixi;
+      const tint = entity.$.sprite.tint;
+      if (pixi) {
+        if (entity.has(Renderable)) {
+          pixi.tint = toHex(entity.$.render.fg ?? AMBIENT_DARK);
+        } else if (tint) {
+          pixi.tint = toHex(tint);
         }
-        // }
       }
     }
   }

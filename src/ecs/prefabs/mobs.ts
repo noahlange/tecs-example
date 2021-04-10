@@ -1,8 +1,8 @@
 import type { Prefab } from '@types';
 import { Monster, Player } from '@ecs/entities';
 import { AIType, Faction } from '@enums';
-import { HealthBar } from '@lib';
 import { T } from '@utils';
+import { HealthBar } from '@lib';
 
 export const enemies: Prefab[] = [
   {
@@ -37,7 +37,7 @@ export const player: Prefab<typeof Player> = {
   tags: [],
   data: {
     text: { title: 'Player' },
-    light: { color: { r: 255, g: 255, b: 0, a: 1 } },
+    light: { color: { r: 0, g: 0, b: 255, a: 1 } },
     sprite: { key: 'player_01' },
     view: { range: 10 },
     position: { z: 10 }

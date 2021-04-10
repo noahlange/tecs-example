@@ -2,6 +2,7 @@ import type { JSX } from 'preact';
 import type { InventoryItem } from '@ecs/entities/types';
 import type { EntityType } from 'tecs';
 import type { Item, Text } from '@ecs/components';
+import { Equippable } from '@ecs/components';
 
 import { ItemType } from '@enums';
 import { h } from 'preact';
@@ -15,7 +16,6 @@ import misc from 'url:../../../assets/ui/btn-misc.png';
 
 import { Equipment } from '@ecs/entities';
 import { WeaponStats } from './stats/Weapon';
-import { isEquippable } from '@utils';
 
 interface InventoryProps {
   items: InventoryItem[];
@@ -56,7 +56,8 @@ export function InventoryUI(props: InventoryProps): JSX.Element {
             {props.items.map((item, i) => {
               const { $, id } = item;
               const isSelected = i === props.index;
-              const isEquipped = isEquippable(item) && item.$.equip.isEquipped;
+              const isEquipped =
+                item.has(Equippable) && item.$.equip.isEquipped;
               return (
                 <li className={`item ${isSelected ? 'selected' : ''}`} key={id}>
                   {isEquipped ? (

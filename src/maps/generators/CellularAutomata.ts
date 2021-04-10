@@ -1,9 +1,9 @@
 import type { Vector2Array } from '@lib';
-import { MapBuilder } from '@lib';
-
 import type { Vector2 } from '@types';
+
 import { TileType } from '@enums';
 import { RNG } from '@utils';
+import { MapBuilder } from '@lib';
 
 const deltas: Vector2[] = [
   { x: -1, y: -1 },

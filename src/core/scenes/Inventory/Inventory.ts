@@ -2,11 +2,12 @@ import type { InventoryItem } from '@ecs/entities/types';
 import { h, render } from 'preact';
 
 import { Scene, UIList } from '@lib';
-import { ItemType } from '@enums';
+import { ItemType, Tag } from '@enums';
 import { Player } from '@ecs/entities';
-import { Action, isConsumable, isEquippable } from '@utils';
+import { Action } from '@utils';
 
 import { InventoryUI } from './InventoryUI';
+import { Equippable } from '@ecs/components';
 
 export class Inventory extends Scene {
   protected yList = new UIList<InventoryItem>();
@@ -15,7 +16,7 @@ export class Inventory extends Scene {
   protected player!: Player;
 
   protected handleInput(): void {
-    const next = this.game.$.commands.getNextEvent();
+    const next = this.game.$.input.getNextEvent();
     if (next?.isKeyboard) {
       switch (next.key) {
         case 'i':
@@ -74,9 +75,9 @@ export class Inventory extends Scene {
 
   protected use(): void {
     const target = this.yList.selected;
+
     if (target) {
-      console.log(target);
-      if (isEquippable(target)) {
+      if (target.has(Equippable) && target.is(Tag.IS_EQUIPPABLE)) {
         this.player.$.action.data = {
           id: target.$.equip.isEquipped
             ? Action.ITEM_UNEQUIP
@@ -84,7 +85,7 @@ export class Inventory extends Scene {
           actor: this.player,
           target
         };
-      } else if (isConsumable(target)) {
+      } else if (target.is(Tag.IS_CONSUMABLE)) {
         this.player.$.action.data = {
           id: Action.ITEM_USE,
           target,

@@ -22,13 +22,9 @@ export class RenderManager extends Manager {
 
   public getWorldPoint(point: Vector2): Vector2 {
     return {
-      x: Math.floor((point.x + this.app.stage.pivot.x) / TILE_WIDTH),
-      y: Math.floor((point.y + this.app.stage.pivot.y) / TILE_HEIGHT)
+      x: Math.floor((point.x + this.pixi.stage.pivot.x) / TILE_WIDTH),
+      y: Math.floor((point.y + this.pixi.stage.pivot.y) / TILE_HEIGHT)
     };
-  }
-
-  public get view(): HTMLCanvasElement {
-    return this.app.view;
   }
 
   public follow(pos: Vector2): void {
@@ -38,7 +34,7 @@ export class RenderManager extends Manager {
       y: y - view.height / (2 * RESOLUTION)
     };
 
-    this.app.stage.pivot.set(this.camera.x, this.camera.y);
+    this.pixi.stage.pivot.set(this.camera.x, this.camera.y);
   }
 
   public init(): void {
@@ -51,6 +47,6 @@ export class RenderManager extends Manager {
       antialias: false
     });
 
-    document.getElementById('root')?.appendChild(this.app.view);
+    document.getElementById('root')?.appendChild(this.pixi.view);
   }
 }

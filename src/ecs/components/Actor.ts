@@ -1,6 +1,6 @@
 import { Component } from 'tecs';
-import { Action } from '../../utils';
-import type { ActionType } from '../../utils';
+import { Action } from '@utils';
+import type { ActionType } from '@utils';
 
 /**
  * An entity capable of performing actions

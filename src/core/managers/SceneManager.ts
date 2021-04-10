@@ -10,13 +10,14 @@ interface SceneConstructor<T> {
 
 export class SceneManager extends Manager {
   public state: GameState = GameState.RUNNING;
+  public scene: Scene | null = null;
 
   protected stack: Scene[] = [];
-  public scene!: Scene;
 
-  public push<T = {}>(scene: SceneConstructor<T>, props?: T): void {
-    const s = (this.scene = new scene(this.game));
-    s.init(props);
+  public push<T = {}>(Constructor: SceneConstructor<T>, props?: T): void {
+    const s = new Constructor(this.game);
+    this.scene = s;
+    s.init?.(props);
     this.stack.push(s);
   }
 

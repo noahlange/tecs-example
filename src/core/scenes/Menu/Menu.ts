@@ -16,7 +16,7 @@ export class Menu extends Scene {
   }
 
   public tick(): void {
-    const next = this.game.$.commands.getNextEvent();
+    const next = this.game.$.input.getNextEvent();
     if (next?.isKeyboard) {
       switch (next.key) {
         case 'w':

@@ -9,8 +9,6 @@ import {
   Text
 } from '../components';
 
-import type { InventoryItem } from '../entities/types';
-
 import { Action, getInteractionPos, isWithin } from '@utils';
 
 export class Items extends System {
@@ -34,16 +32,18 @@ export class Items extends System {
         case Action.INTERACT: {
           const pos = getInteractionPos(actor.$.position);
           for (const item of items) {
-            if (isWithin(item.$.position, [actor.$.position, pos])) {
+            if (
+              isWithin(item.$.position, [actor.$.position, pos]) &&
+              item.has(Equippable)
+            ) {
               // if it's an item, add to our inventory
               items.delete(item);
               actor.$.action.data = {
                 id: Action.ITEM_PICK_UP,
                 count: item.$.item.count,
                 actor: actor,
-                target: item as InventoryItem
+                target: item
               };
-
               break;
             }
           }

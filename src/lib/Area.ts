@@ -2,7 +2,7 @@ import type { Game } from '@core/Game';
 import type { Vector2, Color } from '@types';
 import type { TileType } from '@enums';
 
-import { Pathfinding } from 'malwoden';
+import { FOV, Pathfinding } from 'malwoden';
 
 import {
   CHUNK_HEIGHT,
@@ -10,7 +10,8 @@ import {
   CHUNK_RADIUS,
   toChunkPosition,
   iterateAcross,
-  asyncWorker
+  work,
+  fromRelative
 } from '@utils';
 
 import { Chunk } from './Chunk';
@@ -36,8 +37,9 @@ export class Area {
   );
 
   protected point: Vector2 = { x: 0, y: 0 };
-
   protected game: Game;
+
+  public fov!: FOV.PreciseShadowcasting;
 
   public paths: Pathfinding.AStar = new Pathfinding.AStar({
     topology: 'four',
@@ -53,6 +55,13 @@ export class Area {
     return {
       x: chunk.x * CHUNK_WIDTH + r.x,
       y: chunk.y * CHUNK_WIDTH + r.y
+    };
+  }
+
+  public toJSON(): object {
+    return {
+      ...this.point,
+      chunks: this.chunks
     };
   }
 
@@ -129,33 +138,30 @@ export class Area {
       height: Area.chunks.height * CHUNK_HEIGHT
     };
 
+    const reduced = {
+      tiles: new Vector2Array<TileType>(size),
+      lights: new Vector2Array<Color>(size)
+    };
+
     // collapse all the vector arrays into a single vector array
-    const { lights, tiles } = Array.from(this.chunks.entries()).reduce(
-      (a, [point, chunk]) => {
-        const worldX = point.x * CHUNK_WIDTH;
-        const worldY = point.y * CHUNK_HEIGHT;
-
-        for (const [point, tile] of chunk.tiles.entries()) {
-          a.tiles.set({ x: worldX + point.x, y: worldY + point.y }, tile);
-        }
-        for (const [point, light] of chunk.lights.entries()) {
-          a.lights.set({ x: worldX + point.x, y: worldY + point.y }, light);
-        }
-        return a;
-      },
-      {
-        tiles: new Vector2Array<TileType>(size),
-        lights: new Vector2Array<Color>(size)
+    for (const [point, chunk] of this.chunks.entries()) {
+      const x = point.x * CHUNK_WIDTH;
+      const y = point.y * CHUNK_HEIGHT;
+      for (const [point, tile] of chunk.tiles.entries()) {
+        reduced.tiles.set({ x: x + point.x, y: y + point.y }, tile);
       }
-    );
+      for (const [point, light] of chunk.lights.entries()) {
+        reduced.lights.set({ x: x + point.x, y: y + point.y }, light);
+      }
+    }
 
-    const worker = asyncWorker(
+    const worker = work(
       new Worker(new URL('../workers/lighting', import.meta.url))
     );
 
     const res = await worker.run<LightingPayload, LightingResponse>({
-      tiles: Array.from(tiles.entries()),
-      lights: Array.from(lights.entries())
+      tiles: Array.from(reduced.tiles.entries()),
+      lights: Array.from(reduced.lights.entries())
     });
 
     // e.g., 48x48
@@ -163,13 +169,10 @@ export class Area {
       // e.g., 0-2
       const chunkX = Math.floor(point.x / CHUNK_WIDTH);
       const chunkY = Math.floor(point.y / CHUNK_HEIGHT);
-      // debugger;
       const chunk = this.chunks.get({ x: chunkX, y: chunkY });
-      const chunkStartX = chunkX * CHUNK_WIDTH;
-      const chunkStartY = chunkY * CHUNK_HEIGHT;
       const pointInChunk = {
-        x: point.x - chunkStartX,
-        y: point.y - chunkStartY
+        x: point.x - chunkX * CHUNK_WIDTH,
+        y: point.y - chunkY * CHUNK_HEIGHT
       };
 
       chunk.tints.set(pointInChunk, color);
@@ -189,6 +192,12 @@ export class Area {
   public set center(next: Vector2) {
     const curr = this.point;
     this.point = next;
+    this.fov = new FOV.PreciseShadowcasting({
+      lightPasses: point =>
+        this.collisions.isVisible(fromRelative(this, point)),
+      topology: 'four',
+      cartesianRange: true
+    });
     this.updateChunks(curr, next);
   }
 
@@ -199,11 +208,8 @@ export class Area {
     const [chunk, position] = toChunkPosition(world);
     const chunkX = chunk.x - this.x;
     const chunkY = chunk.y - this.y;
-    return [
-      this.chunks.get({ x: chunkX + CHUNK_RADIUS, y: chunkY + CHUNK_RADIUS }) ??
-        null,
-      position
-    ];
+    const point = { x: chunkX + CHUNK_RADIUS, y: chunkY + CHUNK_RADIUS };
+    return [this.chunks.get(point) ?? null, position];
   }
 
   protected isVisible(pos: Vector2): boolean {

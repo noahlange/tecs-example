@@ -1,11 +1,11 @@
+import type { AnyInputEvent } from '@types';
+import type { ResultNode } from 'bondage';
+
 import { h, render } from 'preact';
 
 import { OptionsResult, Runner } from 'bondage';
-import type { ResultNode } from 'bondage';
-
 import { Player } from '@ecs/entities';
 import { Scene } from '@lib';
-import type { AnyInputEvent } from '@types';
 import { dialogue } from '@utils';
 
 import { DialogueUI } from './DialogueUI';
@@ -84,7 +84,7 @@ export class Dialogue extends Scene {
 
   public tick(): void {
     this.player ??= this.game.ecs.query.entities(Player).find();
-    const next = this.game.$.commands.getNextEvent();
+    const next = this.game.$.input.getNextEvent();
 
     if (next) {
       this.getAction(next);

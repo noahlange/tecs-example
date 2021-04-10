@@ -1,4 +1,3 @@
-import type { System } from 'tecs';
 /**
  * Modify a system's effective tick rate, invoking its `tick` method once every `n` ticks.
  * @param t

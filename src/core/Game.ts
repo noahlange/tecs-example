@@ -1,6 +1,5 @@
-import type { Scene } from '@lib';
-import type { Compressed } from 'compress-json';
 import type { Events } from '@types';
+import type { Scene } from '@lib';
 
 import * as Managers from './managers';
 import { ECS } from '../ecs/ECS';
@@ -9,10 +8,11 @@ import { createNanoEvents } from 'nanoevents';
 
 interface GameManagers {
   renderer: Managers.Render;
-  commands: Managers.Command;
+
   input: Managers.Input;
   scenes: Managers.Scene;
   messages: Managers.Message;
+  save: Managers.Save;
   map: Managers.Map;
 }
 
@@ -21,11 +21,6 @@ export class Game {
 
   public $: GameManagers;
 
-  public async load(save: Compressed): Promise<void> {
-    this.ecs.load(save);
-    return this.start();
-  }
-
   protected events = createNanoEvents<Events>();
 
   public on<E extends keyof Events>(event: E, callback: Events[E]): void {
@@ -33,8 +28,8 @@ export class Game {
   }
 
   public once<E extends keyof Events>(event: E, callback: Events[E]): void {
-    const unregister = this.events.on(event, (...args) => {
-      callback(...args);
+    const unregister = this.events.on(event, (...args: any[]) => {
+      (callback as (...args: any) => any)(...args);
       unregister();
     });
   }
@@ -46,12 +41,19 @@ export class Game {
     this.events.emit(event, ...data);
   }
 
-  public async start(): Promise<void> {
+  public async start(save?: any): Promise<void> {
     this.ecs.game = this;
+    // init systems...
     for (const key of Object.keys(this.$) as (keyof GameManagers)[]) {
       this.$[key].init?.();
     }
+    // boot managers
     await this.ecs.start();
+    if (save) {
+      // populate ECS with load save data.
+      this.ecs.load(save);
+    }
+    // attach pixi ticker
     this.$.renderer.app.ticker.add(this.ecs.tick.bind(this.ecs));
   }
 
@@ -67,7 +69,7 @@ export class Game {
     return this.$.scenes.state === GameState.PAUSED;
   }
 
-  public get scene(): Scene {
+  public get scene(): Scene | null {
     return this.$.scenes.scene;
   }
 
@@ -86,10 +88,10 @@ export class Game {
   public constructor() {
     this.$ = {
       renderer: new Managers.Render(this),
-      commands: new Managers.Command(this),
       scenes: new Managers.Scene(this),
       messages: new Managers.Message(this),
       input: new Managers.Input(this),
+      save: new Managers.Save(this),
       map: new Managers.Map(this)
     };
   }

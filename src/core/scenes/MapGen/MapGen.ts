@@ -1,61 +1,24 @@
-import type { Vector2Array } from '@lib';
-import { Builder } from '../../../maps/generators/Canyon';
-import { Cell as CellEntity } from '@ecs/entities';
+import { Player } from '@ecs/entities';
+import { player } from '@ecs/prefabs';
 import { Scene } from '@lib';
+import { toChunkPosition } from '@utils';
 
-import { TileType } from '@enums';
-
-const getKeyFromTile = (type: TileType): string => {
-  const isWall = type === TileType.WALL;
-  return isWall ? 'wall_01_ew' : 'floor_02_06';
-};
+const START = { x: 0, y: 0 };
 
 export class MapGen extends Scene {
-  protected builder: Builder = new Builder({ width: 64, height: 64 });
-  protected entities: InstanceType<typeof CellEntity>[] = [];
-  protected current: Vector2Array<TileType> | null = null;
-
-  public getNextSnapshot(): void {
-    const snapshot = this.builder.history.shift();
-    if (snapshot) {
-      if (this.current) {
-        for (const { $ } of this.entities) {
-          const key = getKeyFromTile(this.current.get($.position));
-          if (key !== $.sprite.key) {
-            $.sprite.key = key;
-            $.render.dirty = true;
-            $.render.fg = { r: 255, g: 255, b: 255, a: 1 };
-          }
-        }
-      } else {
-        this.entities = Array.from(snapshot.entries()).map(([pos, sprite]) => {
-          const isWall = sprite === TileType.WALL;
-          return this.game.ecs.create(CellEntity, {
-            position: pos,
-            collision: { passable: !isWall, allowLOS: !isWall },
-            sprite: {
-              key: getKeyFromTile(sprite)
-            },
-            render: { dirty: true, fg: { r: 255, g: 255, b: 255, a: 1 } }
-          });
-        });
-      }
-      this.current = snapshot;
-    }
-  }
-
-  public tick(): void {
-    const next = this.game.$.commands.getNextEvent();
-    if (next?.isKeyboard) {
-      switch (next.key) {
-        case ' ':
-          this.getNextSnapshot();
-          break;
-      }
-    }
-  }
-
   public init(): void {
-    // @todo: reimplement
+    const playerEntity = this.game.ecs.query.entities(Player).first();
+    const entity = playerEntity ?? this.game.ecs.create(Player, player.data);
+    const [chunk] = toChunkPosition(entity.$.position);
+
+    if (!playerEntity) {
+      this.game.once('init.area', area => {
+        const { x, y } = area.getSpawn(START);
+        entity.$.position.x = x;
+        entity.$.position.y = y;
+      });
+    }
+
+    this.game.$.map.area.center = chunk ?? START;
   }
 }

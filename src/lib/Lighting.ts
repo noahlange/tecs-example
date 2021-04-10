@@ -78,13 +78,15 @@ export class Lighting {
       emitting = this._computeEmitters(lit, done);
     }
     for (const [point, light] of lit.entries()) {
+      const clampColor = (a: number, b: number): number =>
+        Math.round(Math.max(Math.min(255, a), b));
       /* let the user know what and how is lit */
       yield [
         point,
         {
-          r: Math.max(Math.min(255, light.r), AMBIENT_LIGHT.r),
-          g: Math.max(Math.min(255, light.g), AMBIENT_LIGHT.g),
-          b: Math.max(Math.min(255, light.b), AMBIENT_LIGHT.b),
+          r: clampColor(light.r, AMBIENT_LIGHT.r),
+          g: clampColor(light.g, AMBIENT_LIGHT.g),
+          b: clampColor(light.b, AMBIENT_LIGHT.b),
           a: 1
         }
       ];

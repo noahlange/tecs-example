@@ -20,19 +20,7 @@ export function* iterateAcross(
   }
 }
 
-export function keys<T, K extends keyof T>(object: T): K[] {
-  return Object.keys(object) as K[];
-}
-
-export function values<T, K extends keyof T>(object: T): T[K][] {
-  return Object.values(object);
-}
-
-export function entries<T, K extends keyof T>(object: T): [K, T[K]][] {
-  return Object.entries(object) as [K, T[K]][];
-}
-
-export function asyncWorker(
+export function work(
   worker: Worker,
   persist: boolean = false
 ): { run<I, O>(data: I): Promise<O> } {
@@ -50,4 +38,16 @@ export function asyncWorker(
       });
     }
   };
+}
+
+export function keys<T, K extends keyof T>(object: T): K[] {
+  return Object.keys(object) as K[];
+}
+
+export function values<T, K extends keyof T>(object: T): T[K][] {
+  return Object.values(object);
+}
+
+export function entries<T, K extends keyof T>(object: T): [K, T[K]][] {
+  return Object.entries(object) as [K, T[K]][];
 }

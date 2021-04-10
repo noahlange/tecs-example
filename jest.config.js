@@ -7,12 +7,8 @@ module.exports = {
   testMatch: ['<rootDir>/src/tests/**/*.ts'],
   testPathIgnorePatterns: ['<rootDir>/src/tests/helpers'],
   coveragePathIgnorePatterns: ['<rootDir>/src/tests/helpers'],
+  globals: { 'ts-jest': { useESM: true } },
   moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
     prefix: '<rootDir>/'
-  }),
-  globals: {
-    'ts-jest': {
-      useESM: true
-    }
-  }
+  })
 };

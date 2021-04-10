@@ -2,6 +2,7 @@ import type { Color, Size } from '@types';
 
 export const TILE_WIDTH = 16;
 export const TILE_HEIGHT = 16;
+
 export const CHUNK_WIDTH = 16;
 export const CHUNK_HEIGHT = 16;
 export const CHUNK_RADIUS = 1;

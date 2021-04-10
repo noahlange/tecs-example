@@ -1,5 +1,4 @@
 import type { Vector2 } from '@types';
-import { Vector2Array } from '@lib';
 import { Direction } from '@enums';
 
 export function isWithin(a: Vector2, points: Vector2[]): boolean {
@@ -53,27 +52,28 @@ export function getInteractionPos(point: Vector2 & { d: Direction }): Vector2 {
 }
 
 export const getNewDirection = (() => {
-  const dirs = new Vector2Array<Direction>({ width: 3, height: 3 });
-  dirs.set({ x: 1, y: 0 }, Direction.N);
-  dirs.set({ x: 2, y: 1 }, Direction.E);
-  dirs.set({ x: 1, y: 2 }, Direction.S);
-  dirs.set({ x: 0, y: 1 }, Direction.W);
-
+  const dirs: Record<string, Direction> = {
+    '1,0': Direction.N,
+    '2,1': Direction.E,
+    '1,2': Direction.S,
+    '0,1': Direction.W
+  };
   return (point: Vector2): Direction | null => {
-    return dirs.get({ x: point.x + 1, y: point.y + 1 }) ?? null;
+    const key = `${point.x + 1},${point.y + 1}`;
+    return dirs[key] ?? null;
   };
 })();
 
-export { getTargetAOE, getCirclePoints } from './aoe';
-export { roll } from './random';
-export * as RNG from './random';
+// order is, unfortunately, important here
 export { Sprite as T } from './tiles';
 
+export { roll } from './random';
+export * as RNG from './random';
+
 export * from './actions';
-export * from './tiles';
-export * from './dialogue';
+export * from './aoe';
 export * from './constants';
-export * from './tests';
 export * from './decorators';
+export * from './dialogue';
 export * from './misc';
 export * from './geometry';

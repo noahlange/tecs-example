@@ -1,5 +1,4 @@
 import type { Vector2 } from '@types';
-
 import { Vector2Array } from '@lib';
 import { AOE, Direction } from '@enums';
 

@@ -8,7 +8,7 @@ import * as prefabs from '@ecs/prefabs';
 import { Tag, TileType } from '@enums';
 import { Pathfinding } from 'malwoden';
 import { CollisionMap } from './CollisionMap';
-import { AMBIENT_DARK, asyncWorker, CHUNK_HEIGHT, CHUNK_WIDTH } from '@utils';
+import { AMBIENT_DARK, work, CHUNK_HEIGHT, CHUNK_WIDTH } from '@utils';
 import { Vector2Array } from './Vector2Array';
 import { Cell } from '@ecs/entities';
 import { Rectangle } from './Rectangle';
@@ -22,29 +22,44 @@ export interface ChunkOptions {
   game: Game;
 }
 
+export interface SavedChunk {
+  options: Pick<ChunkOptions, Exclude<keyof ChunkOptions, 'game'>>;
+  cells: string[];
+  entities: string[];
+}
+
 const prefabItems = [...prefabs.armor, ...prefabs.items, ...prefabs.weapons];
-const size = {
-  width: CHUNK_WIDTH,
-  height: CHUNK_HEIGHT
-};
 
 export class Chunk {
+  public toJSON(): SavedChunk {
+    const cells = Array.from(this.cells.values()).map(cell => cell.id);
+    const entities = this.entities.map(entity => entity.id);
+    return {
+      options: { ...this.point, ...this.size },
+      cells,
+      entities
+    };
+  }
+
   public paths: Pathfinding.AStar;
   public tints: Vector2Array<Color>;
   public tiles: Vector2Array<TileType>;
   public lights: Vector2Array<Color>;
   public bounds: Rectangle;
   public collisions: CollisionMap;
-
-  protected game: Game;
+  public entities: Entity[] = [];
+  public cells: Vector2Array<InstanceType<typeof Cell>>;
 
   /**
    * Chunk coordinate (e.g., 1, 2)
    */
   protected point: Vector2;
+  protected size: { width: number; height: number };
+  protected game: Game;
 
-  public entities: Entity[] = [];
-  public cells: Vector2Array<InstanceType<typeof Cell>>;
+  protected get seed(): string {
+    return `${this.point.x},${this.point.y}`;
+  }
 
   public get x(): number {
     return this.point.x;
@@ -66,7 +81,7 @@ export class Chunk {
     }
     for (const e of this.entities) {
       e.tags.add(
-        e.tags.has(Tag.IS_IMPERMANENT)
+        e.is(Tag.IS_IMPERMANENT)
           ? // flag stateless entities for destruction
             Tag.TO_DESTROY
           : // mark stateful entities inactive, but don't destroy
@@ -74,7 +89,7 @@ export class Chunk {
       );
     }
     this.entities = [];
-    this.cells = new Vector2Array(size);
+    this.cells = new Vector2Array(this.size);
   }
 
   public getSpawn(): Vector2 {
@@ -126,7 +141,7 @@ export class Chunk {
   public async generate(
     builder: keyof typeof Builders = 'Empty'
   ): Promise<this> {
-    const worker = asyncWorker(
+    const worker = work(
       new Worker(new URL('../workers/maps', import.meta.url))
     );
 
@@ -135,12 +150,14 @@ export class Chunk {
       y: this.point.y,
       width: CHUNK_WIDTH,
       height: CHUNK_HEIGHT,
+      seed: this.seed,
       builder
     });
 
-    this.tiles = new Vector2Array<TileType>(size);
+    this.tiles = new Vector2Array<TileType>(this.size);
 
     for (const [point, type] of data.tiles) {
+      // @todo - move elsewhere
       this.collisions.set(point, type !== TileType.WALL);
       this.tiles.set(point, type);
     }
@@ -165,18 +182,16 @@ export class Chunk {
   public constructor({ x, y, width, height, game }: ChunkOptions) {
     this.game = game;
     this.point = { x, y };
-    this.tiles = new Vector2Array({ width, height });
-    this.tints = new Vector2Array({ width, height });
-    this.lights = new Vector2Array({ width, height });
-    this.cells = new Vector2Array({ width, height });
-    this.bounds = new Rectangle({
-      x1: 0,
-      x2: width,
-      y1: 0,
-      y2: height
-    });
+    this.size = { width, height };
 
+    this.tiles = new Vector2Array(this.size);
+    this.tints = new Vector2Array(this.size);
+    this.lights = new Vector2Array(this.size);
+    this.cells = new Vector2Array(this.size);
+
+    this.bounds = new Rectangle({ x1: 0, x2: width, y1: 0, y2: height });
     this.collisions = new CollisionMap(this.bounds);
+
     this.paths = new Pathfinding.AStar({
       isBlockedCallback: pt => !this.collisions.isPassable(pt),
       topology: 'four'

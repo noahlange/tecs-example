@@ -1,18 +1,8 @@
 import type { Vector2, Size } from '@types';
 
 export class Vector2Array<T> {
-  public static from<T>(items: [Vector2, T][]): Vector2Array<T> {
-    const width = Math.max(...items.map(([pos]) => pos.x)) + 1;
-    const height = Math.max(...items.map(([pos]) => pos.y)) + 1;
-    const arr = new Vector2Array<T>({ width, height });
-    for (const [point, value] of items) {
-      arr.set(point, value);
-    }
-    return arr;
-  }
-
   protected items: T[];
-
+  protected filler: T | null = null;
   public readonly width: number;
   public readonly height: number;
 
@@ -55,6 +45,7 @@ export class Vector2Array<T> {
   }
 
   public fill(value: T): void {
+    this.filler = value;
     this.items.fill(value);
   }
 
@@ -84,6 +75,14 @@ export class Vector2Array<T> {
         yield [this.getPoint(i), v];
       }
     }
+  }
+
+  public toJSON(): { width: number; height: number; entries: [Vector2, T][] } {
+    return {
+      width: this.width,
+      height: this.height,
+      entries: Array.from(this.entries())
+    };
   }
 
   public toString(): string {
