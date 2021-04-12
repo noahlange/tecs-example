@@ -186,6 +186,7 @@ export class Area {
       chunk.update();
     }
 
+    this.game.ecs.update();
     this.game.emit('init.area', this);
   }
 

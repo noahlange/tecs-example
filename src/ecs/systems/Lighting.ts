@@ -134,10 +134,12 @@ export class LightingSystem extends System {
       const base = this.area?.collisions.isVisible(pos) ? LIGHT : DARK;
       const light = data ? add(LIGHT, data) : LIGHT;
       const mult = multiply(base, data ?? LIGHT);
-
-      $.render.fg = $.sprite?.tint ? mix(mult, $.sprite?.tint) : mult;
-      $.render.bg = multiply(light, LIGHT);
-      $.render.dirty = true;
+      const fg = $.sprite?.tint ? mix(mult, $.sprite?.tint) : mult;
+      if (fg !== $.render.fg) {
+        $.render.fg = fg;
+        $.render.bg = multiply(light, LIGHT);
+        $.render.dirty = true;
+      }
     }
   }
 

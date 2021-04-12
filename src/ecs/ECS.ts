@@ -31,10 +31,18 @@ export class ECS extends World.with(
 ) {
   protected ts: number = 0;
   protected stats: Stats | null = null;
+
   protected initStats(): void {
     this.stats = new Stats();
     this.stats.showPanel(1);
     document.body.appendChild(this.stats.dom);
+  }
+
+  /**
+   * For manually-invoking the entity manager's tick() method, due to the hybrid ecs/non-ecs approach
+   */
+  public update(): void {
+    this.manager.tick();
   }
 
   public tick(d: number, ts: number): void {

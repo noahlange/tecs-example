@@ -128,13 +128,22 @@ export class Renderer extends System {
       this.updatePosition(entity);
       this.updateTransform(entity);
 
-      const pixi = entity.$.sprite.pixi;
-      const tint = entity.$.sprite.tint;
+      if (!entity.$.render?.dirty) {
+        continue;
+      }
+
+      const { pixi, tint } = entity.$.sprite;
+
       if (pixi) {
+        // i.e., has some lighting color data
         if (entity.has(Renderable)) {
           pixi.tint = toHex(entity.$.render.fg ?? AMBIENT_DARK);
+          entity.$.render.dirty = false;
         } else if (tint) {
-          pixi.tint = toHex(tint);
+          const hex = toHex(tint);
+          if (hex && hex !== pixi.tint) {
+            pixi.tint = hex;
+          }
         }
       }
     }
