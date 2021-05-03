@@ -1,12 +1,10 @@
+import type { KeyboardInputEvent, Vector2 } from '../../../lib/types';
 import type { ActionType } from '@utils';
-import type { KeyboardInputEvent, Vector2 } from '@types';
 
+import { Player } from '@core/entities';
 import { Scene } from '@lib';
-import { Player } from '@ecs/entities';
+import { Action } from '@lib/enums';
 
-import { Action } from '@utils';
-import { GameplayUI } from './GameplayUI';
-import { h, render } from 'preact';
 import { Inventory } from '..';
 
 const deltaKey: Record<string, Vector2> = {
@@ -55,14 +53,14 @@ export class Gameplay extends Scene {
         );
       }
 
-      render(
-        h(GameplayUI, {
-          player: this.player,
-          area: this.game.$.map.area,
-          state: this.game.state
-        }),
-        document.getElementById('ui')!
-      );
+      // render(
+      //   h(GameplayUI, {
+      //     player: this.player,
+      //     area: this.game.$.map.world,
+      //     state: this.game.state
+      //   }),
+      //   document.getElementById('ui')!
+      // );
     }
   }
 }

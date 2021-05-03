@@ -1,4 +1,4 @@
-import type { Color } from '../types';
+import type { Color } from '../lib/types';
 
 export function add(a: Color, b: Color): Color {
   return {

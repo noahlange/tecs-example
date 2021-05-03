@@ -1,4 +1,4 @@
-import type { Game } from '@core/Game';
+import type { Game } from '@core';
 
 export class Manager {
   protected game: Game;

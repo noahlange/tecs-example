@@ -3,3 +3,5 @@ dist
 .parcel-cache
 .ignore
 .DS_Store
+.env
+stats.html

@@ -1,9 +1,10 @@
-import type { Vector2, Color, Prefab } from '@types';
-import { TileType } from '@enums';
-import { RNG, fromChunkPosition } from '@utils';
+import type { Color, Prefab, Vector2 } from '../lib/types';
+import type { GameTileData } from '@core/maps/lib/GameMap';
 
-import * as generators from '../maps/generators';
-import * as prefabbed from '../ecs/prefabs';
+import * as generators from '@core/maps/generators';
+import * as prefabbed from '@core/prefabs';
+import { isObstruction, RGB, RNG } from '@utils';
+import { fromChunkPosition } from '@utils/geometry';
 
 export interface GeneratorPayload {
   x: number;
@@ -15,7 +16,7 @@ export interface GeneratorPayload {
 }
 
 export interface GeneratorResponse {
-  tiles: [Vector2, TileType][];
+  tiles: [Vector2, GameTileData][];
   lights: [Vector2, Color][];
   prefabs: Prefab[];
 }
@@ -32,45 +33,40 @@ self.onmessage = async (e: MessageEvent<GeneratorPayload>) => {
   const tiles = gen.history[gen.history.length - 1];
 
   // add lights
-  const lights = [];
-  for (const [point, tile] of tiles.entries()) {
-    if (RNG.float() < 0.0625 && tile === TileType.FLOOR) {
-      const val = RNG.int.between(25, 75);
-      const val2 = RNG.int.between(25, 75);
-      const val3 = RNG.int.between(25, 75);
-      const color = { r: val, g: val2, b: val3, a: 1 };
-      lights.push([point, color]);
-    }
-  }
+  const lights = Array.from(tiles.entries())
+    .filter(([, tile]) => RNG.float() < 0.075 && !isObstruction(tile.collision))
+    .map(([point]) => [
+      point,
+      RGB.simplify({
+        r: RNG.int.between(25, 75),
+        g: RNG.int.between(25, 75),
+        b: RNG.int.between(25, 75),
+        a: 1
+      })
+    ]);
 
-  // generate tracker ID for prefabs so we don't recreate extant entities
-  const prefabs: Prefab[] = [
+  // @todo - generate tracker ID for prefabs so we don't recreate existing entities
+  const shuffled: Prefab[] = RNG.shuffle([
     ...prefabbed.weapons,
     ...prefabbed.items,
     ...prefabbed.consumables
-  ];
+  ]);
 
-  const shuffled = RNG.shuffle(prefabs.slice());
-
-  const res = [];
-  for (let i = 0; i < 5; i++) {
-    const prefab = shuffled.shift();
-    if (prefab) {
-      prefab.data = Object.assign(prefab.data, {
-        position: fromChunkPosition({ x, y }, gen.getSpawn())
-      });
-      res.push(prefab);
-    }
-  }
+  const prefabs = shuffled
+    .slice(0, 5)
+    .filter(prefab => !!prefab)
+    .map(prefab => {
+      return {
+        id: prefab.id,
+        data: Object.assign(prefab.data, {
+          position: fromChunkPosition({ x, y }, gen.getSpawn())
+        }),
+        tags: prefab.tags
+      };
+    });
 
   // @ts-ignore
-  postMessage({
-    tiles: Array.from(tiles.entries()),
-    lights,
-    prefabs: res.map(item => ({
-      id: item.id,
-      data: item.data,
-      tags: item.tags
-    }))
-  });
+  postMessage({ tiles: Array.from(tiles.entries()), lights, prefabs });
 };
+
+export default {};

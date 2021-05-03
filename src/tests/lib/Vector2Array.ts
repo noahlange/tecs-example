@@ -1,5 +1,23 @@
+import type { Vector2 } from '../../lib/types';
+
 import { describe, expect, test } from '@jest/globals';
 import { Vector2Array } from '@lib';
+
+describe('Vector2Array.from()', () => {
+  test('should return a grid bounding the data', () => {
+    const data: [Vector2, number][] = [
+      [{ x: 0, y: 0 }, 1],
+      [{ x: 1, y: 0 }, 2],
+      [{ x: 0, y: 1 }, 3],
+      [{ x: 1, y: 1 }, 4]
+    ];
+
+    const arr = Vector2Array.from(data);
+
+    expect(arr.width).toBe(2);
+    expect(arr.height).toBe(2);
+  });
+});
 
 describe('Vector2Array.getIndex()', () => {
   test('should return index corresponding to point', () => {

@@ -1,9 +1,11 @@
-import { Manager } from '@lib';
 import type {
   AnyInputEvent,
   KeyboardInputEvent,
   MouseInputEvent
-} from '@types';
+} from '../../lib/types';
+import type * as PIXI from 'pixi.js';
+
+import { Manager } from '@lib';
 import { debounce } from 'ts-debounce';
 
 /**
@@ -20,8 +22,8 @@ export class InputManager extends Manager {
     this.events.push(e);
   }
 
-  public getNextEvent(): AnyInputEvent | undefined {
-    return this.events.shift();
+  public getNextEvent(): AnyInputEvent | null {
+    return this.events.shift() ?? null;
   }
 
   protected toMouseInputEvent(e: PIXI.InteractionEvent): MouseInputEvent {
@@ -53,13 +55,14 @@ export class InputManager extends Manager {
 
   protected handle = {
     onMouseMove: debounce((e: PIXI.InteractionEvent) => {
-      this.onInputEvent(this.toMouseInputEvent(e));
+      // this.onInputEvent(this.toMouseInputEvent(e));
     }, 64),
     onClick: (e: PIXI.InteractionEvent) => {
-      this.onInputEvent(this.toMouseInputEvent(e));
+      // this.onInputEvent(this.toMouseInputEvent(e));
     },
     onKeyDown: (e: KeyboardEvent) => {
-      this.onInputEvent(this.toKeyboardInputEvent(e));
+      this.events.push(this.toKeyboardInputEvent(e));
+      this.game.ecs.tick(0, Date.now());
     }
   };
 

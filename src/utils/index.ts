@@ -1,79 +1,43 @@
-import type { Vector2 } from '@types';
-import { Direction } from '@enums';
+import type { Color, Size } from '../lib/types';
 
-export function isWithin(a: Vector2, points: Vector2[]): boolean {
-  return points.some(p => p.x === a.x && p.y === a.y);
-}
+// @todo - dynamic on a per-map basis?
+export const TILE_WIDTH = 16;
+export const TILE_HEIGHT = 16;
 
-export function isSamePoint(a?: Vector2, b?: Vector2): boolean {
-  return a && b ? a.x === b.x && a.y === b.y : false;
-}
+export const CHUNK_WIDTH = 16;
+export const CHUNK_HEIGHT = 16;
+export const CHUNK_RADIUS = 1;
 
-export function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max);
-}
+export const RESOLUTION = 1;
 
-export function add(...points: Vector2[]): Vector2 {
-  let [x, y] = [0, 0];
-  for (const point of points) {
-    x += point.x;
-    y += point.y;
+export const AMBIENT_LIGHT: Color = { r: 80, g: 80, b: 80, a: 1 };
+export const AMBIENT_DARK: Color = { r: 40, g: 40, b: 40, a: 1 };
+
+export const view: Size = { width: 1920 / 2, height: 1080 / 2 };
+
+export const bit = {
+  any(target: number, toMatch: number = 0): boolean {
+    return !target || (target & toMatch) > 0;
+  },
+  all(target: number, toMatch: number = 0): boolean {
+    return (target & toMatch) === target;
+  },
+  none(target: number, toMatch: number = 0): boolean {
+    return !toMatch || !(toMatch & target);
   }
-  return { x, y };
-}
+};
 
-export function getInteractionPos(point: Vector2 & { d: Direction }): Vector2 {
-  let { x, y } = point;
-  switch (point.d) {
-    case Direction.N:
-    case Direction.NE:
-    case Direction.NW:
-      y -= 1;
-      break;
-    case Direction.S:
-    case Direction.SE:
-    case Direction.SW:
-      y += 1;
-      break;
-  }
-  switch (point.d) {
-    case Direction.NW:
-    case Direction.W:
-    case Direction.SW:
-      x -= 1;
-      break;
-    case Direction.NE:
-    case Direction.E:
-    case Direction.SE:
-      x += 1;
-      break;
-  }
-  return { x, y };
-}
-
-export const getNewDirection = (() => {
-  const dirs: Record<string, Direction> = {
-    '1,0': Direction.N,
-    '2,1': Direction.E,
-    '1,2': Direction.S,
-    '0,1': Direction.W
-  };
-  return (point: Vector2): Direction | null => {
-    const key = `${point.x + 1},${point.y + 1}`;
-    return dirs[key] ?? null;
-  };
-})();
-
-// order is, unfortunately, important here
-export { Sprite as T } from './tiles';
-
+export { T } from './tiles';
 export { roll } from './random';
-export * as RNG from './random';
+export { work } from './worker';
 
+// namespace exports
+export * as RNG from './random';
+export * as RGB from './colors';
+export * as _ from './misc';
+
+// universal exports
 export * from './actions';
-export * from './aoe';
-export * from './constants';
 export * from './decorators';
 export * from './dialogue';
-export * from './misc';
-export * from './geometry';
+export * from './collisions';

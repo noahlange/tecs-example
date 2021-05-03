@@ -1,4 +1,5 @@
-import type { GameMessage } from '@types';
+import type { GameMessage } from '../../lib/types';
+
 import { Manager } from '@lib';
 
 export class MessageManager extends Manager {
@@ -9,11 +10,13 @@ export class MessageManager extends Manager {
   }
 
   public remove(type?: number): void {
-    for (const m of this.messages) {
-      if (!type || m.type === type) {
-        this.messages.delete(m);
+    if (type) {
+      for (const m of this.messages) {
+        if (m.type === type) {
+          this.messages.delete(m);
+        }
       }
-    }
+    } else this.clear();
   }
 
   public get(): GameMessage[] {

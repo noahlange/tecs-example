@@ -1,7 +1,8 @@
-import seedrandom from 'seedrandom';
+import { customRandom, urlAlphabet } from 'nanoid';
 import Roll from 'roll';
-import { RNG } from '@utils';
-import { Seeder } from '@lib';
+import seedrandom from 'seedrandom';
+
+import { Seeder } from '../lib/Seeder';
 
 interface RandomNumber {
   (): number;
@@ -67,6 +68,10 @@ interface Roller {
 }
 
 export const roll: Roller = (() => {
-  const roller = new Roll(() => RNG.float());
+  const roller = new Roll(() => float());
   return Object.assign((str: string) => roller.roll(str).result, { roller });
 })();
+
+export const id = customRandom(urlAlphabet, 8, size => {
+  return new Uint8Array(size).map(() => 256 * random());
+});

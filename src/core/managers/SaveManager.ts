@@ -1,12 +1,12 @@
 import { Manager } from '@lib';
-import { entries } from '@utils';
+import { _ } from '@utils';
 import pako from 'pako';
 
 export class SaveManager extends Manager {
   public toSave(): Uint8Array {
     const save: Record<string, any> = {};
     const ecs = this.game.ecs.save();
-    for (const [key, value] of entries(this.game.$)) {
+    for (const [key, value] of _.entries(this.game.$)) {
       if (value.toJSON) {
         save[key] = value.toJSON();
       }
@@ -17,8 +17,8 @@ export class SaveManager extends Manager {
   }
 
   public init(): void {
-    window.save = () => {
-      console.log(this.toSave());
-    };
+    // window.save = () => {
+    //   console.log(this.toSave());
+    // };
   }
 }

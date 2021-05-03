@@ -1,8 +1,8 @@
 import { Gameplay } from './Gameplay';
-import { Dialogue } from './Dialogue';
+// import { Dialogue } from './Dialogue';
 import { Inventory } from './Inventory';
-import { Menu } from './Menu';
-import { MapTest } from './MapTest';
 import { MapGen } from './MapGen';
+import { MapTest } from './MapTest';
+import { Menu } from './Menu';
 
-export { Gameplay, Dialogue, Inventory, MapTest, MapGen, Menu };
+export { Gameplay, Inventory, MapTest, MapGen, Menu };

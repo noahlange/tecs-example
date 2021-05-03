@@ -1,26 +1,36 @@
-import type { Vector2Array } from '@lib';
-import { Builder } from '../../../maps/generators/Canyon';
-import { Cell as CellEntity } from '@ecs/entities';
+import type { GameTileData, Vector2Array } from '@lib';
+
+import { Position } from '@core/components';
+import { Cell } from '@core/entities';
+import { Canyon as Builder } from '@core/maps';
 import { Scene } from '@lib';
+import { Collision, Projection, Tag, TileType } from '@lib/enums';
+import { isEmpty } from '@utils';
+import { Entity } from 'tecs';
 
-import { TileType } from '@enums';
-
-const getKeyFromTile = (type: TileType): string => {
-  const isWall = type === TileType.WALL;
-  return isWall ? 'wall_01_ew' : 'floor_02_06';
+const getKeyFromTile = (data: GameTileData): string => {
+  return data.spriteKey ?? isEmpty(data.collision)
+    ? TileType.FLOOR
+    : TileType.WALL;
 };
+
+const Camera = Entity.with(Position);
 
 export class MapTest extends Scene {
   protected builder: Builder = new Builder({ width: 64, height: 64 });
-  protected entities: InstanceType<typeof CellEntity>[] = [];
-  protected current: Vector2Array<TileType> | null = null;
+  protected entities: InstanceType<typeof Cell>[] = [];
+  protected current: Vector2Array<GameTileData> | null = null;
 
   public getNextSnapshot(): void {
+    for (const entity of this.entities) {
+      entity.tags.add(Tag.TO_DESTROY);
+    }
     const snapshot = this.builder.history.shift();
     if (snapshot) {
       if (this.current) {
         for (const { $ } of this.entities) {
-          const key = getKeyFromTile(this.current.get($.position));
+          const tile = this.current.get($.position, {});
+          const key = getKeyFromTile(tile);
           if (key !== $.sprite.key) {
             $.sprite.key = key;
             $.render.dirty = true;
@@ -28,12 +38,11 @@ export class MapTest extends Scene {
           }
         }
       } else {
-        this.entities = Array.from(snapshot.entries()).map(([pos, sprite]) => {
-          const isWall = sprite === TileType.WALL;
-          return this.game.ecs.create(CellEntity, {
+        this.entities = Array.from(snapshot.entries()).map(([pos, data]) => {
+          return this.game.ecs.create(Cell, {
             position: pos,
-            collision: { passable: !isWall, allowLOS: !isWall },
-            sprite: { key: getKeyFromTile(sprite) },
+            collision: { value: Collision.NONE },
+            sprite: { key: getKeyFromTile(data) },
             render: { dirty: true, fg: { r: 255, g: 255, b: 255, a: 1 } }
           });
         });
@@ -54,6 +63,14 @@ export class MapTest extends Scene {
   }
 
   public init(): void {
-    // @todo: reimplement
+    const world = this.game.$.map.world;
+    world.generate();
+    world.projection = Projection.ISOMETRIC;
+
+    this.game.ecs.create(
+      Camera,
+      { position: { x: world.width / 3, y: world.height / 3 } },
+      [Tag.IS_CAMERA]
+    );
   }
 }

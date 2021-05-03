@@ -1,11 +1,15 @@
+import '@ui/styles/index.scss';
+
 import * as PIXI from 'pixi.js';
 
-window.LOAD_TEST = false;
+// required for PIXI dev tools
 window.PIXI = PIXI;
+// @ts-ignore: can't blacklist @types
+window.global = window.globalThis;
 
 (async () => {
   const { Game } = await import('./core/Game');
-  const { Gameplay, MapGen } = await import('./core/scenes');
+  const { Gameplay, MapGen, Menu } = await import('./core/scenes');
 
   /**
    * @todo

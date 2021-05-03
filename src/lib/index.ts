@@ -1,15 +1,14 @@
-export type { CollisionMethods } from './CollisionMap';
-
 export { Vector2Array } from './Vector2Array';
-export { MapBuilder } from './MapBuilder';
+export { MapBuilder } from '@core/maps/lib/MapBuilder';
 export { HealthBar } from './HealthBar';
-export { Area } from './Area';
 export { Manager } from './Manager';
-export { CollisionMap } from './CollisionMap';
+
 export { Scene } from './Scene';
 export { UIList } from './UIList';
-export { Chunk } from './Chunk';
+// export { Chunk } from './Chunk';
 export { Lighting } from './Lighting';
 export { Rectangle } from './Rectangle';
 export { Seeder } from './Seeder';
-export { GameMap } from './GameMap';
+export { GameMap } from '@core/maps/lib/GameMap';
+
+export type { GameTileData } from '@core/maps/lib/GameMap';

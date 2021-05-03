@@ -1,14 +1,14 @@
-import type { Events } from '@types';
+import type { Events } from '../lib/types';
 import type { Scene } from '@lib';
 
-import * as Managers from './managers';
-import { ECS } from '../ecs/ECS';
-import { GameState } from '@enums';
+import { ECS } from '@core/ECS';
+import { GameState } from '@lib/enums';
 import { createNanoEvents } from 'nanoevents';
+
+import * as Managers from './managers';
 
 interface GameManagers {
   renderer: Managers.Render;
-
   input: Managers.Input;
   scenes: Managers.Scene;
   messages: Managers.Message;
@@ -54,7 +54,9 @@ export class Game {
       this.ecs.load(save);
     }
     // attach pixi ticker
-    this.$.renderer.app.ticker.add(this.ecs.tick.bind(this.ecs));
+    this.$.renderer.app.ticker.add(d =>
+      this.ecs.tick.bind(this.ecs)(d, Date.now())
+    );
   }
 
   public set state(state: GameState) {

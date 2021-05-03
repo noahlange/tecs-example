@@ -1,6 +1,6 @@
-import { UIList, Scene } from '@lib';
+import { Scene, UIList } from '@lib';
+import { MenuUI } from '@ui/scenes/Menu';
 import { h, render } from 'preact';
-import { MenuUI } from './MenuUI';
 
 enum MenuOption {
   NEW_GAME = 0,

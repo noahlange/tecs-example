@@ -1,13 +1,12 @@
-import type { InventoryItem } from '@ecs/entities/types';
-import { h, render } from 'preact';
+import type { InventoryItem } from '@core/entities/types';
 
+import { Equippable } from '@core/components';
+import { Player } from '@core/entities';
 import { Scene, UIList } from '@lib';
-import { ItemType, Tag } from '@enums';
-import { Player } from '@ecs/entities';
-import { Action } from '@utils';
-
-import { InventoryUI } from './InventoryUI';
-import { Equippable } from '@ecs/components';
+import { ItemType, Tag } from '@lib/enums';
+import { Action } from '@lib/enums';
+import { InventoryUI } from '@ui/scenes/Inventory';
+import { h, render } from 'preact';
 
 export class Inventory extends Scene {
   protected yList = new UIList<InventoryItem>();

@@ -1,15 +1,15 @@
 /**
- * Effectively a copy-paste of rot.js's lighting code with Array2D and a swapped FOV implementation using malwoden.
+ * Effectively a copy-paste of rot.js's lighting code using Vector2Array and malwoden's FOV implementation.
  * https://github.com/ondras/rot.js/blob/master/src/lighting.ts
  * https://github.com/Aedalus/malwoden
  */
 
-import type { Vector2, Size, Color } from '@types';
+import type { Color, Size, Vector2 } from './types';
 import type { FOV } from 'malwoden';
-import { Vector2Array } from './Vector2Array';
 
-import { AMBIENT_LIGHT } from '@utils';
-import { add } from '@utils/colors';
+import { AMBIENT_LIGHT, RGB } from '@utils';
+
+import { Vector2Array } from './Vector2Array';
 
 interface ReflectivityCallback {
   (point: Vector2): number;
@@ -58,7 +58,7 @@ export class Lighting {
    * Compute the lighting
    */
   public *compute(): IterableIterator<[Vector2, Color]> {
-    const done = new Vector2Array<number>(this.size);
+    const done = new Vector2Array<boolean>(this.size);
     const lit = new Vector2Array<Color>(this.size);
     let emitting = new Vector2Array<Color>(this.size);
 
@@ -66,7 +66,7 @@ export class Lighting {
       /* prepare emitters for first pass */
       emitting.set(
         key,
-        add(emitting.get(key) ?? { r: 0, g: 0, b: 0, a: 1 }, light)
+        RGB.add(emitting.get(key, { r: 0, g: 0, b: 0, a: 1 }), light)
       );
     }
     for (let i = 0; i < this.options.passes; i++) {
@@ -93,6 +93,7 @@ export class Lighting {
     }
     return this;
   }
+
   /**
    * Compute one iteration from all emitting cells
    * @param emittingCells These emit light
@@ -102,20 +103,20 @@ export class Lighting {
   protected emitLight(
     emitting: Vector2Array<Color>,
     lit: Vector2Array<Color>,
-    done: Vector2Array<number>
+    done: Vector2Array<boolean>
   ): this {
     for (const [point, light] of emitting.entries()) {
-      const fov = this.cache.fov.get(point) ?? this._updateFOV(point);
+      const fov = this.cache.fov.get(point, () => this._updateFOV(point));
       this.cache.fov.set(point, fov);
-      for (const [key, formFactor] of fov.entries()) {
-        const res = lit.get(key) ?? { r: 0, g: 0, b: 0, a: 1 };
-        res.r += Math.round(light.r * formFactor);
-        res.g += Math.round(light.g * formFactor);
-        res.b += Math.round(light.b * formFactor);
-        res.a += Math.round(light.a * formFactor);
-        lit.set(key, res);
+      for (const [key, ff] of fov.entries()) {
+        const res = lit.get(key, { r: 0, g: 0, b: 0, a: 1 });
+        res.r += light.r * ff;
+        res.g += light.g * ff;
+        res.b += light.b * ff;
+        res.a += light.a * ff;
+        lit.set(key, RGB.simplify(res));
       }
-      done.set(point, 1);
+      done.set(point, true);
     }
     return this;
   }
@@ -124,18 +125,19 @@ export class Lighting {
    */
   protected _computeEmitters(
     lit: Vector2Array<Color>,
-    done: Vector2Array<number>
+    done: Vector2Array<boolean>
   ): Vector2Array<Color> {
     const res = new Vector2Array<Color>(this.size);
 
     for (const [point, color] of lit.entries()) {
-      if (done.get(point)) {
+      if (done.get(point, false)) {
         // already emitted
         continue;
       }
 
-      const reflectivity =
-        this.cache.reflectivity.get(point) ?? this.reflectivityCallback(point);
+      const reflectivity = this.cache.reflectivity.get(point, () =>
+        this.reflectivityCallback(point)
+      );
 
       this.cache.reflectivity.set(point, reflectivity);
 

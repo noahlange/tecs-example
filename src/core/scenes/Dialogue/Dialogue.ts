@@ -1,14 +1,12 @@
-import type { AnyInputEvent } from '@types';
+import type { AnyInputEvent } from '../../../lib/types';
 import type { ResultNode } from 'bondage';
 
-import { h, render } from 'preact';
-
-import { OptionsResult, Runner } from 'bondage';
-import { Player } from '@ecs/entities';
+import { Player } from '@core/entities';
 import { Scene } from '@lib';
+import { DialogueUI } from '@ui/scenes/Dialogue';
 import { dialogue } from '@utils';
-
-import { DialogueUI } from './DialogueUI';
+import { OptionsResult, Runner } from 'bondage';
+import { h, render } from 'preact';
 
 export class Dialogue extends Scene {
   protected player!: Player;

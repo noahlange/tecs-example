@@ -18,14 +18,21 @@
     "noEmit": true,
     "paths": {
       "@utils": ["./src/utils/index.ts"],
-      "@utils/colors": ["./src/utils/colors.ts"],
+      "@utils/tiled": ["./src/utils/tiled/index.ts"],
+      "@utils/pixi": ["./src/utils/pixi/index.ts"],
+      "@utils/geometry": ["./src/utils/geometry/index.ts"],
+      "@core": ["./src/core/index.ts"],
       "@lib": ["./src/lib/index.ts"],
-      "@types": ["./src/types.ts"],
-      "@enums": ["./src/enums.ts"],
-      "@ecs/*": ["./src/ecs/*"],
-      "@core/*": ["./src/core/*"]
+      "@lib/enums": ["./src/lib/enums.ts"],
+      "@lib/types": ["./src/lib/types.ts"],
+      "@ui/*": ["./src/ui/*"],
+      "@core/*": ["./src/core/*"],
+      "@workers/*": ["./src/workers/*"],
+      "mini-signals": [
+        "./node_modules/resource-loader/typings/mini-signals.d.ts"
+      ]
     }
   },
-  "include": ["src/**/*"],
-  "exclude": [".ignore"]
+  "include": ["src/**/*", "assets"],
+  "exclude": [".ignore", "./static"]
 }

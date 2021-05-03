@@ -1,6 +1,33 @@
-import type { Vector2, Size } from '@types';
+import type { Size, Vector2 } from './types';
+
+import { iterateGrid } from '@utils/geometry';
 
 export class Vector2Array<T> {
+  public static from<T>(items: [Vector2, T][]): Vector2Array<T> {
+    const { x, y } = items.reduce(
+      (a: { x: number[]; y: number[] }, [point]) => {
+        a.x.push(point.x);
+        a.y.push(point.y);
+        return a;
+      },
+      { x: [0], y: [0] }
+    );
+
+    const [minX, maxX] = [Math.min(...x), Math.max(...x)];
+    const [minY, maxY] = [Math.min(...y), Math.max(...y)];
+
+    const res = new Vector2Array<T>({
+      width: 1 + (maxX - minX),
+      height: 1 + (maxY - minY)
+    });
+
+    for (const [point, item] of items) {
+      res.set(point, item);
+    }
+
+    return res;
+  }
+
   protected items: T[];
   protected filler: T | null = null;
   public readonly width: number;
@@ -31,8 +58,21 @@ export class Vector2Array<T> {
     delete this.items[i];
   }
 
-  public get(point: Vector2): T {
-    return this.items[this.getIndex(point)];
+  public get(point: Vector2): T | undefined;
+  public get(point: Vector2, defaultValue: T | (() => T)): T;
+  /**
+   * Return the contents of { x, y } or `defaultValue` if no contents exist.
+   * If defaultValue is a function (usually for an expensive operation that
+   * shouldn't be invoked inline), return its return value—otherwise return
+   * the value itself.
+   */
+  public get(point: Vector2, defaultValue?: T | (() => T)): T | undefined {
+    return (
+      this.items[this.getIndex(point)] ??
+      (typeof defaultValue === 'function'
+        ? (defaultValue as () => T)()
+        : defaultValue)
+    );
   }
 
   public set(point: Vector2, value: T): void {
@@ -87,11 +127,11 @@ export class Vector2Array<T> {
 
   public toString(): string {
     let str = '';
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        str += this.get({ x, y }) ?? ' ';
+    for (const point of iterateGrid(this)) {
+      str += this.get(point) ?? ' ';
+      if (point.x === this.width) {
+        str += '\n';
       }
-      str += '\n';
     }
     return str;
   }

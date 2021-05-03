@@ -1,0 +1,51 @@
+@import '@ui/styles';
+
+.dialogue {
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  pointer-events: auto;
+  height: 100%;
+  color: white;
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+
+  .dialogue-text {
+    background-color: black;
+    padding: $pad-md;
+  }
+
+  .dialogue-options {
+    position: relative;
+    padding: $pad-md;
+
+    button {
+      font-family: inherit;
+      font-size: inherit;
+      border: 0;
+      padding: 0;
+      line-height: 1;
+      outline: none;
+      display: block;
+      width: 100%;
+      text-align: left;
+      background-color: transparent;
+      color: white;
+      transition: 0.1s opacity;
+
+      &:hover {
+        cursor: pointer;
+        opacity: 0.75;
+      }
+    }
+  }
+
+  ol {
+    padding: 0;
+    margin: 0;
+  }
+}

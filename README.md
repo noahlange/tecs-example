@@ -11,4 +11,8 @@ cd tecs-example
 npm i && npm start
 ```
 
-Production builds are currently broken, courtesy of `bondage`'s `enbf-parser` dependency, which explodes. Long-term plan is to ditch bondage anyway.
+## ideas
+
+- integration with https://github.com/claus/react-dat-gui
+  - decorators to define component field types?
+- fix bondage/yarn integration

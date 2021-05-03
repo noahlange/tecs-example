@@ -1,4 +1,4 @@
-import type { Rect, Vector2 } from '@types';
+import type { Rect, Vector2 } from './types';
 
 export class Rectangle {
   public static intersects(a: Rect, b: Rect): boolean {

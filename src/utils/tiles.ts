@@ -1,4 +1,4 @@
-export enum Sprite {
+export enum T {
   BLANK = '\ue000',
   WALL = '\ue001',
   FLOOR = '\ue002',
@@ -15,5 +15,3 @@ export enum Sprite {
   DOOR_OPEN = '\ue014',
   PATH_DOT = '\ue015'
 }
-
-export { Sprite as T };

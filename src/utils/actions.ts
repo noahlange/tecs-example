@@ -1,24 +1,9 @@
-import type { AreaOfEffect, Equippable } from '@ecs/components';
-import type { Attack } from '@ecs/entities';
-import type { InventoryEntity, InventoryItem } from '@ecs/entities/types';
-import type { Vector2 } from '@types';
+import type { Vector2 } from '../lib/types';
+import type { AreaOfEffect, Equippable } from '@core/components';
+import type { Attack } from '@core/entities';
+import type { InventoryEntity, InventoryItem } from '@core/entities/types';
+import type { Action } from '@lib/enums';
 import type { EntityType } from 'tecs';
-
-export enum Action {
-  MENU_NAVIGATE = 'menu_navigate',
-  NONE = 'none',
-  INTERACT = 'interact',
-  MOVE = 'move',
-  SET_DESTINATION = 'set_destination',
-  ITEM_PICK_UP = 'item_pick_up',
-  ITEM_DROP = 'item_drop',
-  ITEM_USE = 'item_use',
-  ITEM_EQUIP = 'item_equip',
-  ITEM_UNEQUIP = 'item_unequip',
-  COMBAT_ATTACK = 'combat_attack',
-  COMBAT_DEFEND = 'combat_defend',
-  COMBAT_ATTACK_PAUSED = 'combat_attack_paused'
-}
 
 export interface ActionItem {
   id: Action;

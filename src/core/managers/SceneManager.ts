@@ -1,8 +1,8 @@
-import type { Scene } from '@lib';
 import type { Game } from '../Game';
+import type { Scene } from '@lib';
 
 import { Manager } from '@lib';
-import { GameState } from '@enums';
+import { GameState } from '@lib/enums';
 
 interface SceneConstructor<T> {
   new (scene: Game): Scene<T>;
