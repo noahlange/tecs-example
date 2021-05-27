@@ -31,7 +31,7 @@ body {
   align-items: center;
   justify-content: space-around;
   overflow: hidden;
-  background: white;
+
   height: 100vh;
 }
 
@@ -42,15 +42,10 @@ canvas,
   height: $view-height;
 }
 
-#ui {
-  position: fixed;
-}
-
 canvas {
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   z-index: 0;
-  pointer-events: auto;
 }
 
 main {
@@ -59,4 +54,9 @@ main {
   align-items: center;
   flex-direction: row-reverse;
   position: relative;
+}
+
+#ui {
+  position: fixed;
+  display: none;
 }

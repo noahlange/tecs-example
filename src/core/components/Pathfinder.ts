@@ -10,10 +10,11 @@ export class Pathfinder extends Component {
   }
 
   public set destination(destination: Vector2 | null) {
-    this.destination = destination;
-    this.isActive = destination === null;
+    this.target = destination;
+    this.isActive = destination !== null;
     this.path = [];
   }
+
   public isVisible: boolean = false;
   public isActive: boolean = false;
   public target: Vector2 | null = null;
