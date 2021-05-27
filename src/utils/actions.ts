@@ -1,8 +1,8 @@
-import type { Vector2 } from '../lib/types';
 import type { AreaOfEffect, Equippable } from '@core/components';
 import type { Attack } from '@core/entities';
 import type { InventoryEntity, InventoryItem } from '@core/entities/types';
 import type { Action } from '@lib/enums';
+import type { Vector2 } from '@lib/types';
 import type { EntityType } from 'tecs';
 
 export interface ActionItem {
@@ -25,8 +25,8 @@ export interface CombatAttackAction extends ActionItem {
 export interface DestinationAction extends ActionItem {
   id: Action.SET_DESTINATION;
   target: Vector2;
-  isActive: boolean;
-  isVisible: boolean;
+  isActive?: boolean;
+  isVisible?: boolean;
 }
 
 export interface CombatDefendAction extends ActionItem {

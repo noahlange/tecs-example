@@ -1,4 +1,4 @@
-import type { Vector2 } from '../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import {
   AreaOfEffect,
@@ -12,7 +12,7 @@ import {
 import { Player } from '@core/entities';
 import { Tag } from '@lib/enums';
 import { TILE_WIDTH } from '@utils';
-import { isWithin } from '@utils/geometry';
+import { contains } from '@utils/geometry';
 import { Entity, System } from 'tecs';
 
 const E = Entity.with(Overlay, Position);
@@ -47,7 +47,7 @@ export class Overlays extends System {
       // filter out points we cannot see or touch
       const visible = cells
         .filter(point => collisions.isObstacle(point))
-        .filter(f => isWithin(f, fov));
+        .filter(f => contains(f, fov));
 
       if (visible.length) {
         this.world.create(E, {

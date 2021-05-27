@@ -7,7 +7,7 @@ interface ShowIfProps<T> {
 
 export default function ShowIf<T>(props: ShowIfProps<T>): JSX.Element | null {
   const { value, children } = props;
-  return (value ?? null) !== null
+  return !(value ?? false)
     ? typeof children === 'function'
       ? children(value as T)
       : children

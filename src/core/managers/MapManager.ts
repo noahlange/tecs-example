@@ -1,8 +1,8 @@
-import type { CollisionMethods, Vector2 } from '../../lib/types';
 import type { WorldMap } from '@core/maps';
+import type { CollisionMethods, Vector2 } from '@lib/types';
 import type { Pathfinding } from 'malwoden';
 
-import { ChunkMap } from '@core/maps';
+import { StaticMap } from '@core/maps';
 import { Manager } from '@lib';
 
 export class MapManager extends Manager {
@@ -33,7 +33,17 @@ export class MapManager extends Manager {
     return { area: this.world };
   }
 
-  public init(): void {
-    this.world = new ChunkMap(this.game, { x: 0, y: 0, width: 48, height: 48 });
+  public async init(): Promise<void> {
+    const options = {
+      x: 0,
+      y: 0,
+      width: 48,
+      height: 48,
+      map: '/static/iso/tiled-map.json'
+    };
+    this.world = new StaticMap(this.game, options);
+
+    await this.world.generate();
+    // this.world = new ChunkMap(this.game, options);
   }
 }

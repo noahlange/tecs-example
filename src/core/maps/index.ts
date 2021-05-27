@@ -1,6 +1,6 @@
-export { ChunkMap } from './lib/ChunkMap';
-export { StaticMap } from './lib/StaticMap';
+export { ChunkMap } from './chunk/ChunkMap';
+export { StaticMap } from './static/StaticMap';
 export { WorldMap } from './lib/WorldMap';
-export { Chunk } from './lib/Chunk';
+export { Chunk } from './chunk/Chunk';
 
 export * from './generators';

@@ -1,4 +1,4 @@
-import type { Vector2 } from '../../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import { MapBuilder, Rectangle } from '@lib';
 import { Collision, TileType } from '@lib/enums';

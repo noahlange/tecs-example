@@ -1,5 +1,5 @@
-import type { Vector2 } from '../../lib/types';
 import type { ChunkMap } from '@core/maps';
+import type { Vector2 } from '@lib/types';
 
 import { fromRelative, isSamePoint, toRelative } from '@utils/geometry';
 import { System } from 'tecs';

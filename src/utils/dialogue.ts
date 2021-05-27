@@ -1,4 +1,4 @@
-import type { Vector2 } from '../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import dlg from '../../static/dialogue/gatsby.json';
 

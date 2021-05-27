@@ -1,4 +1,4 @@
-import type { Vector2 } from '../../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import { MapBuilder } from '@lib';
 import { Collision, TileType } from '@lib/enums';
@@ -6,12 +6,12 @@ import { CHUNK_HEIGHT, CHUNK_WIDTH, isObstacle } from '@utils';
 import { getRandomNeighbor } from '@utils/geometry';
 
 export class Builder extends MapBuilder {
-  public static tiles = CHUNK_WIDTH * CHUNK_HEIGHT * 0.375;
+  public static tiles: number = CHUNK_WIDTH * CHUNK_HEIGHT * 0.375;
 
-  protected cleared: number = 0;
   protected current: Vector2 | null = null;
+  protected cleared: number = 0;
   protected lifetime: number = 250;
-  protected brush: number = 2;
+  protected brushSize: number = 2;
 
   protected drawPoint(point: Vector2): void {
     if (!isObstacle(this.map.tiles.get(point)?.collision)) {

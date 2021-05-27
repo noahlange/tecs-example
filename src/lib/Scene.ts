@@ -5,6 +5,7 @@ export class Scene<T = {}> {
 
   public tick?(d: number, ts: number): void;
   public init?(props?: T): void;
+  public render?(): void;
 
   public end(): void {
     this.game.$.scenes.pop();

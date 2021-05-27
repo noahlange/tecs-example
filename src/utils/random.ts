@@ -1,8 +1,7 @@
+import { Seeder } from '@lib';
 import { customRandom, urlAlphabet } from 'nanoid';
 import Roll from 'roll';
 import seedrandom from 'seedrandom';
-
-import { Seeder } from '../lib/Seeder';
 
 interface RandomNumber {
   (): number;
@@ -15,15 +14,16 @@ export function setSeed(seed: string): void {
   random = seedrandom.alea(seed);
 }
 
-export function useSeed(seed: string, callback: () => void): void {
+export function useSeed<T>(seed: string, callback: () => T): T {
   // get current seed
   const start = Seeder.seed ?? 'initial_seed';
   // set new seed
   Seeder.set(seed);
   // do stuff
-  callback();
+  const res = callback();
   // replace old seed
   Seeder.set(start);
+  return res;
 }
 
 export const float: RandomNumber = Object.assign((): number => random.quick(), {

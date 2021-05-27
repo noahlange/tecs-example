@@ -1,4 +1,4 @@
-import type { Vector2 } from '../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import { AIState, AIType } from '@lib/enums';
 import { Component } from 'tecs';

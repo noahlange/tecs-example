@@ -11,8 +11,11 @@ cd tecs-example
 npm i && npm start
 ```
 
-## ideas
+Includes an interactive command line tool (`atlas-gen`) for generating image atlases with animation data.
+
+## ideas / todo
 
 - integration with https://github.com/claus/react-dat-gui
   - decorators to define component field types?
-- fix bondage/yarn integration
+- reimplement dialogue system
+- confirm correct behavior of object destruction/recreation on chunk changes

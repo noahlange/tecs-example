@@ -1,25 +1,27 @@
-import type { CollisionMethods, Vector2 } from '../../../lib/types';
 import type { Game } from '@core';
 import type { GameTileData } from '@lib';
-import type { GeneratorPayload, GeneratorResponse } from '@workers/maps';
+import type { CollisionMethods, Vector2 } from '@lib/types';
 import type { Entity } from 'tecs';
 
+import { Cell } from '@core/entities';
 import { Vector2Array } from '@lib';
 import { Collision } from '@lib/enums';
-import { isObstacle, isObstruction, work } from '@utils';
-import Worker from '@workers/maps?worker';
+import { Tiled } from '@lib/Tiled';
+import { isObstacle, isObstruction } from '@utils';
 
-import { WorldMap } from './WorldMap';
+import { WorldMap } from '../lib/WorldMap';
 
-interface StaticMapOptions {
+export interface StaticMapOptions {
   x: number;
   y: number;
   width: number;
   height: number;
+  map: string;
 }
 
 export class StaticMap extends WorldMap {
   protected tiles: Vector2Array<GameTileData>;
+  protected options: StaticMapOptions;
 
   public getSpawn(): Vector2 {
     return { x: 0, y: 0 };
@@ -43,43 +45,29 @@ export class StaticMap extends WorldMap {
 
   protected entities: Entity[] = [];
 
-  public set center(next: Vector2) {
-    // this.generate();
-  }
+  public set center(next: Vector2) {}
 
   public async generate(): Promise<void> {
-    const worker = work(new Worker());
-
-    const data = await worker.run<GeneratorPayload, GeneratorResponse>({
-      x: this.point.x,
-      y: this.point.y,
-      width: this.width,
-      height: this.height,
-      seed: '',
-      builder: 'Canyon'
+    const tilemap = await Tiled.from(this.options.map);
+    // set projection (iso/ortho)
+    this.projection = tilemap.projection;
+    // @todo - load tile props
+    this.entities = Array.from(tilemap).map(([point, sprite]) => {
+      this.tiles.set(point, { spriteKey: sprite, collision: Collision.NONE });
+      return this.game.ecs.create(Cell, {
+        sprite: { key: sprite },
+        collision: { value: Collision.NONE },
+        position: point
+      });
     });
 
-    // const sets = [tiledTiles] as TiledTileset[];
-    // Object.assign(
-    //   this.game.$.renderer.sheets,
-    //   await getSpritesheetsFromTilesets(sets)
-    // );
-
-    this.tiles = Vector2Array.from(data.tiles);
-    // this.entities = data.tiles.map(([position, data]) => {
-    //   return this.game.ecs.create(Cell, {
-    //     sprite: { key: data.spriteKey },
-    //     collision: { value: data.collision },
-    //     position
-    //   });
-    // });
-
+    this.game.$.renderer.loadSpritesheets(await tilemap.getSpritesheets());
     this.game.emit('init.map.static', this);
   }
 
   public constructor(game: Game, options: StaticMapOptions) {
     super(game, options);
+    this.options = options;
     this.tiles = new Vector2Array(options);
-    // this.generate();
   }
 }

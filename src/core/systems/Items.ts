@@ -1,5 +1,5 @@
 import { Action } from '@lib/enums';
-import { getInteractionPos, isWithin } from '@utils/geometry';
+import { contains, getInteractionPos } from '@utils/geometry';
 import { System } from 'tecs';
 
 import {
@@ -33,7 +33,7 @@ export class Items extends System {
           const pos = getInteractionPos(actor.$.position);
           for (const item of items) {
             if (
-              isWithin(item.$.position, [actor.$.position, pos]) &&
+              contains(item.$.position, [actor.$.position, pos]) &&
               item.has(Equippable)
             ) {
               // if it's an item, add to our inventory

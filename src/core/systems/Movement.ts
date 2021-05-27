@@ -1,8 +1,9 @@
 import { Player } from '@core/entities';
 import { Action } from '@lib/enums';
+import { getRelativeDirection } from '@utils/geometry';
 import { System } from 'tecs';
 
-import { Actor, Pathfinder, Playable, Position } from '../components';
+import { Actor, Pathfinder, Playable, Position, Tweened } from '../components';
 
 export class Movement extends System {
   public static type = 'movement';
@@ -11,7 +12,7 @@ export class Movement extends System {
     player: this.world.query.entities(Player),
     movers: this.world.query
       .components(Actor, Position)
-      .some.components(Pathfinder, Playable)
+      .some.components(Pathfinder, Playable, Tweened)
       .persist()
   };
 
@@ -26,13 +27,15 @@ export class Movement extends System {
         case Action.MOVE: {
           const { delta } = $.action.data;
 
-          $.position.x += delta.x;
-          $.position.y += delta.y;
-          $.action.data = { id: Action.NONE };
+          $.position.d = getRelativeDirection($.position, {
+            x: $.position.x + delta.x,
+            y: $.position.y + delta.y
+          });
 
-          if ($.pathfinder) {
-            $.pathfinder.destination = null;
-            $.pathfinder.path = [];
+          // if we're tweening, wait until we've stopped moving before updating the position
+          if (!$.tween?.active) {
+            $.position.x += delta.x;
+            $.position.y += delta.y;
           }
 
           break;

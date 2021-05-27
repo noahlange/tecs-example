@@ -18,8 +18,6 @@ export default defineConfig({
     alias: {
       // minified
       pako: resolve(__dirname, './node_modules/pako/dist/pako.min.js'),
-      // ditto; npm import showed up uninvited in workers and crashed them
-      'pixi.js': resolve(__dirname, './static/scripts/pixi.min.mjs'),
       // local aliases
       '@ui': resolve(__dirname, './src/ui'),
       '@utils': resolve(__dirname, './src/utils'),

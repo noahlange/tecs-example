@@ -1,8 +1,9 @@
-import type { Events } from '../lib/types';
 import type { Scene } from '@lib';
+import type { Events } from '@lib/types';
 
 import { ECS } from '@core/ECS';
 import { GameState } from '@lib/enums';
+import { update } from '@tweenjs/tween.js';
 import { createNanoEvents } from 'nanoevents';
 
 import * as Managers from './managers';
@@ -54,9 +55,10 @@ export class Game {
       this.ecs.load(save);
     }
     // attach pixi ticker
-    this.$.renderer.app.ticker.add(d =>
-      this.ecs.tick.bind(this.ecs)(d, Date.now())
-    );
+    this.$.renderer.app.ticker.add(() => {
+      update();
+      this.ecs.tick(this.$.renderer.app.ticker.deltaMS, Date.now());
+    });
   }
 
   public set state(state: GameState) {

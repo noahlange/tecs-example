@@ -1,4 +1,5 @@
 export { Actor } from './Actor';
+export { Animated } from './Animated';
 export { AI } from './AI';
 export { AreaOfEffect } from './AreaOfEffect';
 export { Collision } from './Collision';
@@ -22,3 +23,4 @@ export { UI } from './UI';
 export { Equippable } from './Equippable';
 export { Equipped } from './Equipped';
 export { Sprite } from './Sprite';
+export { Tweened } from './Tweened';

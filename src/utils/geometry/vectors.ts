@@ -1,4 +1,4 @@
-import type { Rect, Vector2 } from '../../lib/types';
+import type { Rect, Vector2 } from '@lib/types';
 
 import { Rectangle } from '@lib';
 
@@ -31,13 +31,16 @@ export function toChunkPosition(world: Vector2): [Vector2, Vector2] {
   ];
 }
 
+/**
+ * Convert a world + position tuple to a world coordinate.
+ */
 export function fromChunkPosition(chunk: Vector2, pos: Vector2): Vector2 {
   const x = chunk.x * CHUNK_WIDTH;
   const y = chunk.y * CHUNK_HEIGHT;
   return { x: x + pos.x, y: y + pos.y };
 }
 
-export function isWithin(a: Vector2, points: Vector2[]): boolean {
+export function contains(a: Vector2, points: Vector2[]): boolean {
   return points.some(p => p.x === a.x && p.y === a.y);
 }
 

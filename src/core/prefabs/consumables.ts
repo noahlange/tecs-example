@@ -1,4 +1,4 @@
-import type { Prefab } from '../../lib/types';
+import type { Prefab } from '@lib/types';
 
 import { Potion } from '@core/entities';
 import { EffectType, ItemType, Tag } from '@lib/enums';

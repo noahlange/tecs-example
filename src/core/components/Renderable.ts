@@ -1,4 +1,4 @@
-import type { Color } from '../../lib/types';
+import type { Color } from '@lib/types';
 
 import { RGB } from '@utils';
 import { Component } from 'tecs';

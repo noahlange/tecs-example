@@ -1,4 +1,4 @@
-import type { Rect } from '../../../lib/types';
+import type { Rect } from '@lib/types';
 
 import { MapBuilder, Rectangle } from '@lib';
 import { Collision, TileType } from '@lib/enums';
@@ -16,11 +16,11 @@ export class Builder extends MapBuilder {
     expanded.y2 += 2;
 
     const [minX, maxX] = [expanded.x1, expanded.x2].sort((a, b) => a - b);
-    const [minY, maxY] = [expanded.y1, expanded.y2].sort((a, b) => a - b);
-
     if (minX < 1 || maxX > this.width - 2) {
       return false;
     }
+
+    const [minY, maxY] = [expanded.y1, expanded.y2].sort((a, b) => a - b);
     if (minY < 1 || maxY > this.height - 2) {
       return false;
     }
@@ -32,6 +32,7 @@ export class Builder extends MapBuilder {
         }
       }
     }
+
     return true;
   }
 

@@ -4,6 +4,7 @@ import { Entity } from 'tecs';
 
 import {
   Actor,
+  Animated,
   Combatant,
   Equipped,
   Faction,
@@ -16,6 +17,7 @@ import {
   Sprite,
   Stats,
   Text,
+  Tweened,
   View
 } from '../../components';
 
@@ -33,7 +35,9 @@ export class Player extends Entity.with(
   Pathfinder,
   Renderable,
   Text,
-  View
+  View,
+  Animated,
+  Tweened
 ) {}
 
 export type PlayerEntity = EntityType<

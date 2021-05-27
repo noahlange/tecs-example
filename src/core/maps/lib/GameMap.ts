@@ -1,4 +1,4 @@
-import type { Color, Vector2 } from '../../../lib/types';
+import type { Color, Vector2 } from '@lib/types';
 
 import { Rectangle, Vector2Array } from '@lib';
 import { Collision } from '@lib/enums';
@@ -12,7 +12,7 @@ interface GameMapOptions {
 export interface GameTileData {
   spriteKey?: string;
   tint?: Color;
-  collision?: number;
+  collision?: Collision | number;
 }
 
 export class GameMap {
@@ -49,10 +49,7 @@ export class GameMap {
 
   public constructor(options: GameMapOptions) {
     this.tiles = new Vector2Array<GameTileData>(
-      {
-        width: options.width,
-        height: options.height
-      },
+      { width: options.width, height: options.height },
       null
     );
   }

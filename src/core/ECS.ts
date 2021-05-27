@@ -4,6 +4,7 @@ import { World } from 'tecs';
 import * as Components from './components';
 import * as Entities from './entities';
 import {
+  Animation,
   Camera,
   Collisions,
   Interact,
@@ -26,7 +27,8 @@ export class ECS extends World.with(
   View,
   Lighting,
   Renderer,
-  Camera
+  Camera,
+  Animation
 ) {
   protected ts: number = 0;
   protected stats: Stats | null = null;

@@ -1,4 +1,4 @@
-import type { Color, Vector2 } from '../../lib/types';
+import type { Color, Vector2 } from '@lib/types';
 
 export class Overlay {
   public static readonly type = 'overlay';

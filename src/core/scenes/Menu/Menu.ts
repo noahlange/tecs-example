@@ -15,6 +15,10 @@ export class Menu extends Scene {
     return;
   }
 
+  public render(): void {
+    render(h(MenuUI, {}), document.getElementById('ui')!);
+  }
+
   public tick(): void {
     const next = this.game.$.input.getNextEvent();
     if (next?.isKeyboard) {
@@ -27,8 +31,6 @@ export class Menu extends Scene {
           break;
       }
     }
-
-    render(h(MenuUI, {}), document.getElementById('ui')!);
   }
 
   public init(): void {

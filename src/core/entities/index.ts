@@ -12,32 +12,20 @@ import {
   Sprite,
   Text
 } from '../components';
+import { Chest } from './interactive/Chest';
+import { Door } from './interactive/Door';
+import { Monster } from './mobs/Monster';
+import { Player } from './mobs/Player';
 
-export const Cell = Entity.with(Position, Sprite, Collision, Renderable);
-export const Mob = Entity.with(Position, Sprite, Renderable, LightSource);
-export const Light = Entity.with(Position, LightSource);
-export const Scroll = Entity.with(Position, Sprite, Renderable, Text, Item);
+const Cell = Entity.with(Position, Sprite, Collision, Renderable);
+const Mob = Entity.with(Position, Sprite, Renderable, LightSource);
+const Light = Entity.with(Position, LightSource);
+const Scroll = Entity.with(Position, Sprite, Renderable, Text, Item);
+const Potion = Entity.with(Position, Sprite, Renderable, Text, Item, Effects);
+const Book = Entity.with(Position, Sprite, Renderable, Text, Item, Effects);
+const Attack = Entity.with(AreaOfEffect, Equippable, Position);
 
-export const Potion = Entity.with(
-  Position,
-  Sprite,
-  Renderable,
-  Text,
-  Item,
-  Effects
-);
-export const Book = Entity.with(
-  Position,
-  Sprite,
-  Renderable,
-  Text,
-  Item,
-  Effects
-);
-
-export const Attack = Entity.with(AreaOfEffect, Equippable, Position);
-
-export const Equipment = Entity.with(
+const Equipment = Entity.with(
   Position,
   Sprite,
   Renderable,
@@ -46,7 +34,17 @@ export const Equipment = Entity.with(
   Equippable
 );
 
-export { Door } from './interactive/Door';
-export { Chest } from './interactive/Chest';
-export { Player } from './mobs/Player';
-export { Monster } from './mobs/Monster';
+export {
+  Cell,
+  Mob,
+  Light,
+  Scroll,
+  Potion,
+  Book,
+  Attack,
+  Equipment,
+  Door,
+  Chest,
+  Player,
+  Monster
+};

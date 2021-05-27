@@ -1,4 +1,4 @@
-import type { CollisionMethods } from '../../lib/types';
+import type { CollisionMethods } from '@lib/types';
 
 import { Action } from '@lib/enums';
 import { getNewDirection } from '@utils/geometry';
@@ -34,10 +34,15 @@ export class Collisions extends System {
     for (const { $ } of this.$.movers) {
       switch ($.action.data.id) {
         case Action.MOVE: {
+          // we want to update the direction independently of whether or not
+          // the mob actually moves
           $.position.d = getNewDirection($.action.data.delta) ?? $.position.d;
-          const { x: dx, y: dy } = $.action.data.delta;
-          const next = { x: $.position.x + dx, y: $.position.y + dy };
-          if (this.collisions.isObstacle(next)) {
+          if (
+            this.collisions.isObstacle({
+              x: $.position.x + $.action.data.delta.x,
+              y: $.position.y + $.action.data.delta.y
+            })
+          ) {
             $.action.data = { id: Action.NONE };
           }
         }

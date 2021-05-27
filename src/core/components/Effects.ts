@@ -1,4 +1,4 @@
-import type { ItemEffect } from '../../lib/types';
+import type { ItemEffect } from '@lib/types';
 
 import { Component } from 'tecs';
 

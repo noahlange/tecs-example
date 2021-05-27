@@ -1,5 +1,5 @@
-import type { Atlas, AtlasFrame } from '../../lib/types';
 import type { TiledTileset } from './types';
+import type { Atlas, AtlasFrame } from '@lib/types';
 
 import { iterateGrid } from '../geometry';
 
@@ -36,11 +36,12 @@ export function getAtlasFromTileset(tileset: TiledTileset): Atlas {
       image: tileset.image,
       scale: '1',
       size: {
-        width: imagewidth,
-        height: imageheight
+        w: imagewidth,
+        h: imageheight
       }
     },
-    frames
+    frames,
+    animations: {}
   };
 }
 

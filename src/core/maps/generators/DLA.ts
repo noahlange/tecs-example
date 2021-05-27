@@ -1,5 +1,5 @@
-import type { Vector2 } from '../../../lib/types';
-import type { MapBuilderOpts } from '../lib/MapBuilder';
+import type { MapBuilderOptions } from '@lib';
+import type { Vector2 } from '@lib/types';
 
 import { MapBuilder, Rectangle } from '@lib';
 import { Collision, TileType } from '@lib/enums';
@@ -20,7 +20,7 @@ const deltas: Vector2[] = [
   { x: 1, y: 0 }
 ];
 
-interface DiffusionLimitedAggregationOpts extends MapBuilderOpts {
+interface DiffusionLimitedAggregationOpts extends MapBuilderOptions {
   percentage?: number;
 }
 
@@ -29,7 +29,7 @@ export class DiffusionLimitedAggregation extends MapBuilder {
 
   protected algorithm: Algorithm = Algorithm.INWARDS;
   protected count = 0;
-  protected brush = 3;
+  protected brushSize = 3;
 
   protected get max(): number {
     return Math.round(

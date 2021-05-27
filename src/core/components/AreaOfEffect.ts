@@ -1,5 +1,5 @@
-import type { Vector2 } from '../../lib/types';
 import type { Direction } from '@lib/enums';
+import type { Vector2 } from '@lib/types';
 
 import { AOE } from '@lib/enums';
 import { RNG } from '@utils';

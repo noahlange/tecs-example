@@ -65,7 +65,6 @@ export class MapTest extends Scene {
   public init(): void {
     const world = this.game.$.map.world;
     world.generate();
-    world.projection = Projection.ISOMETRIC;
 
     this.game.ecs.create(
       Camera,

@@ -1,6 +1,6 @@
-import type { Vector2 } from '../../lib/types';
 import type { CombatEntity } from '@core/entities/types';
 import type { DamageType, Direction } from '@lib/enums';
+import type { Vector2 } from '@lib/types';
 import type { CombatAttackAction } from '@utils';
 
 import {
@@ -13,7 +13,7 @@ import {
 } from '@core/components';
 import { Vector2Array } from '@lib';
 import { Action } from '@lib/enums';
-import { roll } from '@utils';
+import { RNG } from '@utils';
 import { getInteractionPos } from '@utils/geometry';
 import { System } from 'tecs';
 
@@ -63,7 +63,7 @@ export class Combat extends System {
         const points = $.aoe.all(a.target);
         // roll damage once
         const damage = $.equip.damage.reduce(
-          (a, d) => a.set(d.type, roll(d.value)),
+          (a, d) => a.set(d.type, RNG.roll(d.value)),
           new Map<DamageType, number>()
         );
 

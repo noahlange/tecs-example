@@ -10,22 +10,22 @@ const START = { x: 0, y: 0 };
 export class MapGen extends Scene {
   public init(): void {
     const playerEntity = this.game.ecs.query.entities(Player).first();
-    const entity = playerEntity ?? this.game.ecs.create(Player, player.data);
-    const [chunk] = toChunkPosition(entity.$.position);
+    const entity =
+      playerEntity ?? this.game.ecs.create(Player, player.data, player.tags);
 
-    if (!playerEntity) {
-      this.game.once('init.map.chunks', map => {
-        const { x, y } = map.getSpawn(START);
-        entity.$.position.x = x;
-        entity.$.position.y = y;
-      });
+    // if (entity) {
+    //   this.game.once('init.map.chunks', map => {
+    //     const { x, y } = map.getSpawn(START);
+    //     entity.$.position.x = x;
+    //     entity.$.position.y = y;
+    //   });
 
-      this.game.once('init.map.static', () => {
-        entity.$.position.x = 16;
-        entity.$.position.y = 16;
-      });
-    }
+    //   this.game.once('init.map.static', () => {
+    //     entity.$.position.x = 8;
+    //     entity.$.position.y = 8;
+    //   });
+    // }
 
-    (this.game.$.map.world as ChunkMap).center = chunk ?? START;
+    // (this.game.$.map.world as ChunkMap).center = chunk ?? START;
   }
 }

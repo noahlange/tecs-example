@@ -1,12 +1,12 @@
-import type { Color, Vector2 } from '../../../lib/types';
 import type * as Builders from '../generators';
 import type { Game } from '@core';
 import type { GameTileData } from '@lib';
+import type { Color, Vector2 } from '@lib/types';
 import type { GeneratorPayload, GeneratorResponse } from '@workers/maps';
 import type { Entity } from 'tecs';
 
 import { Cell } from '@core/entities';
-import * as prefabs from '@core/prefabs';
+import * as prefabbed from '@core/prefabs';
 import { Rectangle, Vector2Array } from '@lib';
 import { Tag } from '@lib/enums';
 import {
@@ -36,7 +36,11 @@ export interface SavedChunk {
   entities: string[];
 }
 
-const prefabItems = [...prefabs.armor, ...prefabs.items, ...prefabs.weapons];
+const prefabs = [
+  ...prefabbed.weapons,
+  ...prefabbed.items,
+  ...prefabbed.consumables
+];
 
 export class Chunk {
   public toJSON(): SavedChunk {
@@ -124,7 +128,7 @@ export class Chunk {
         {
           position: {
             x: this.x * CHUNK_WIDTH + point.x,
-            y: this.y * CHUNK_WIDTH + point.y
+            y: this.y * CHUNK_HEIGHT + point.y
           },
           collision: { value: type.collision },
           render: { dirty: true },
@@ -147,6 +151,8 @@ export class Chunk {
     builder: keyof typeof Builders = 'Empty'
   ): Promise<this> {
     const worker = work(new Worker());
+    const baseX = this.point.x * CHUNK_WIDTH;
+    const baseY = this.point.y * CHUNK_HEIGHT;
 
     const data = await worker.run<GeneratorPayload, GeneratorResponse>({
       x: this.point.x,
@@ -168,13 +174,29 @@ export class Chunk {
       this.lights.set(point, color);
     }
 
+    for (const [point, color] of data.tints) {
+      this.tints.set(point, color);
+    }
+
     for (const prefab of data.prefabs) {
-      const found = prefabItems.find(p => p.id === prefab.id);
+      const found = prefabs.find(p => p.entity.id === prefab.entity.id);
       if (found) {
-        // this.entities.push(
-        //   // @todo: make sure we aren't double-spawning prefabs
-        //   this.game.ecs.create(found.entity, prefab.data, prefab.tags)
-        // );
+        const data = (prefab.data ?? {}) as any;
+
+        this.entities.push(
+          //  @todo: make sure we aren't double-spawning prefabs
+          this.game.ecs.create(
+            found.entity,
+            {
+              ...data,
+              position: {
+                x: baseX + data.position.x,
+                y: baseY + data.position.y
+              }
+            },
+            prefab.tags
+          )
+        );
       }
     }
 
@@ -189,9 +211,9 @@ export class Chunk {
   };
 
   public constructor({ x, y, width, height, game }: ChunkOptions) {
-    this.game = game;
-    this.point = { x, y };
     this.size = { width, height };
+    this.point = { x, y };
+    this.game = game;
 
     this.tiles = new Vector2Array(this.size);
     this.tints = new Vector2Array(this.size);

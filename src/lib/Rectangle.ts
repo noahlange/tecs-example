@@ -1,13 +1,8 @@
 import type { Rect, Vector2 } from './types';
 
-export class Rectangle {
-  public static intersects(a: Rect, b: Rect): boolean {
-    return (
-      Math.max(a.y1, b.y1) < Math.min(a.y2, b.y2) &&
-      Math.max(a.x1, b.x1) < Math.min(a.x1, b.x2)
-    );
-  }
+import { intersects } from '@utils/geometry';
 
+export class Rectangle {
   public x1: number;
   public y1: number;
   public x2: number;
@@ -29,19 +24,16 @@ export class Rectangle {
   }
 
   public intersects(rect: Rect): boolean {
-    return (
-      Math.max(this.x1, rect.x1) < Math.min(this.x2, rect.x2) &&
-      Math.max(this.y1, rect.y1) < Math.min(this.y2, rect.y2)
-    );
+    return intersects(this, rect);
   }
 
   public contains(point: Vector2): boolean {
-    if (point.x >= this.x1 && point.x <= this.x2) {
-      if (point.x >= this.y1 && point.y <= this.y2) {
-        return true;
-      }
-    }
-    return false;
+    return (
+      point.x >= this.x1 &&
+      point.x <= this.x2 &&
+      point.y >= this.y1 &&
+      point.y <= this.y2
+    );
   }
 
   public constructor(rect: Rect) {

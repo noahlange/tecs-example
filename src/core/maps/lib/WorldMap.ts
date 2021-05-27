@@ -1,6 +1,6 @@
-import type { CollisionMethods, Size, Vector2 } from '../../../lib/types';
 import type { Game } from '@core';
 import type { Projection } from '@lib/enums';
+import type { CollisionMethods, Size, Vector2 } from '@lib/types';
 
 import { FOV, Pathfinding } from 'malwoden';
 
@@ -46,7 +46,7 @@ export abstract class WorldMap {
     this.point = { x: options.x, y: options.y };
     this.size = { width: options.width, height: options.height };
     this.paths = new Pathfinding.AStar({
-      topology: 'four',
+      topology: 'eight',
       isBlockedCallback: point => this.collisions.isObstacle(point)
     });
 

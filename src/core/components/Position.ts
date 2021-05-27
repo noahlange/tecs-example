@@ -1,4 +1,4 @@
-import type { Vector2 } from '../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import { Direction } from '@lib/enums';
 import { toChunkPosition } from '@utils/geometry';
@@ -8,6 +8,7 @@ export class Position extends Component {
   public static readonly type = 'position';
   public d: Direction = Direction.N;
   public z: number = 1;
+
   public x: number = 0;
   public y: number = 0;
 

@@ -1,5 +1,6 @@
-import type { Atlas } from '../../lib/types';
 import type { TiledTileset } from '../tiled/types';
+import type { Atlas } from '@lib/types';
+import type { Spritesheet } from 'pixi.js';
 
 import * as PIXI from 'pixi.js';
 
@@ -43,4 +44,10 @@ export async function getSpritesheetsFromTilesets(
   return res.reduce((a, b) => {
     return { ...a, [b.atlas.meta.name]: b.sprites };
   }, {});
+}
+
+export async function getSpritesheetFromAtlas(
+  atlas: Atlas
+): Promise<Spritesheet> {
+  return getSpritesheetFromURL(atlas.meta.image, atlas);
 }

@@ -1,4 +1,4 @@
-import type { AnyInputEvent } from '../../../lib/types';
+import type { AnyInputEvent } from '@lib/types';
 import type { ResultNode } from 'bondage';
 
 import { Player } from '@core/entities';

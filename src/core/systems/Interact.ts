@@ -1,5 +1,5 @@
 import { Action } from '@lib/enums';
-import { getInteractionPos, isWithin } from '@utils/geometry';
+import { contains, getInteractionPos } from '@utils/geometry';
 import { System } from 'tecs';
 
 import { Actor, Interactive, Position } from '../components';
@@ -21,8 +21,8 @@ export class Interact extends System {
         case Action.INTERACT: {
           const pos = getInteractionPos(actor.$.position);
           for (const interactive of interactives) {
-            // either the actor's current position or the position they're interacting with
-            if (isWithin(interactive.$.position, [actor.$.position, pos])) {
+            // either their current position or the one they're pointing to
+            if (contains(interactive.$.position, [actor.$.position, pos])) {
               if (interactive instanceof Door || interactive instanceof Chest) {
                 interactive.interact();
                 interactives.delete(interactive);

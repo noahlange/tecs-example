@@ -1,9 +1,11 @@
-import type { Prefab } from '../../lib/types';
+import type { Prefab } from '@lib/types';
 
 import { Monster, Player } from '@core/entities';
 import { HealthBar } from '@lib';
-import { AIType, Faction } from '@lib/enums';
+import { AIType, Direction, Faction, Tag } from '@lib/enums';
 import { T } from '@utils';
+
+import atlas from '../../../static/sprites/Medieval_PB_Premade_Male_3_Mastersheet.json';
 
 export const enemies: Prefab[] = [
   {
@@ -35,12 +37,18 @@ export const enemies: Prefab[] = [
 export const player: Prefab<typeof Player> = {
   id: 'player01',
   entity: Player,
-  tags: [],
+  tags: [Tag.IS_ANIMATING],
   data: {
-    text: { title: 'Player' },
-    light: { color: { r: 0, g: 0, b: 255, a: 1 } },
-    sprite: { key: 'players.player_01' },
-    view: { range: 10 },
-    position: { z: 10 }
+    position: { x: 8, y: 8, d: Direction.N, z: 100 },
+    animation: {
+      fps: 9,
+      atlas,
+      animation: 'idle',
+      index: null,
+      reset: null
+    },
+    sprite: {
+      pivot: { x: 0.5, y: 0.5 }
+    }
   }
 };

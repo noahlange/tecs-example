@@ -1,23 +1,31 @@
-import type { Vector2, Vector3 } from '../../lib/types';
+import type { Position, Sprite } from '@core/components';
+import type { Vector2, Vector3 } from '@lib/types';
+import type { Spritesheet } from 'pixi.js';
+import type { EntityType } from 'tecs';
 
 import { Manager } from '@lib';
 import { Projection } from '@lib/enums';
 import { RESOLUTION, TILE_HEIGHT, TILE_WIDTH, view } from '@utils';
-import { toRelative } from '@utils/geometry';
 import { getSpritesheetFromURL } from '@utils/pixi';
 import * as PIXI from 'pixi.js';
+import { Viewport } from 'pixi-viewport';
 
 import { atlas } from '../../atlases';
 
 export class RenderManager extends Manager {
   public sheets: Record<string, PIXI.Spritesheet> = {};
 
-  protected camera: Vector2 = { x: 0, y: 0 };
+  public camera: Vector2 = { x: 0, y: 0 };
+  public pivot: Vector2 = { x: 0, y: 0 };
   protected pixi!: PIXI.Application;
-  protected projection = Projection.ORTHOGRAPHIC;
+  public viewport!: Viewport;
 
   public get app(): PIXI.Application {
     return this.pixi;
+  }
+
+  public loadSpritesheets(spritesheets: { [key: string]: Spritesheet }): void {
+    Object.assign(this.sheets, spritesheets);
   }
 
   public getTexture(sheet: string, key: string): PIXI.Texture | null {
@@ -39,42 +47,62 @@ export class RenderManager extends Manager {
   }
 
   public getScreenPoint(point: Vector2): Vector3 {
+    const TW = TILE_WIDTH;
+    const TH = TILE_HEIGHT;
     const map = this.game.$.map;
-    const rel = toRelative(map, point) ?? point;
+    const rel = point;
     switch (map.world.projection) {
       case Projection.ISOMETRIC: {
         return {
-          x: (rel.x - rel.y) * (TILE_WIDTH / 2),
-          y: (rel.y + rel.x) * (TILE_HEIGHT / 2),
+          x: ((rel.x - rel.y) * TW) / 2,
+          y: ((rel.y + rel.x) * TH) / 2,
           z: rel.y
         };
       }
       case Projection.ORTHOGRAPHIC:
       default: {
         return {
-          x: rel.x * TILE_WIDTH,
-          y: rel.y * TILE_HEIGHT,
+          x: rel.x * TW,
+          y: rel.y * TH,
           z: 0
         };
       }
     }
   }
 
+  // @todo broken
   public getWorldPoint(point: Vector2): Vector2 {
-    return {
-      x: Math.floor((point.x + this.pixi.stage.pivot.x) / TILE_WIDTH),
-      y: Math.floor((point.y + this.pixi.stage.pivot.y) / TILE_HEIGHT)
-    };
+    const TW = TILE_WIDTH / RESOLUTION;
+    const TH = TILE_HEIGHT / RESOLUTION;
+
+    switch (this.game.$.map.world.projection) {
+      case Projection.ISOMETRIC: {
+        const x2 = point.x;
+        const y2 = point.y;
+        const x1 = (x2 / TW + y2 / TH) / 2;
+        const y1 = y2 / TH - x1;
+        return {
+          x: Math.floor(x1 * 2),
+          y: Math.floor(y1 * 2)
+        };
+      }
+      case Projection.ORTHOGRAPHIC:
+      default: {
+        return {
+          x: Math.floor(point.x / TILE_WIDTH),
+          y: Math.floor(point.y / TILE_HEIGHT)
+        };
+      }
+    }
   }
 
-  public follow(pos: Vector2): void {
-    const { x, y } = this.getScreenPoint(pos);
+  public follow(entity: EntityType<[typeof Position], [typeof Sprite]>): void {
+    const { x, y } = this.getScreenPoint(entity.$.position);
+    this.pivot = entity.$.position;
     this.camera = {
       x: x - view.width / (2 * RESOLUTION),
       y: y - view.height / (2 * RESOLUTION)
     };
-
-    this.pixi.stage.pivot.set(this.camera.x, this.camera.y);
   }
 
   public async init(): Promise<void> {
@@ -83,9 +111,20 @@ export class RenderManager extends Manager {
       height: view.height / RESOLUTION,
       resolution: RESOLUTION,
       backgroundColor: 0xffffff,
-      backgroundAlpha: 1,
       antialias: false
     });
+
+    this.viewport = new Viewport({
+      screenWidth: window.innerWidth,
+      screenHeight: window.innerHeight,
+      worldWidth: 2000,
+      worldHeight: 2000,
+      ticker: this.pixi.ticker,
+      interaction: this.pixi.renderer.plugins.interaction
+    });
+
+    this.viewport.drag().wheel();
+    this.app.stage.addChild(this.viewport);
 
     await this.loadAtlases();
     document.getElementById('root')?.appendChild(this.pixi.view);

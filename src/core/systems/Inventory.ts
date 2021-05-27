@@ -8,7 +8,7 @@ import type {
 import type { EntityType } from 'tecs';
 
 import { Action, EffectType, Tag } from '@lib/enums';
-import { getInteractionPos, isWithin } from '@utils/geometry';
+import { contains, getInteractionPos } from '@utils/geometry';
 import { System } from 'tecs';
 
 import { Equippable, Stats } from '../components';
@@ -129,7 +129,7 @@ export class Inventory extends System {
         case Action.INTERACT:
         case Action.ITEM_PICK_UP: {
           for (const item of items) {
-            if (isWithin(item.$.position, [$.position, pos])) {
+            if (contains(item.$.position, [$.position, pos])) {
               this.addItem(entity, item);
             }
           }

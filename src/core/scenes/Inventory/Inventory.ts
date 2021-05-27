@@ -95,7 +95,7 @@ export class Inventory extends Scene {
     }
   }
 
-  protected render(): void {
+  public render(): void {
     if (this.dirty) {
       this.refresh();
     }
@@ -122,7 +122,6 @@ export class Inventory extends Scene {
     if (wasDirty) {
       this.refresh();
     }
-    this.render();
   }
 
   public init(): void {

@@ -1,6 +1,8 @@
-const orZero = (n: number): number => Math.max(0, isNaN(n) ? 0 : n);
-
 export class UIList<T> {
+  private static orZero(n: number): number {
+    return Math.max(0, isNaN(n) ? 0 : n);
+  }
+
   public items: T[];
   public index: number = 0;
 
@@ -13,18 +15,18 @@ export class UIList<T> {
   }
 
   public up(): void {
-    this.index = orZero(
+    this.index = UIList.orZero(
       this.index === 0 ? this.items.length - 1 : this.index - 1
     );
   }
 
   public down(): void {
-    this.index = orZero((this.index + 1) % this.items.length);
+    this.index = UIList.orZero((this.index + 1) % this.items.length);
   }
 
   public setItems(items: T[]): void {
     this.items = items;
-    this.index = orZero(Math.min(this.index, items.length - 1));
+    this.index = UIList.orZero(Math.min(this.index, items.length - 1));
   }
 
   public constructor(items: T[] = []) {

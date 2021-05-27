@@ -1,16 +1,16 @@
 import type { Player } from '@core/entities';
-import type { ChunkMap } from '@core/maps';
+import type { WorldMap } from '@core/maps';
 import type { GameState } from '@lib/enums';
 import type { JSX } from 'preact';
 
-import './gameplay';
+import './gameplay.scss';
 
 import { toChunkPosition } from '@utils/geometry';
 import { h } from 'preact';
 
 interface GameplayUIProps {
   player: Player;
-  area: ChunkMap;
+  area: WorldMap;
   state: GameState;
 }
 

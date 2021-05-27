@@ -1,6 +1,5 @@
-import type { Vector2 } from '../../../lib/types';
-import type { GameTileData } from '../lib/GameMap';
-import type { Vector2Array } from '@lib';
+import type { GameTileData, Vector2Array } from '@lib';
+import type { Vector2 } from '@lib/types';
 
 import { MapBuilder } from '@lib';
 import { Collision, TileType } from '@lib/enums';

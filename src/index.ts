@@ -1,15 +1,22 @@
 import '@ui/styles/index.scss';
 
 import * as PIXI from 'pixi.js';
+import { setID } from 'tecs';
+
+import { RNG } from './utils';
 
 // required for PIXI dev tools
 window.PIXI = PIXI;
-// @ts-ignore: can't blacklist @types
+// @ts-ignore: can't blacklist nodejs in @types
 window.global = window.globalThis;
 
+setID(RNG.id);
+
 (async () => {
+  RNG.setSeed('start');
+
   const { Game } = await import('./core/Game');
-  const { Gameplay, MapGen, Menu } = await import('./core/scenes');
+  const { Gameplay, MapGen } = await import('./core/scenes');
 
   /**
    * @todo

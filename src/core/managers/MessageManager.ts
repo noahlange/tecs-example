@@ -1,4 +1,4 @@
-import type { GameMessage } from '../../lib/types';
+import type { GameMessage } from '@lib/types';
 
 import { Manager } from '@lib';
 

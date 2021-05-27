@@ -127,7 +127,8 @@ export enum Tag {
   IS_INACTIVE = 'is_inactive',
   IS_IMPERMANENT = 'is_impermanent',
   IS_CONSUMABLE = 'is_consumable',
-  IS_EQUIPPABLE = 'is_equippable'
+  IS_EQUIPPABLE = 'is_equippable',
+  IS_ANIMATING = 'is_animating'
 }
 
 export enum Attribute {

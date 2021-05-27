@@ -1,5 +1,5 @@
-import type { Color, Size, Vector2 } from '../../lib/types';
 import type { ChunkMap } from '@core/maps';
+import type { Color, Size, Vector2 } from '@lib/types';
 
 import {
   LightSource,
@@ -40,6 +40,11 @@ enum Repaint {
   DEBUG = 3
 }
 
+/**
+ * Handles dynamic light mixing
+ * @todo - this doesn't currently work and needs to be updated to light/unlight tiles as needed
+ * @todo - does the initial tint need to be stored somewhere?
+ */
 export class LightingSystem extends System {
   public static readonly type = 'lighting';
 
@@ -144,12 +149,15 @@ export class LightingSystem extends System {
     if (this.area) {
       this.computeLighting();
       this.repaint();
-      // only paint explicitly-indicated tiles next tick
+      // clear the tiles for the next tick; we'll only update ones that are explicitly-indicated
       this.repaintGrid.clear();
       this.colorGrid.clear();
     }
   }
 
+  /**
+   * @todo - handle full chunk?
+   */
   public initArea(area: ChunkMap): void {
     this.area = area;
     this.size = {

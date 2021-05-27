@@ -1,6 +1,21 @@
-import type { Vector2 } from '../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import { Direction } from '@lib/enums';
+
+function angleTo(origin: Vector2, target: Vector2): number {
+  const [dx, dy] = [origin.x - target.x, origin.y - target.y];
+  const angle = Math.atan2(-dy, -dx) * (180 / Math.PI) + 135;
+  return angle < 0 ? angle + 360 : angle;
+}
+
+export function getRelativeDirection(
+  anchor: Vector2,
+  point: Vector2
+): Direction {
+  const angle = angleTo(anchor, point);
+  const adj = (angle + 45 / 2) % 360;
+  return Math.floor(adj / 45);
+}
 
 export function getInteractionPos(point: Vector2 & { d: Direction }): Vector2 {
   let { x, y } = point;

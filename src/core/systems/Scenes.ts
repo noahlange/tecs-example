@@ -3,7 +3,19 @@ import { System } from 'tecs';
 export class Scenes extends System {
   public static readonly type = 'scenes';
 
-  public tick(d: number, ts: number): void {
-    this.world.game.scene?.tick?.(d, ts);
+  public delta: number = 0;
+  public ms = 1000 / 30;
+
+  public tick(dt: number, ts: number): void {
+    const scene = this.world.game.scene;
+
+    if (scene) {
+      scene.tick?.(dt, ts);
+      this.delta += dt;
+      if (this.delta >= this.ms) {
+        this.delta = 0;
+        scene.render?.();
+      }
+    }
   }
 }

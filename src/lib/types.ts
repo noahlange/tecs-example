@@ -30,14 +30,9 @@ export interface TileProperty {
 }
 
 export interface AtlasFrame {
-  id: string;
-  frame: {
-    x: number;
-    y: number;
-    w: number;
-    h: number;
-  };
-  properties: { [key: string]: number | boolean | string | undefined };
+  id?: string;
+  frame: { x: number; y: number; w: number; h: number };
+  properties?: { [key: string]: number | boolean | string | undefined };
 }
 
 export interface Atlas {
@@ -46,11 +41,12 @@ export interface Atlas {
     image: string;
     scale: string;
     size: {
-      width: number;
-      height: number;
+      w: number;
+      h: number;
     };
   };
   frames: Record<string, AtlasFrame>;
+  animations: Record<string, string[]>;
 }
 
 export interface Prefab<T extends EntityClass = EntityClass> {
@@ -87,8 +83,8 @@ export interface BaseInputEvent {
 }
 
 export interface MouseInputEvent extends BaseInputEvent {
-  x: number;
-  y: number;
+  local: Vector2;
+  screen: Vector2;
   type: string;
   isKeyboard: false;
 }

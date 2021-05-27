@@ -1,4 +1,4 @@
-import type { Vector2 } from '../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 enum TiledPropertyType {
   BOOLEAN = 'bool',

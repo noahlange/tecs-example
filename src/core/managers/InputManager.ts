@@ -1,12 +1,16 @@
-import type {
-  AnyInputEvent,
-  KeyboardInputEvent,
-  MouseInputEvent
-} from '../../lib/types';
+import type { AnyInputEvent, KeyboardInputEvent } from '@lib/types';
+import type { Vector2 } from 'malwoden';
 import type * as PIXI from 'pixi.js';
+import type { Viewport } from 'pixi-viewport';
 
 import { Manager } from '@lib';
-import { debounce } from 'ts-debounce';
+import { debounce } from 'throttle-debounce-ts';
+
+interface ViewportClickedEvent {
+  event: PIXI.InteractionEvent;
+  world: PIXI.ObservablePoint;
+  viewport: Viewport;
+}
 
 /**
  * Standardize input events, send to command manager.
@@ -14,6 +18,8 @@ import { debounce } from 'ts-debounce';
 export class InputManager extends Manager {
   protected x: number = 0;
   protected y: number = 0;
+
+  public mouse: Vector2 | null = null;
 
   protected commands: any[] = [];
   protected events: AnyInputEvent[] = [];
@@ -24,22 +30,6 @@ export class InputManager extends Manager {
 
   public getNextEvent(): AnyInputEvent | null {
     return this.events.shift() ?? null;
-  }
-
-  protected toMouseInputEvent(e: PIXI.InteractionEvent): MouseInputEvent {
-    const { x, y } = this.game.$.renderer.getWorldPoint(e.data.global);
-    return {
-      name: e.type,
-      type:
-        e.type === 'mousemove'
-          ? 'mouse-move'
-          : e.data.button === 2
-          ? 'right-click'
-          : 'left-click',
-      x: x,
-      y: y,
-      isKeyboard: false
-    };
   }
 
   protected toKeyboardInputEvent(e: KeyboardEvent): KeyboardInputEvent {
@@ -54,11 +44,24 @@ export class InputManager extends Manager {
   }
 
   protected handle = {
-    onMouseMove: debounce((e: PIXI.InteractionEvent) => {
-      // this.onInputEvent(this.toMouseInputEvent(e));
-    }, 64),
-    onClick: (e: PIXI.InteractionEvent) => {
-      // this.onInputEvent(this.toMouseInputEvent(e));
+    onMouseMove: debounce(1000 / 60, (e: PIXI.InteractionEvent) => {
+      const screen = this.game.$.renderer.viewport.toWorld(e.data.global);
+      this.onInputEvent({
+        name: 'mousemove',
+        type: 'mouse-move',
+        local: this.game.$.renderer.getWorldPoint(screen),
+        screen,
+        isKeyboard: false
+      });
+    }),
+    onClick: (e: ViewportClickedEvent) => {
+      this.onInputEvent({
+        name: e.event.type,
+        type: e.event.data.button === 2 ? 'right-click' : 'left-click',
+        local: this.game.$.renderer.getWorldPoint(e.world),
+        screen: e.world,
+        isKeyboard: false
+      });
     },
     onKeyDown: (e: KeyboardEvent) => {
       this.events.push(this.toKeyboardInputEvent(e));
@@ -67,13 +70,13 @@ export class InputManager extends Manager {
   };
 
   public init(): void {
-    const view = this.game.$.renderer.app.stage;
-    view.interactive = true;
-    view.on('pointermove', this.handle.onMouseMove);
-    this.game.$.renderer.app.stage.addListener(
-      'pointerdown',
-      this.handle.onClick
-    );
+    const stage = this.game.$.renderer.app.stage;
+
+    stage.name = 'stage';
+    stage.interactive = true;
+    stage.on('pointermove', this.handle.onMouseMove);
+
+    this.game.$.renderer.viewport.on('clicked', this.handle.onClick);
     window.document.addEventListener('keydown', this.handle.onKeyDown);
   }
 }

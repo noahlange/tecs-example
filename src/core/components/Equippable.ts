@@ -1,5 +1,5 @@
-import type { DamageDefinition } from '../../lib/types';
 import type { Equipped } from './Equipped';
+import type { DamageDefinition } from '@lib/types';
 import type { EntityType } from 'tecs';
 
 import { EquipSlot } from '@lib/enums';

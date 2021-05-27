@@ -23,8 +23,7 @@
       "@utils/geometry": ["./src/utils/geometry/index.ts"],
       "@core": ["./src/core/index.ts"],
       "@lib": ["./src/lib/index.ts"],
-      "@lib/enums": ["./src/lib/enums.ts"],
-      "@lib/types": ["./src/lib/types.ts"],
+      "@lib/*": ["./src/lib/*"],
       "@ui/*": ["./src/ui/*"],
       "@core/*": ["./src/core/*"],
       "@workers/*": ["./src/workers/*"],
@@ -33,6 +32,6 @@
       ]
     }
   },
-  "include": ["src/**/*", "assets"],
+  "include": ["src/**/*", "tools", "assets"],
   "exclude": [".ignore", "./static"]
 }

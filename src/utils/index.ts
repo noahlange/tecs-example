@@ -1,14 +1,17 @@
-import type { Color, Size } from '../lib/types';
+import type { Color, Size } from '@lib/types';
+
+import { Projection } from '@lib/enums';
 
 // @todo - dynamic on a per-map basis?
-export const TILE_WIDTH = 16;
-export const TILE_HEIGHT = 16;
+export const TILE_WIDTH = 64;
+export const TILE_HEIGHT = 32;
 
 export const CHUNK_WIDTH = 16;
 export const CHUNK_HEIGHT = 16;
 export const CHUNK_RADIUS = 1;
 
 export const RESOLUTION = 1;
+export const PROJECTION = Projection.ISOMETRIC;
 
 export const AMBIENT_LIGHT: Color = { r: 80, g: 80, b: 80, a: 1 };
 export const AMBIENT_DARK: Color = { r: 40, g: 40, b: 40, a: 1 };
@@ -28,7 +31,6 @@ export const bit = {
 };
 
 export { T } from './tiles';
-export { roll } from './random';
 export { work } from './worker';
 
 // namespace exports

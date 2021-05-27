@@ -1,4 +1,5 @@
 export { AI } from './AI';
+export { Animation } from './Animation';
 export { Collisions } from './Collisions';
 export { Combat } from './Combat';
 export { Movement } from './Movement';

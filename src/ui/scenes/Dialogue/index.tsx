@@ -1,6 +1,6 @@
 import type { JSX } from 'preact';
 
-import './dialogue';
+import './dialogue.scss';
 
 import { h } from 'preact';
 

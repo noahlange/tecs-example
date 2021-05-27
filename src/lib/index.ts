@@ -12,3 +12,4 @@ export { Seeder } from './Seeder';
 export { GameMap } from '@core/maps/lib/GameMap';
 
 export type { GameTileData } from '@core/maps/lib/GameMap';
+export type { MapBuilderOptions } from '@core/maps/lib/MapBuilder';

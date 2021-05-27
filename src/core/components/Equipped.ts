@@ -2,7 +2,7 @@ import type { EquippableItem } from '../entities/types';
 import type { DamageType } from '@lib/enums';
 
 import { EquipSlot } from '@lib/enums';
-import { roll } from '@utils';
+import { RNG } from '@utils';
 
 export class Equipped {
   public static readonly type = 'equipped';
@@ -25,7 +25,7 @@ export class Equipped {
       if (b?.$.equip) {
         for (const resistance of b.$.equip.resist ?? []) {
           const val = a.get(resistance.type) ?? 0;
-          a.set(resistance.type, val + roll(resistance.value));
+          a.set(resistance.type, val + RNG.roll(resistance.value));
         }
       }
       return a;

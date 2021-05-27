@@ -5,7 +5,8 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
-    project: 'tsconfig.json'
+    project: 'tsconfig.json',
+    extraFileExtensions: ['.mjs']
   },
   extends: [
     'eslint:recommended',
@@ -55,5 +56,5 @@ module.exports = {
       }
     ]
   },
-  ignorePatterns: ['*.js']
+  ignorePatterns: ['*.js', '*.mjs']
 };

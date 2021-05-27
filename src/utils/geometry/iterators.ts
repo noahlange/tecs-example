@@ -1,4 +1,4 @@
-import type { Rect, Size, Vector2 } from '../../lib/types';
+import type { Rect, Size, Vector2 } from '@lib/types';
 
 /**
  * Yield numbers from `0` → `count` (positive) or `count` → `0` (negative).

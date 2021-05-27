@@ -4,6 +4,8 @@ import type { InventoryItem } from '@core/entities/types';
 import type { JSX } from 'preact';
 import type { EntityType } from 'tecs';
 
+import './inventory.scss';
+
 import { ItemType } from '@lib/enums';
 import { h } from 'preact';
 
@@ -74,9 +76,11 @@ export function InventoryUI(props: InventoryProps): JSX.Element {
                 <h2>{selected.$.text.title}</h2>
               </div>
               <ShowIf value={selected.$.item.type === ItemType.WEAPON}>
-                <WeaponStats
-                  item={selected as InstanceType<typeof Equipment>}
-                />
+                {() => (
+                  <WeaponStats
+                    item={selected as InstanceType<typeof Equipment>}
+                  />
+                )}
               </ShowIf>
               <div className="item-description">
                 {selected.$.item.description}

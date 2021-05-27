@@ -1,4 +1,4 @@
-import type { Vector2 } from '../../lib/types';
+import type { Vector2 } from '@lib/types';
 
 import { describe, expect, test } from '@jest/globals';
 import { Vector2Array } from '@lib';

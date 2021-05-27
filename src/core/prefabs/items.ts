@@ -1,4 +1,4 @@
-import type { Prefab } from '../../lib/types';
+import type { Prefab } from '@lib/types';
 
 import { Book, Scroll } from '@core/entities';
 import { ItemType, Tag } from '@lib/enums';

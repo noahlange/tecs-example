@@ -1,10 +1,10 @@
-import type { MapBuilderOpts } from '../lib/MapBuilder';
+import type { MapBuilderOptions } from '@lib';
 
 import { MapBuilder } from '@lib';
 import { Collision, TileType } from '@lib/enums';
 import { RNG } from '@utils';
 
-interface CanyonBuilderOpts extends MapBuilderOpts {
+interface CanyonBuilderOpts extends MapBuilderOptions {
   roughness?: number;
   windiness?: number;
   complexity?: number;
