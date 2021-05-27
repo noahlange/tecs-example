@@ -24,7 +24,7 @@ export class Gameplay extends Scene {
   protected point: Vector2 | null = null;
 
   protected $ = {
-    player: this.game.ecs.query.entities(Player).persist()
+    player: this.game.ctx.$.entities(Player).persist()
   };
 
   protected getKeyboardAction(input: KeyboardInputEvent): ActionType {

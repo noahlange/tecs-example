@@ -9,15 +9,14 @@ export class Movement extends System {
   public static type = 'movement';
 
   protected $ = {
-    player: this.world.query.entities(Player),
-    movers: this.world.query
-      .components(Actor, Position)
+    player: this.ctx.$.entities(Player),
+    movers: this.ctx.$.components(Actor, Position)
       .some.components(Pathfinder, Playable, Tweened)
       .persist()
   };
 
   public tick(): void {
-    if (this.world.game.paused) {
+    if (this.ctx.game.paused) {
       return;
     }
 

@@ -9,9 +9,9 @@ const START = { x: 0, y: 0 };
 
 export class MapGen extends Scene {
   public init(): void {
-    const playerEntity = this.game.ecs.query.entities(Player).first();
+    const playerEntity = this.game.ctx.$.entities(Player).first();
     const entity =
-      playerEntity ?? this.game.ecs.create(Player, player.data, player.tags);
+      playerEntity ?? this.game.ctx.create(Player, player.data, player.tags);
 
     // if (entity) {
     //   this.game.once('init.map.chunks', map => {

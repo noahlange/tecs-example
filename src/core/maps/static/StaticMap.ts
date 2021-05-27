@@ -54,7 +54,7 @@ export class StaticMap extends WorldMap {
     // @todo - load tile props
     this.entities = Array.from(tilemap).map(([point, sprite]) => {
       this.tiles.set(point, { spriteKey: sprite, collision: Collision.NONE });
-      return this.game.ecs.create(Cell, {
+      return this.game.ctx.create(Cell, {
         sprite: { key: sprite },
         collision: { value: Collision.NONE },
         position: point

@@ -258,7 +258,7 @@ export class ChunkMap extends WorldMap {
     //   }
     // }
 
-    this.game.ecs.update();
+    this.game.ctx.update();
     this.game.emit('init.map.chunks', this);
   }
 

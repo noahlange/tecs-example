@@ -39,7 +39,7 @@ export class MapTest extends Scene {
         }
       } else {
         this.entities = Array.from(snapshot.entries()).map(([pos, data]) => {
-          return this.game.ecs.create(Cell, {
+          return this.game.ctx.create(Cell, {
             position: pos,
             collision: { value: Collision.NONE },
             sprite: { key: getKeyFromTile(data) },
@@ -66,7 +66,7 @@ export class MapTest extends Scene {
     const world = this.game.$.map.world;
     world.generate();
 
-    this.game.ecs.create(
+    this.game.ctx.create(
       Camera,
       { position: { x: world.width / 3, y: world.height / 3 } },
       [Tag.IS_CAMERA]

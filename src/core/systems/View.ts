@@ -21,12 +21,10 @@ export class View extends System {
   protected debug = false;
 
   protected queries = {
-    views: this.world.query
-      .components(Position, ViewComponent)
+    views: this.ctx.$.components(Position, ViewComponent)
       .some.components(Playable)
       .persist(),
-    renderable: this.world.query
-      .components(Position, Renderable)
+    renderable: this.ctx.$.components(Position, Renderable)
       .some.components(Sprite)
       .persist()
   };
@@ -74,6 +72,6 @@ export class View extends System {
   }
 
   public init(): void {
-    this.world.game.on('init.map.chunks', area => this.initArea(area));
+    this.ctx.game.on('init.map.chunks', area => this.initArea(area));
   }
 }

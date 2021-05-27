@@ -123,7 +123,7 @@ export class Chunk {
 
   public create(): void {
     for (const [point, type] of this.tiles.entries()) {
-      const entity = this.game.ecs.create(
+      const entity = this.game.ctx.create(
         Cell,
         {
           position: {
@@ -185,7 +185,7 @@ export class Chunk {
 
         this.entities.push(
           //  @todo: make sure we aren't double-spawning prefabs
-          this.game.ecs.create(
+          this.game.ctx.create(
             found.entity,
             {
               ...data,

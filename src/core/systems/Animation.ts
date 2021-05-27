@@ -7,7 +7,7 @@ export class Animation extends System {
   public static readonly type = 'animation';
 
   public $ = {
-    animating: this.world.query.all
+    animating: this.ctx.$.all
       .components(Animated, Sprite, Position)
       .some.components(Actor)
       .all.tags(Tag.IS_ANIMATING)

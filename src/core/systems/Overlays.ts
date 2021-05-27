@@ -27,19 +27,17 @@ export class Overlays extends System {
   }
 
   protected $ = {
-    paths: this.world.query.components(Pathfinder).persist(),
-    aoe: this.world.query
-      .components(Position, Equippable, AreaOfEffect)
+    paths: this.ctx.$.components(Pathfinder).persist(),
+    aoe: this.ctx.$.components(Position, Equippable, AreaOfEffect)
       .none.tags(Tag.TO_DESTROY)
       .persist(),
-    stats: this.world.query
-      .components(Position, Stats)
+    stats: this.ctx.$.components(Position, Stats)
       .none.components(Playable)
       .persist()
   };
 
   protected drawAOE(): void {
-    const collisions = this.world.game.$.map.collisions;
+    const collisions = this.ctx.game.$.map.collisions;
     for (const aoe of this.$.aoe) {
       const fov = this.viewshed;
       const cells = aoe.$.aoe.all(aoe.$.position);
@@ -50,7 +48,7 @@ export class Overlays extends System {
         .filter(f => contains(f, fov));
 
       if (visible.length) {
-        this.world.create(E, {
+        this.ctx.create(E, {
           position: { x: 0, y: 0 },
           overlay: {
             color: { r: 255, g: 0, b: 0, a: 0.125 },
@@ -69,7 +67,7 @@ export class Overlays extends System {
       if (!$.pathfinder.destination || !$.pathfinder.path.length) {
         continue;
       }
-      this.world.create(E, {
+      this.ctx.create(E, {
         position: { x: 0, y: 0 },
         overlay: {
           color: { r: 255, g: 0, b: 0, a: 0.25 },
@@ -86,7 +84,7 @@ export class Overlays extends System {
     for (const entity of this.$.stats) {
       const sprites = entity.$.stats.health.sprites;
       const x = -(sprites.length * TILE_WIDTH - TILE_WIDTH) / 2;
-      this.world.create(E, {
+      this.ctx.create(E, {
         position: { x, y: 0 },
         overlay: {
           color: { r: 255, g: 0, b: 0, a: 1 },
@@ -106,6 +104,6 @@ export class Overlays extends System {
   }
 
   public init(): void {
-    this.player = this.world.query.entities(Player).first();
+    this.player = this.ctx.$.entities(Player).first();
   }
 }

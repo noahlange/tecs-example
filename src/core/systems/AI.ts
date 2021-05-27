@@ -29,8 +29,8 @@ export class AI extends System {
   public static readonly type = 'ai';
 
   protected $ = {
-    player: this.world.query.components(Playable, Position).persist(),
-    mobs: this.world.query.entities(Monster).persist()
+    player: this.ctx.$.components(Playable, Position).persist(),
+    mobs: this.ctx.$.entities(Monster).persist()
   };
 
   protected findMobTarget(mob: MobType): MobType | null {
@@ -50,20 +50,20 @@ export class AI extends System {
   protected handleActiveState({ $ }: MobType, target: MobType): void {
     $.ai.state = AIState.ACTIVE;
 
-    this.world.game.$.messages.add({
+    this.ctx.game.$.messages.add({
       text: `${$.text.title} begins pursuit, leaving home (${$.ai.home?.x}, ${$.ai.home?.y}).`
     });
 
     if ($.pathfinder.destination && $.ai.home) {
       if (!isSamePoint($.position, $.ai.home)) {
-        this.world.game.$.messages.add({
+        this.ctx.game.$.messages.add({
           text: `${$.text.title} is going home.`
         });
         $.pathfinder.destination = { x: $.ai.home.x, y: $.ai.home.y };
       }
 
       if (isSamePoint($.position, $.ai.home)) {
-        this.world.game.$.messages.add({
+        this.ctx.game.$.messages.add({
           text: `${$.text.title} has returned home (${$.ai.home.x}, ${$.ai.home.y}).`
         });
         $.ai.state = AIState.IDLE;

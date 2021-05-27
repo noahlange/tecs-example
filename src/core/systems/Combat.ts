@@ -23,9 +23,14 @@ export class Combat extends System {
   public static readonly type = 'combat';
 
   protected $ = {
-    combatants: this.world.query
-      .components(Combatant, Actor, Stats, Position, Equipped, Text)
-      .persist()
+    combatants: this.ctx.$.components(
+      Combatant,
+      Actor,
+      Stats,
+      Position,
+      Equipped,
+      Text
+    ).persist()
   };
 
   public tick(): void {
@@ -83,7 +88,7 @@ export class Combat extends System {
             //   Math.max(0, target.$.stats.health.value - total)
             // );
 
-            this.world.game.log(`${target.$.text.title} took ${total} damage`);
+            this.ctx.game.log(`${target.$.text.title} took ${total} damage`);
           }
         }
         a.attack.destroy();

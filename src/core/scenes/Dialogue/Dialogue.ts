@@ -81,7 +81,7 @@ export class Dialogue extends Scene {
   }
 
   public tick(): void {
-    this.player ??= this.game.ecs.query.entities(Player).find();
+    this.player ??= this.game.ctx.$.entities(Player).find();
     const next = this.game.$.input.getNextEvent();
 
     if (next) {

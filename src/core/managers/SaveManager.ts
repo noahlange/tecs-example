@@ -5,7 +5,7 @@ import pako from 'pako';
 export class SaveManager extends Manager {
   public toSave(): Uint8Array {
     const save: Record<string, any> = {};
-    const ecs = this.game.ecs.save();
+    const ecs = this.game.ctx.save();
     for (const [key, value] of _.entries(this.game.$)) {
       if (value.toJSON) {
         save[key] = value.toJSON();

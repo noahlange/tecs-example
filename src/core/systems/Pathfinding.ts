@@ -7,15 +7,14 @@ export class Pathfinding extends System {
   public static readonly type = 'pathfinder';
 
   protected $ = {
-    mobs: this.world.query.components(Pathfinder, Position).persist(),
-    finders: this.world.query
-      .components(Pathfinder, Actor, Position)
+    mobs: this.ctx.$.components(Pathfinder, Position).persist(),
+    finders: this.ctx.$.components(Pathfinder, Actor, Position)
       .some.components(Tweened)
       .persist()
   };
 
   public tick(): void {
-    const collisions = this.world.game.$.map.collisions;
+    const collisions = this.ctx.game.$.map.collisions;
     for (const { $ } of this.$.finders) {
       const { pathfinder } = $;
 
@@ -43,7 +42,7 @@ export class Pathfinding extends System {
         // determine if our destination has changed.
         if (!pathfinder.path.length) {
           pathfinder.path =
-            this.world.game.$.map.getPath(
+            this.ctx.game.$.map.getPath(
               { x: $.position.x, y: $.position.y },
               pathfinder.destination
             ) ?? [];

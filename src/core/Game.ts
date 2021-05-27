@@ -18,7 +18,7 @@ interface GameManagers {
 }
 
 export class Game {
-  public ecs = new ECS();
+  public ctx = new ECS();
 
   public $: GameManagers;
 
@@ -43,21 +43,21 @@ export class Game {
   }
 
   public async start(save?: any): Promise<void> {
-    this.ecs.game = this;
+    this.ctx.game = this;
     // init systems...
     for (const key of Object.keys(this.$) as (keyof GameManagers)[]) {
       this.$[key].init?.();
     }
     // boot managers
-    await this.ecs.start();
+    await this.ctx.start();
     if (save) {
       // populate ECS with load save data.
-      this.ecs.load(save);
+      this.ctx.load(save);
     }
     // attach pixi ticker
     this.$.renderer.app.ticker.add(() => {
       update();
-      this.ecs.tick(this.$.renderer.app.ticker.deltaMS, Date.now());
+      this.ctx.tick(this.$.renderer.app.ticker.deltaMS, Date.now());
     });
   }
 

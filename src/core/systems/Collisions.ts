@@ -12,11 +12,9 @@ export class Collisions extends System {
   protected collisions!: CollisionMethods;
 
   protected $ = {
-    movers: this.world.query.components(Actor, Position).persist(),
-    cells: this.world.query.components(Collision, Position).persist(),
-    colliders: this.world.query
-      .components(Collision, Position, Interactive)
-      .persist()
+    movers: this.ctx.$.components(Actor, Position).persist(),
+    cells: this.ctx.$.components(Collision, Position).persist(),
+    colliders: this.ctx.$.components(Collision, Position, Interactive).persist()
   };
 
   protected updateDynamicCollisions(): void {
@@ -51,6 +49,6 @@ export class Collisions extends System {
   }
 
   public init(): void {
-    this.collisions = this.world.game.$.map.collisions;
+    this.collisions = this.ctx.game.$.map.collisions;
   }
 }

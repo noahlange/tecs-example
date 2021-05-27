@@ -34,22 +34,18 @@ export class Renderer extends System {
   };
 
   protected $ = {
-    removals: this.world.query
-      .tags(Tag.TO_DESTROY)
-      .components(Sprite)
-      .persist(),
-    sprites: this.world.query
-      .components(Position, Sprite)
+    removals: this.ctx.$.tags(Tag.TO_DESTROY).components(Sprite).persist(),
+    sprites: this.ctx.$.components(Position, Sprite)
       .some.components(Actor, Renderable, Tweened)
       .none.tags(Tag.TO_DESTROY)
       .persist(),
-    overlays: this.world.query.components(Overlay, Position).persist()
+    overlays: this.ctx.$.components(Overlay, Position).persist()
   };
 
   public drawOverlays(): void {
     for (const entity of this.$.overlays) {
       const { $ } = entity;
-      const { x, y } = this.world.game.$.renderer.getScreenPoint($.position);
+      const { x, y } = this.ctx.game.$.renderer.getScreenPoint($.position);
       const container = new PIXI.Container();
 
       const sprites = $.overlay.tiles.map(cell => {
@@ -88,7 +84,7 @@ export class Renderer extends System {
   public tweenPosition(entity: Spriteable): void {
     if (entity.has(Tweened, Actor)) {
       const { tween, sprite, position } = entity.$;
-      const screen = this.world.game.$.renderer.getScreenPoint(position);
+      const screen = this.ctx.game.$.renderer.getScreenPoint(position);
       if (sprite.pixi && !tween.tween) {
         tween.tween = new Tween(sprite.pixi.position)
           .to(screen, 500)
@@ -107,7 +103,7 @@ export class Renderer extends System {
 
   public updatePosition(entity: Spriteable): void {
     const { position, sprite } = entity.$;
-    const screen = this.world.game.$.renderer.getScreenPoint(position);
+    const screen = this.ctx.game.$.renderer.getScreenPoint(position);
     const pixi = sprite.pixi;
     if (pixi) {
       const zIndex = (position.z ?? 0) + screen.z;
@@ -178,7 +174,7 @@ export class Renderer extends System {
       const [name, key] = sprite.key.split('.');
       const texture = this.renderer.getTexture(name, key);
       if (texture?.valid) {
-        const rel = this.world.game.$.renderer.getScreenPoint(position);
+        const rel = this.ctx.game.$.renderer.getScreenPoint(position);
         const pixi = new PIXI.Sprite(texture);
         pixi.zIndex = position.z + rel.z;
         pixi.position.set(rel.x * TILE_WIDTH, rel.y * TILE_HEIGHT);
@@ -214,7 +210,7 @@ export class Renderer extends System {
 
   // init functions can be async
   public async init(): Promise<void> {
-    this.renderer = this.world.game.$.renderer;
+    this.renderer = this.ctx.game.$.renderer;
     this.app = this.renderer.app;
     this.app.stage.interactive = true;
 

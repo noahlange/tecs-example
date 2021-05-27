@@ -65,7 +65,7 @@ export class InputManager extends Manager {
     },
     onKeyDown: (e: KeyboardEvent) => {
       this.events.push(this.toKeyboardInputEvent(e));
-      this.game.ecs.tick(0, Date.now());
+      this.game.ctx.tick(0, Date.now());
     }
   };
 

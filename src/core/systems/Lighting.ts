@@ -61,15 +61,13 @@ export class LightingSystem extends System {
   protected lighting!: Lighting;
 
   protected $ = {
-    views: this.world.query
-      .components(Position, View)
+    views: this.ctx.$.components(Position, View)
       .some.components(Playable)
       .persist(),
-    renderable: this.world.query
-      .components(Position, Renderable)
+    renderable: this.ctx.$.components(Position, Renderable)
       .some.components(Sprite)
       .persist(),
-    lights: this.world.query.components(LightSource, Position).persist()
+    lights: this.ctx.$.components(LightSource, Position).persist()
   };
 
   /**
@@ -177,6 +175,6 @@ export class LightingSystem extends System {
   }
 
   public init(): void {
-    this.world.game.on('init.map.chunks', area => this.initArea(area));
+    this.ctx.game.on('init.map.chunks', area => this.initArea(area));
   }
 }

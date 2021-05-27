@@ -133,6 +133,6 @@ export class Inventory extends Scene {
       ItemType.MAGIC,
       ItemType.MISC
     ]);
-    this.player = this.game.ecs.query.entities(Player).find();
+    this.player = this.game.ctx.$.entities(Player).find();
   }
 }

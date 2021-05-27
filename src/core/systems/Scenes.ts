@@ -7,7 +7,7 @@ export class Scenes extends System {
   public ms = 1000 / 30;
 
   public tick(dt: number, ts: number): void {
-    const scene = this.world.game.scene;
+    const scene = this.ctx.game.scene;
 
     if (scene) {
       scene.tick?.(dt, ts);

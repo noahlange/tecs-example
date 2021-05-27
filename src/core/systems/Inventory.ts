@@ -25,10 +25,13 @@ export class Inventory extends System {
   public static readonly type = 'inventory';
 
   protected $ = {
-    items: this.world.query.components(Item, Position, Text).persist(),
-    hasInventory: this.world.query
-      .components(Actor, InventoryComponent, Position, Equipped)
-      .persist()
+    items: this.ctx.$.components(Item, Position, Text).persist(),
+    hasInventory: this.ctx.$.components(
+      Actor,
+      InventoryComponent,
+      Position,
+      Equipped
+    ).persist()
   };
 
   protected addItem(entity: InventoryEntity, item: InventoryItem): void {
@@ -44,7 +47,7 @@ export class Inventory extends System {
       entity.$.inventory.items.push(item);
     }
 
-    this.world.game.log(
+    this.ctx.game.log(
       entity.$.action.data.count
         ? `Added ${item.$.text.title} (${entity.$.action.data.count})`
         : `Added ${item.$.text.title}`

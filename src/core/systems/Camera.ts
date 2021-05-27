@@ -12,8 +12,8 @@ export class Camera extends System {
   public static readonly type = 'camera';
 
   protected $ = {
-    player: this.world.query.entities(Player).persist(),
-    camera: this.world.query.tags(Tag.IS_CAMERA).components(Position).persist()
+    player: this.ctx.$.entities(Player).persist(),
+    camera: this.ctx.$.tags(Tag.IS_CAMERA).components(Position).persist()
   };
 
   protected player: Player | null = null;
@@ -21,17 +21,17 @@ export class Camera extends System {
   protected stage: Container | null = null;
 
   public tick(): void {
-    if (this.world.game.scene instanceof Gameplay) {
+    if (this.ctx.game.scene instanceof Gameplay) {
       this.player ??= this.$.player.first();
       const thing = this.stage?.getChildByName?.('fg');
 
       if (this.player && thing) {
-        // const screen = this.world.game.$.renderer.getScreenPoint(
+        // const screen = this.ctx.game.$.renderer.getScreenPoint(
         //   this.player.$.position
         // );
         const pixi = this.player.$.sprite.pixi;
         if (pixi) {
-          this.world.game.$.renderer.viewport.follow(pixi);
+          this.ctx.game.$.renderer.viewport.follow(pixi);
         }
 
         // if (!this.target) {
@@ -45,8 +45,8 @@ export class Camera extends System {
         //   console.log(screen, this.target);
         // }
 
-        // this.world.game.$.renderer.follow(this.player);
-        // const area = this.world.game.$.map.world;
+        // this.ctx.game.$.renderer.follow(this.player);
+        // const area = this.ctx.game.$.map.world;
         // const [next] = pos.chunk;
         // if (next.x !== area.x || next.y !== area.y) {
         //   // @ts-ignore: @todo fix
@@ -56,13 +56,13 @@ export class Camera extends System {
     } else {
       const camera = this.$.camera.first();
       if (camera) {
-        // this.world.game.$.renderer.follow(camera);
+        // this.ctx.game.$.renderer.follow(camera);
       }
     }
   }
 
   public init(): void {
-    const app = this.world.game.$.renderer.app;
+    const app = this.ctx.game.$.renderer.app;
 
     this.stage = app.stage;
   }

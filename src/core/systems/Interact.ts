@@ -9,8 +9,8 @@ export class Interact extends System {
   public static readonly type = 'interact';
 
   protected $ = {
-    interactives: this.world.query.components(Position, Interactive).persist(),
-    actors: this.world.query.components(Actor, Position).persist()
+    interactives: this.ctx.$.components(Position, Interactive).persist(),
+    actors: this.ctx.$.components(Actor, Position).persist()
   };
 
   public tick(): void {

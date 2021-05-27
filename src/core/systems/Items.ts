@@ -15,11 +15,10 @@ export class Items extends System {
   public static readonly type = 'items';
 
   protected $ = {
-    items: this.world.query
-      .components(Position, Item, Text)
+    items: this.ctx.$.components(Position, Item, Text)
       .some.components(Equippable)
       .persist(),
-    actors: this.world.query.components(Actor, Position, Inventory).persist()
+    actors: this.ctx.$.components(Actor, Position, Inventory).persist()
   };
 
   public tick(): void {

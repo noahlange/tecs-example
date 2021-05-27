@@ -1,5 +1,5 @@
 import Stats from 'stats.js';
-import { World } from 'tecs';
+import { Context } from 'tecs';
 
 import * as Components from './components';
 import * as Entities from './entities';
@@ -17,7 +17,7 @@ import {
   View
 } from './systems';
 
-export class ECS extends World.with(
+export class ECS extends Context.with(
   Scenes,
   Pathfinding,
   Collisions,
@@ -46,7 +46,7 @@ export class ECS extends World.with(
     this.manager.tick();
   }
 
-  public tick(d: number, ts: number): void {
+  public async tick(d: number, ts: number): Promise<void> {
     this.stats?.begin();
     super.tick(d, ts);
     this.stats?.end();
