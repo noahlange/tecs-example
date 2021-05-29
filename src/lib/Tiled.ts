@@ -1,11 +1,17 @@
+import type { TiledLayer } from '../utils/tiled/types';
 import type { Projection } from '@lib/enums';
 import type { Vector3 } from '@lib/types';
 import type { Spritesheet } from '@pixi/spritesheet';
 import type { TiledMap, TiledTileset } from '@utils/tiled';
 
+import { jsonz } from '@utils';
 import { iterateGrid } from '@utils/geometry';
 import { getSpritesheetsFromTilesets } from '@utils/pixi';
 import { getProjectionFromTiledMap, getTileIdentifier } from '@utils/tiled';
+
+interface IterableLayer extends TiledLayer {
+  [Symbol.iterator](): IterableIterator<[Vector3, string | null]>;
+}
 
 export class Tiled {
   public static async from(source: string): Promise<Tiled> {
@@ -19,28 +25,45 @@ export class Tiled {
   protected tilemap!: TiledMap;
   protected getID!: (index: number) => string;
 
+  public get width(): number {
+    return this.tilemap.width;
+  }
+
+  public get height(): number {
+    return this.tilemap.height;
+  }
+
   public get projection(): Projection {
     return getProjectionFromTiledMap(this.tilemap);
   }
 
-  public *[Symbol.iterator](): IterableIterator<[Vector3, string]> {
-    let z = 0;
-    for (const layer of this.tilemap.layers) {
-      let i = 0;
-      for (const point of iterateGrid(this.tilemap)) {
-        yield [{ ...point, z }, this.getID(layer.data[i++])];
+  public get layers(): IterableLayer[] {
+    const [tilemap, getID] = [this.tilemap, this.getID.bind(this)];
+    return this.tilemap.layers.map(
+      (layer, z): IterableLayer => {
+        return {
+          ...layer,
+          *[Symbol.iterator](): IterableIterator<[Vector3, string | null]> {
+            let i = 0;
+            for (const point of iterateGrid(tilemap)) {
+              const index = layer.data?.[i++] ?? null;
+              yield [{ ...point, z }, index ? getID(index) : null];
+            }
+          }
+        };
       }
-      z++;
-    }
+    );
   }
 
   public async load(): Promise<void> {
-    this.tilemap = await import(/* @vite-ignore */ this.source);
+    this.tilemap = await jsonz.read(this.source);
     this.getID = getTileIdentifier(this.tilemap.tilesets);
     this.tilesets = await Promise.all(
-      this.tilemap.tilesets.map(
-        tileset => import(/* @vite-ignore */ tileset.source)
-      ) ?? []
+      this.tilemap.tilesets.map(tileset => {
+        return tileset.source
+          ? import(/* @vite-ignore */ tileset.source).then(m => m.default)
+          : Promise.resolve(tileset);
+      }) ?? []
     );
   }
 

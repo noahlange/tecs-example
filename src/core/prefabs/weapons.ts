@@ -1,7 +1,8 @@
 import type { Prefab } from '@lib/types';
 
-import { Equipment } from '@core/entities';
 import { DamageType, EquipSlot, ItemType, Tag } from '@lib/enums';
+
+import { Equipment } from '../entities';
 
 export const weapons: Prefab[] = [
   {

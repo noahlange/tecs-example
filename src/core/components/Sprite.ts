@@ -16,7 +16,8 @@ export class Sprite extends Component implements SpriteData {
 
   public pixi: PIXI.Sprite | null = null;
   public tint: Color | null = { r: 255, g: 255, b: 255, a: 1 };
-  public pivot = { x: 0.5, y: 0 };
+  // bottom center
+  public pivot = { x: 0.5, y: 1 };
 
   public set key(value: string | null) {
     this._prevKey = this._key;

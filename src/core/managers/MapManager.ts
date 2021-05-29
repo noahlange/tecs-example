@@ -37,9 +37,9 @@ export class MapManager extends Manager {
     const options = {
       x: 0,
       y: 0,
-      width: 48,
-      height: 48,
-      map: '/static/iso/tiled-map.json'
+      width: 100,
+      height: 100,
+      map: '/static/maps/frontier_plains.json'
     };
     this.world = new StaticMap(this.game, options);
 

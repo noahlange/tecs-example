@@ -12,7 +12,7 @@ import {
 import { Tag } from '@lib/enums';
 import { Tween } from '@tweenjs/tween.js';
 import { AMBIENT_DARK, RGB, TILE_HEIGHT, TILE_WIDTH } from '@utils';
-import { isSamePoint } from '@utils/geometry';
+import { distance, isSamePoint } from '@utils/geometry';
 import * as PIXI from 'pixi.js';
 import { System } from 'tecs';
 
@@ -104,9 +104,10 @@ export class Renderer extends System {
   public updatePosition(entity: Spriteable): void {
     const { position, sprite } = entity.$;
     const screen = this.ctx.game.$.renderer.getScreenPoint(position);
+
     const pixi = sprite.pixi;
     if (pixi) {
-      const zIndex = (position.z ?? 0) + screen.z;
+      const zIndex = position.z + position.y;
       // @todo tweening
       if (!isSamePoint(screen, pixi.position)) {
         if (entity.has(Tweened)) {
@@ -204,12 +205,10 @@ export class Renderer extends System {
     // this.updateRemovals();
     // this.drawOverlays();
     this.updateSprites();
-
-    // this.viewport.moveCenter(x, y);
   }
 
   // init functions can be async
-  public async init(): Promise<void> {
+  public async start(): Promise<void> {
     this.renderer = this.ctx.game.$.renderer;
     this.app = this.renderer.app;
     this.app.stage.interactive = true;

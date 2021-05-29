@@ -103,7 +103,7 @@ export class Overlays extends System {
     // this.drawPaths();
   }
 
-  public init(): void {
+  public start(): void {
     this.player = this.ctx.$.entities(Player).first();
   }
 }

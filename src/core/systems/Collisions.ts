@@ -1,54 +1,36 @@
-import type { CollisionMethods } from '@lib/types';
+import type { Context } from 'tecs';
 
 import { Action } from '@lib/enums';
 import { getNewDirection } from '@utils/geometry';
-import { System } from 'tecs';
 
 import { Actor, Collision, Interactive, Position } from '../components';
 
-export class Collisions extends System {
-  public static type = 'collisions';
+export function Collisions(ctx: Context): void {
+  const collisions = ctx.game.$.map.collisions;
 
-  protected collisions!: CollisionMethods;
-
-  protected $ = {
-    movers: this.ctx.$.components(Actor, Position).persist(),
-    cells: this.ctx.$.components(Collision, Position).persist(),
-    colliders: this.ctx.$.components(Collision, Position, Interactive).persist()
-  };
-
-  protected updateDynamicCollisions(): void {
-    for (const { $ } of this.$.colliders) {
-      this.collisions.set(
-        $.position,
-        $.collision.isObstacle,
-        $.collision.isObstruction
-      );
-    }
+  for (const { $ } of ctx.$.components(Collision, Position, Interactive)) {
+    collisions.set(
+      $.position,
+      $.collision.isObstacle,
+      $.collision.isObstruction
+    );
   }
 
-  public tick(): void {
-    this.updateDynamicCollisions();
-    for (const { $ } of this.$.movers) {
-      switch ($.action.data.id) {
-        case Action.MOVE: {
-          // we want to update the direction independently of whether or not
-          // the mob actually moves
-          $.position.d = getNewDirection($.action.data.delta) ?? $.position.d;
-          if (
-            this.collisions.isObstacle({
-              x: $.position.x + $.action.data.delta.x,
-              y: $.position.y + $.action.data.delta.y
-            })
-          ) {
-            $.action.data = { id: Action.NONE };
-          }
+  for (const { $ } of ctx.$.components(Actor, Position)) {
+    switch ($.action.data.id) {
+      case Action.MOVE: {
+        // we want to update the direction independently of whether or not
+        // the mob actually moves
+        $.position.d = getNewDirection($.action.data.delta) ?? $.position.d;
+        if (
+          collisions.isObstacle({
+            x: $.position.x + $.action.data.delta.x,
+            y: $.position.y + $.action.data.delta.y
+          })
+        ) {
+          $.action.data = { id: Action.NONE };
         }
       }
     }
-  }
-
-  public init(): void {
-    this.collisions = this.ctx.game.$.map.collisions;
   }
 }

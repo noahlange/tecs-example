@@ -13,7 +13,7 @@ export function getProjectionFromTiledMap(map: TiledMap): Projection {
 }
 
 export function getProjectionFromTileset(map: TiledTileset): Projection {
-  switch (map.grid.orientation) {
+  switch (map.grid?.orientation) {
     case 'isometric':
       return Projection.ISOMETRIC;
     case 'orthographic':

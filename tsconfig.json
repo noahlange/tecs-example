@@ -1,4 +1,10 @@
 {
+  "ts-node": {
+    "transpileOnly": true,
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
@@ -32,6 +38,6 @@
       ]
     }
   },
-  "include": ["src/**/*", "tools", "assets"],
+  "include": ["src/**/*", "./tools", "assets"],
   "exclude": [".ignore", "./static"]
 }

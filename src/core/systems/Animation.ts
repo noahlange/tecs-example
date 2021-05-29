@@ -1,27 +1,26 @@
-import { Actor, Position, Sprite } from '@core/components';
-import { Animated } from '@core/components/Animated';
+import type { Context } from 'tecs';
+
 import { Action, Tag } from '@lib/enums';
-import { System } from 'tecs';
 
-export class Animation extends System {
-  public static readonly type = 'animation';
+import { Actor, Position, Sprite } from '../components';
+import { Animated } from '../components/Animated';
 
-  public $ = {
-    animating: this.ctx.$.all
+export function Animation(ctx: Context, dt: number): void {
+  const $ = {
+    animating: ctx.$.all
       .components(Animated, Sprite, Position)
       .some.components(Actor)
       .all.tags(Tag.IS_ANIMATING)
-      .persist()
   };
 
-  public updateActionAnimation(): void {
-    for (const entity of this.$.animating) {
+  const updateAnimationAction = (): void => {
+    for (const entity of $.animating) {
       const { animation: a } = entity.$;
       const curr = a.animation;
       if (entity.has(Actor)) {
         switch (entity.$.action.data.id) {
           case Action.MOVE: {
-            a.animation = 'run';
+            a.animation = 'walk';
             break;
           }
           case Action.NONE: {
@@ -35,10 +34,10 @@ export class Animation extends System {
         }
       }
     }
-  }
+  };
 
-  public updateAnimationFrame(dt: number): void {
-    for (const entity of this.$.animating) {
+  const updateAnimationFrame = (dt: number): void => {
+    for (const entity of $.animating) {
       const [$, a] = [entity.$, entity.$.animation];
       const ms = 1000 / a.fps;
 
@@ -69,10 +68,8 @@ export class Animation extends System {
         }
       }
     }
-  }
+  };
 
-  public tick(dt: number): void {
-    this.updateActionAnimation();
-    this.updateAnimationFrame(dt);
-  }
+  updateAnimationAction();
+  updateAnimationFrame(dt);
 }

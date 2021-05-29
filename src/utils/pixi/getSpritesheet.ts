@@ -10,6 +10,12 @@ export async function getSpritesheetFromTexture(
   texture: PIXI.Texture,
   atlas: Atlas
 ): Promise<PIXI.Spritesheet> {
+  const name = atlas.meta.name;
+  atlas.frames = Object.entries(atlas.frames).reduce(
+    (a, [key, value]) => ({ ...a, [`${name}.${key}`]: value }),
+    {}
+  );
+
   const spritesheet = new PIXI.Spritesheet(texture, atlas);
   return new Promise(resolve => spritesheet.parse(() => resolve(spritesheet)));
 }

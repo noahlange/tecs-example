@@ -5,7 +5,7 @@ import { HealthBar } from '@lib';
 import { AIType, Direction, Faction, Tag } from '@lib/enums';
 import { T } from '@utils';
 
-import atlas from '../../../static/sprites/Medieval_PB_Premade_Male_3_Mastersheet.json';
+import atlas from '../../../static/sprites/characters/skeleton.json';
 
 export const enemies: Prefab[] = [
   {
@@ -39,7 +39,7 @@ export const player: Prefab<typeof Player> = {
   entity: Player,
   tags: [Tag.IS_ANIMATING],
   data: {
-    position: { x: 8, y: 8, d: Direction.N, z: 100 },
+    position: { x: 24, y: 90, d: Direction.N, z: 100 },
     animation: {
       fps: 9,
       atlas,

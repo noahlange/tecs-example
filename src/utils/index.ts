@@ -36,6 +36,7 @@ export { work } from './worker';
 // namespace exports
 export * as RNG from './random';
 export * as RGB from './colors';
+export * as jsonz from './jsonz';
 export * as _ from './misc';
 
 // universal exports

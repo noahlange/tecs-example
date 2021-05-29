@@ -9,6 +9,7 @@ import {
   Collisions,
   Interact,
   Inventory,
+  Items,
   Lighting,
   Movement,
   Pathfinding,
@@ -24,6 +25,7 @@ export class ECS extends Context.with(
   Movement,
   Interact,
   Inventory,
+  Items,
   View,
   Lighting,
   Renderer,
@@ -35,25 +37,26 @@ export class ECS extends Context.with(
 
   protected initStats(): void {
     this.stats = new Stats();
-    this.stats.showPanel(1);
+    this.stats.showPanel(0);
     document.body.appendChild(this.stats.dom);
   }
 
   /**
    * For manually-invoking the entity manager's tick() method, due to the hybrid ecs/non-ecs approach
    */
-  public update(): void {
+  public async update(): Promise<void> {
     this.manager.tick();
   }
 
   public async tick(d: number, ts: number): Promise<void> {
     this.stats?.begin();
-    super.tick(d, ts);
+    await super.tick(d, ts);
     this.stats?.end();
   }
 
-  public init(): void {
+  public async start(): Promise<void> {
     this.initStats();
+    super.start();
   }
 
   public constructor() {

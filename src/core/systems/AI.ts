@@ -82,7 +82,7 @@ export class AI extends System {
     }
   }
 
-  public init(): void {
+  public start(): void {
     for (const { $ } of this.$.mobs) {
       if (!$.ai.home) {
         $.ai.home = { x: $.position.x, y: $.position.y };

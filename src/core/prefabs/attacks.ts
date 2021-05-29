@@ -1,7 +1,8 @@
 import type { Prefab } from '@lib/types';
 
-import { Attack } from '@core/entities';
 import { AOE, DamageType } from '@lib/enums';
+
+import { Attack } from '../entities';
 
 export const attacks: Prefab[] = [
   {

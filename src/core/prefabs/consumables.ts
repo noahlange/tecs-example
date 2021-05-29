@@ -1,7 +1,8 @@
 import type { Prefab } from '@lib/types';
 
-import { Potion } from '@core/entities';
 import { EffectType, ItemType, Tag } from '@lib/enums';
+
+import { Potion } from '../entities';
 
 export const consumables: Prefab[] = [
   {

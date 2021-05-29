@@ -174,7 +174,7 @@ export class LightingSystem extends System {
     );
   }
 
-  public init(): void {
+  public start(): void {
     this.ctx.game.on('init.map.chunks', area => this.initArea(area));
   }
 }

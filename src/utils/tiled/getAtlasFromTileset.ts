@@ -21,6 +21,7 @@ export function getAtlasFromTileset(tileset: TiledTileset): Atlas {
 
     const props = tiles[index]?.properties ?? [];
     const i = index.toString().padStart(3, '0');
+
     frames[i] = {
       id: i,
       frame: { x, y, w: tilewidth, h: tileheight },

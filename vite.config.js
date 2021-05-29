@@ -18,6 +18,7 @@ export default defineConfig({
     alias: {
       // minified
       pako: resolve(__dirname, './node_modules/pako/dist/pako.min.js'),
+      tecs: resolve(__dirname, './node_modules/tecs/lib/index.js'),
       // local aliases
       '@ui': resolve(__dirname, './src/ui'),
       '@utils': resolve(__dirname, './src/utils'),

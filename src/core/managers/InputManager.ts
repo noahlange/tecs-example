@@ -44,7 +44,7 @@ export class InputManager extends Manager {
   }
 
   protected handle = {
-    onMouseMove: debounce(1000 / 60, (e: PIXI.InteractionEvent) => {
+    onMouseMove: debounce(1000 / 30, (e: PIXI.InteractionEvent) => {
       const screen = this.game.$.renderer.viewport.toWorld(e.data.global);
       this.onInputEvent({
         name: 'mousemove',

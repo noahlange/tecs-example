@@ -14,13 +14,13 @@ import { WorldMap } from '../lib/WorldMap';
 export interface StaticMapOptions {
   x: number;
   y: number;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
   map: string;
 }
 
 export class StaticMap extends WorldMap {
-  protected tiles: Vector2Array<GameTileData>;
+  protected tiles!: Vector2Array<GameTileData>;
   protected options: StaticMapOptions;
 
   public getSpawn(): Vector2 {
@@ -49,25 +49,61 @@ export class StaticMap extends WorldMap {
 
   public async generate(): Promise<void> {
     const tilemap = await Tiled.from(this.options.map);
+    this.options.width = tilemap.width;
+    this.options.height = tilemap.height;
+    this.tiles = new Vector2Array(tilemap);
     // set projection (iso/ortho)
     this.projection = tilemap.projection;
-    // @todo - load tile props
-    this.entities = Array.from(tilemap).map(([point, sprite]) => {
-      this.tiles.set(point, { spriteKey: sprite, collision: Collision.NONE });
-      return this.game.ctx.create(Cell, {
-        sprite: { key: sprite },
-        collision: { value: Collision.NONE },
-        position: point
+    const entities = [];
+    const collisions = tilemap.layers.find(layer => layer.name === 'collision');
+
+    for (const [point, value] of collisions ?? []) {
+      this.tiles.set(point, {
+        // spriteKey: value,
+        collision: (() => {
+          switch (value) {
+            case 'collision.000':
+            case 'collision.001':
+            case 'collision.002':
+            case 'collision.003':
+            case 'collision.004':
+            case 'collision.005':
+            case 'collision.006':
+              return Collision.COMPLETE;
+            default:
+              return Collision.NONE;
+          }
+        })()
       });
-    });
+    }
+
+    for (const layer of tilemap.layers) {
+      if (layer.name === 'collision') {
+        continue;
+      }
+      for (const [point, key] of layer) {
+        const value = this.tiles.get(point);
+        entities.push(
+          this.game.ctx.create(Cell, {
+            sprite: {
+              key: key
+              // key:
+              //   (value?.collision === Collision.COMPLETE
+              //     ? value?.spriteKey
+              //     : key) ?? key
+            },
+            position: point
+          })
+        );
+      }
+    }
 
     this.game.$.renderer.loadSpritesheets(await tilemap.getSpritesheets());
     this.game.emit('init.map.static', this);
   }
 
   public constructor(game: Game, options: StaticMapOptions) {
-    super(game, options);
+    super(game, { width: 0, height: 0, ...options });
     this.options = options;
-    this.tiles = new Vector2Array(options);
   }
 }

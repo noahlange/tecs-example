@@ -5,7 +5,7 @@ import { Collision } from '@lib/enums';
 import { iterateGrid } from '@utils/geometry';
 import { getTileIdentifier } from '@utils/tiled';
 
-import map from '../../../../static/iso/tiled-map.json';
+import map from '../../../../static/maps/frontier_plains.json';
 
 export class Builder extends MapBuilder {
   public tiled: TiledMap = map;
@@ -16,6 +16,10 @@ export class Builder extends MapBuilder {
     this.height = map.height;
 
     for (const layer of map.layers) {
+      if (!layer.data) {
+        continue;
+      }
+
       let index = 0;
       for (const point of iterateGrid(this)) {
         // @todo - get tiledata from tileset

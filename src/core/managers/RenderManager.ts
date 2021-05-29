@@ -1,7 +1,5 @@
-import type { Position, Sprite } from '@core/components';
 import type { Vector2, Vector3 } from '@lib/types';
 import type { Spritesheet } from 'pixi.js';
-import type { EntityType } from 'tecs';
 
 import { Manager } from '@lib';
 import { Projection } from '@lib/enums';
@@ -15,21 +13,15 @@ import { atlas } from '../../atlases';
 export class RenderManager extends Manager {
   public sheets: Record<string, PIXI.Spritesheet> = {};
 
-  public camera: Vector2 = { x: 0, y: 0 };
-  public pivot: Vector2 = { x: 0, y: 0 };
-  protected pixi!: PIXI.Application;
+  public app!: PIXI.Application;
   public viewport!: Viewport;
-
-  public get app(): PIXI.Application {
-    return this.pixi;
-  }
 
   public loadSpritesheets(spritesheets: { [key: string]: Spritesheet }): void {
     Object.assign(this.sheets, spritesheets);
   }
 
   public getTexture(sheet: string, key: string): PIXI.Texture | null {
-    return this.sheets[sheet]?.textures[key] ?? null;
+    return this.sheets[sheet]?.textures[`${sheet}.${key}`] ?? null;
   }
 
   public async loadAtlases(): Promise<void[]> {
@@ -96,37 +88,30 @@ export class RenderManager extends Manager {
     }
   }
 
-  public follow(entity: EntityType<[typeof Position], [typeof Sprite]>): void {
-    const { x, y } = this.getScreenPoint(entity.$.position);
-    this.pivot = entity.$.position;
-    this.camera = {
-      x: x - view.width / (2 * RESOLUTION),
-      y: y - view.height / (2 * RESOLUTION)
-    };
-  }
-
   public async init(): Promise<void> {
-    this.pixi = new PIXI.Application({
-      width: view.width / RESOLUTION,
-      height: view.height / RESOLUTION,
+    const { height: h, width: w } = view;
+
+    this.app = new PIXI.Application({
+      width: w / RESOLUTION,
+      height: h / RESOLUTION,
       resolution: RESOLUTION,
-      backgroundColor: 0xffffff,
+      backgroundAlpha: 0,
       antialias: false
     });
 
     this.viewport = new Viewport({
-      screenWidth: window.innerWidth,
-      screenHeight: window.innerHeight,
-      worldWidth: 2000,
-      worldHeight: 2000,
-      ticker: this.pixi.ticker,
-      interaction: this.pixi.renderer.plugins.interaction
+      screenWidth: w,
+      screenHeight: h,
+      worldWidth: w,
+      worldHeight: h,
+      ticker: this.app.ticker,
+      interaction: this.app.renderer.plugins.interaction
     });
 
-    this.viewport.drag().wheel();
+    this.viewport.wheel();
     this.app.stage.addChild(this.viewport);
 
     await this.loadAtlases();
-    document.getElementById('root')?.appendChild(this.pixi.view);
+    document.getElementById('root')?.appendChild(this.app.view);
   }
 }

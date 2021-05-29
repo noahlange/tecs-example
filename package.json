@@ -61,7 +61,8 @@
     "start": "vite serve",
     "test": "node --experimental-vm-modules ./node_modules/.bin/jest",
     "types": "tsc --noEmit",
-    "atlas-gen": "node tools/atlas-gen/index.mjs"
+    "atlas-gen": "ts-node tools/atlas-gen/index.ts",
+    "zip": "ts-node tools/zip/index.ts"
   },
   "alias": {
     "@core": "./src/core",

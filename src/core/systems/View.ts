@@ -71,7 +71,7 @@ export class View extends System {
     this.area = area;
   }
 
-  public init(): void {
+  public start(): void {
     this.ctx.game.on('init.map.chunks', area => this.initArea(area));
   }
 }

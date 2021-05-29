@@ -2,14 +2,14 @@ import { describe, expect, test } from '@jest/globals';
 import * as tiled from '@utils/tiled';
 
 describe('getTileIdentifier()', () => {
-  const tilesets = [
+  const tilesets = ([
     { firstgid: 0, source: 'one' },
     { firstgid: 10, source: 'two' },
     { firstgid: 20, source: 'three' },
     { firstgid: 30, source: 'four' },
     { firstgid: 40, source: 'five' },
     { firstgid: 50, source: 'six' }
-  ];
+  ] as any[]) as tiled.TiledTileset[];
 
   test('should return tileset + tile id from index offset', () => {
     const getID = tiled.getTileIdentifier(tilesets);

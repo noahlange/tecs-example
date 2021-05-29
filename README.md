@@ -11,7 +11,10 @@ cd tecs-example
 npm i && npm start
 ```
 
-Includes an interactive command line tool (`atlas-gen`) for generating image atlases with animation data.
+Includes two misc. command line tools:
+
+- `atlas-gen`: generates image atlases with animation data.
+- `zip`: compresses json files using pako (for import with `jsonz.read()`)
 
 ## ideas / todo
 

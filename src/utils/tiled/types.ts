@@ -43,14 +43,11 @@ export interface WangSet {
   wangtiles: WangTile[];
 }
 
-export interface TiledTilesetReference {
-  firstgid: number;
-  source: string;
-}
-
 export interface TiledTileset {
+  firstgid: number;
   columns: number;
-  grid: {
+  source?: string;
+  grid?: {
     height: number;
     orientation: string;
     width: number;
@@ -61,19 +58,19 @@ export interface TiledTileset {
   tilewidth: number;
   tileheight: number;
   tilecount: number;
-  tiledversion: string;
+  tiledversion?: string;
   margin: number;
-  tileoffset: Vector2;
+  tileoffset?: Vector2;
   name: string;
-  wangsets: WangSet[];
+  wangsets?: WangSet[];
   tiles?: TiledTile[];
 }
 
 export interface TiledLayer {
   // in CSV export mode
-  data: number[];
-  height: number;
-  width: number;
+  data?: number[];
+  height?: number;
+  width?: number;
   name: string;
   opacity: number;
   type: string;
@@ -86,10 +83,10 @@ export interface TiledMap {
   height: number;
   width: number;
   layers: TiledLayer[];
-  tilesets: TiledTilesetReference[];
+  tilesets: TiledTileset[];
   nextobjectid: number;
   orientation: string;
-  properties?: Record<string, number | string | boolean | undefined>;
+  properties?: { name: string; type: string; value: string }[];
   renderorder: string;
   tileheight: number;
   tilewidth: number;

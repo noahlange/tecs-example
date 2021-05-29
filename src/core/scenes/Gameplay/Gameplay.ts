@@ -9,7 +9,7 @@ import { getRelativeDirection } from '@utils/geometry';
 import { getSpritesheetFromAtlas } from '@utils/pixi';
 import { h, render } from 'preact';
 
-import atlas from '../../../../static/sprites/Medieval_PB_Premade_Male_3_Mastersheet.json';
+import atlas from '../../../../static/sprites/characters/skeleton.json';
 import { Inventory } from '..';
 
 const deltaKey: Record<string, Vector2> = {

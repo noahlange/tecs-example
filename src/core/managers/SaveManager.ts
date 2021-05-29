@@ -12,7 +12,6 @@ export class SaveManager extends Manager {
       }
     }
 
-    ecs.entities = ecs.entities.slice(0, 2000);
     return pako.deflate(JSON.stringify({ ecs }));
   }
 
