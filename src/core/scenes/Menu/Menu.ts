@@ -11,7 +11,7 @@ enum MenuOption {
 export class Menu extends Scene {
   protected list = new UIList<MenuOption>();
 
-  public end(): void {
+  public stop(): void {
     return;
   }
 
@@ -33,7 +33,7 @@ export class Menu extends Scene {
     }
   }
 
-  public init(): void {
+  public start(): void {
     this.list.setItems([
       MenuOption.NEW_GAME,
       MenuOption.LOAD_GAME,

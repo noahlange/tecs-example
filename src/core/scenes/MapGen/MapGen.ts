@@ -1,31 +1,21 @@
-import type { ChunkMap } from '@core/maps';
+import type { TiledMap } from '@utils/tiled';
 
 import { Player } from '@core/entities';
-import { player } from '@core/prefabs';
+import { StaticMap } from '@core/maps';
+import { getPlayerPrefab } from '@core/prefabs';
 import { Scene } from '@lib';
-import { toChunkPosition } from '@utils/geometry';
-
-const START = { x: 0, y: 0 };
+import { jsonz } from '@utils';
 
 export class MapGen extends Scene {
-  public init(): void {
-    const playerEntity = this.game.ctx.$.entities(Player).first();
-    const entity =
-      playerEntity ?? this.game.ctx.create(Player, player.data, player.tags);
+  public async start(): Promise<void> {
+    this.game.on('init.map.static', async () => {
+      const { data, tags } = await getPlayerPrefab();
+      this.game.ctx.create(Player, data, tags);
+    });
 
-    // if (entity) {
-    //   this.game.once('init.map.chunks', map => {
-    //     const { x, y } = map.getSpawn(START);
-    //     entity.$.position.x = x;
-    //     entity.$.position.y = y;
-    //   });
-
-    //   this.game.once('init.map.static', () => {
-    //     entity.$.position.x = 8;
-    //     entity.$.position.y = 8;
-    //   });
-    // }
-
-    // (this.game.$.map.world as ChunkMap).center = chunk ?? START;
+    const tiled = await jsonz.read<TiledMap>('/static/maps/frontier_plains');
+    const map = new StaticMap(this.game, tiled);
+    await map.generate();
+    this.game.$.map.world = map;
   }
 }

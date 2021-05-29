@@ -11,24 +11,24 @@ import { h, render } from 'preact';
 export class Dialogue extends Scene {
   protected player!: Player;
   protected runner: Runner | null = null;
-  protected run: Iterator<ResultNode> | null = null;
+  protected results: Iterator<ResultNode> | null = null;
   protected pending: OptionsResult | null = null;
   protected done: boolean = false;
 
   protected text: string = '';
   protected options: string[] = [];
 
-  public end(): void {
-    this.run = null;
+  public stop(): void {
+    this.results = null;
     this.done = true;
-    super.end();
+    super.stop();
   }
 
-  protected start(file: string, start?: string | null): void {
+  protected run(file: string, start?: string | null): void {
     const content = dialogue[file];
     if (file && this.runner) {
       this.runner.load(content);
-      this.run = this.runner.run(start ?? 'start');
+      this.results = this.runner.run(start ?? 'start');
     }
   }
 
@@ -64,9 +64,9 @@ export class Dialogue extends Scene {
   }
 
   protected next(): void {
-    const next = this.run?.next();
+    const next = this.results?.next();
     if (next?.done) {
-      this.end();
+      this.stop();
     } else if (next) {
       const result = next.value;
       this.text = result.text ?? this.text;
@@ -98,9 +98,9 @@ export class Dialogue extends Scene {
     );
   }
 
-  public init(): void {
+  public start(): void {
     this.runner = new Runner();
-    this.start('dialogue');
+    this.run('dialogue');
     this.next();
   }
 }

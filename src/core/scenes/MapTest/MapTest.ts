@@ -4,7 +4,7 @@ import { Position } from '@core/components';
 import { Cell } from '@core/entities';
 import { Canyon as Builder } from '@core/maps';
 import { Scene } from '@lib';
-import { Collision, Projection, Tag, TileType } from '@lib/enums';
+import { Collision, Tag, TileType } from '@lib/enums';
 import { isEmpty } from '@utils';
 import { Entity } from 'tecs';
 
@@ -62,7 +62,7 @@ export class MapTest extends Scene {
     }
   }
 
-  public init(): void {
+  public start(): void {
     const world = this.game.$.map.world;
     world.generate();
 

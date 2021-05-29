@@ -3,9 +3,7 @@ import type { Prefab } from '@lib/types';
 import { Monster, Player } from '@core/entities';
 import { HealthBar } from '@lib';
 import { AIType, Direction, Faction, Tag } from '@lib/enums';
-import { T } from '@utils';
-
-import atlas from '../../../static/sprites/characters/skeleton.json';
+import { jsonz, T } from '@utils';
 
 export const enemies: Prefab[] = [
   {
@@ -34,21 +32,23 @@ export const enemies: Prefab[] = [
   }
 ];
 
-export const player: Prefab<typeof Player> = {
-  id: 'player01',
-  entity: Player,
-  tags: [Tag.IS_ANIMATING],
-  data: {
-    position: { x: 24, y: 90, d: Direction.N, z: 100 },
-    animation: {
-      fps: 9,
-      atlas,
-      animation: 'idle',
-      index: null,
-      reset: null
-    },
-    sprite: {
-      pivot: { x: 0.5, y: 0.5 }
+export async function getPlayerPrefab(): Promise<Prefab<typeof Player>> {
+  return {
+    id: 'player01',
+    entity: Player,
+    tags: [Tag.IS_ANIMATING],
+    data: {
+      position: { x: 24, y: 90, d: Direction.N, z: 100 },
+      animation: {
+        fps: 9,
+        atlas: await jsonz.read('/static/sprites/characters/skeleton'),
+        animation: 'idle',
+        index: null,
+        reset: null
+      },
+      sprite: {
+        pivot: { x: 0.5, y: 0.5 }
+      }
     }
-  }
-};
+  };
+}

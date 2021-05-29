@@ -56,7 +56,7 @@ export class ECS extends Context.with(
 
   public async start(): Promise<void> {
     this.initStats();
-    super.start();
+    await super.start();
   }
 
   public constructor() {

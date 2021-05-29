@@ -1,17 +1,13 @@
-import type { TiledMap } from '@utils/tiled';
-
 import { MapBuilder } from '@lib';
 import { Collision } from '@lib/enums';
+import { jsonz } from '@utils';
 import { iterateGrid } from '@utils/geometry';
 import { getTileIdentifier } from '@utils/tiled';
 
-import map from '../../../../static/maps/frontier_plains.json';
-
 export class Builder extends MapBuilder {
-  public tiled: TiledMap = map;
-
-  public generate(): void {
-    const getIdentifier = getTileIdentifier(this.tiled.tilesets);
+  public async generate(): Promise<void> {
+    const map = await jsonz.read('/static/maps/frontier_plains');
+    const getIdentifier = getTileIdentifier(map);
     this.width = map.width;
     this.height = map.height;
 

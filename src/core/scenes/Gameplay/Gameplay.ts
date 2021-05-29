@@ -1,5 +1,5 @@
 import type { KeyboardInputEvent, Vector2 } from '@lib/types';
-import type { ActionType } from '@utils';
+import { ActionType, jsonz } from '@utils';
 
 import { Player } from '@core/entities';
 import { Scene } from '@lib';
@@ -9,7 +9,6 @@ import { getRelativeDirection } from '@utils/geometry';
 import { getSpritesheetFromAtlas } from '@utils/pixi';
 import { h, render } from 'preact';
 
-import atlas from '../../../../static/sprites/characters/skeleton.json';
 import { Inventory } from '..';
 
 const deltaKey: Record<string, Vector2> = {
@@ -94,7 +93,8 @@ export class Gameplay extends Scene {
     }
   }
 
-  public async init(): Promise<void> {
+  public async start(): Promise<void> {
+    const atlas = await jsonz.read('/static/sprites/characters/skeleton');
     const data = await getSpritesheetFromAtlas(atlas);
     this.game.$.renderer.loadSpritesheets({ [atlas.meta.name]: data });
   }

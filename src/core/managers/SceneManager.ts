@@ -17,7 +17,7 @@ export class SceneManager extends Manager {
   public push<T = {}>(Constructor: SceneConstructor<T>, props?: T): void {
     const s = new Constructor(this.game);
     this.scene = s;
-    s.init?.(props);
+    s.start?.(props);
     this.stack.push(s);
   }
 

@@ -4,11 +4,8 @@ import type { Spritesheet } from 'pixi.js';
 import { Manager } from '@lib';
 import { Projection } from '@lib/enums';
 import { RESOLUTION, TILE_HEIGHT, TILE_WIDTH, view } from '@utils';
-import { getSpritesheetFromURL } from '@utils/pixi';
 import * as PIXI from 'pixi.js';
 import { Viewport } from 'pixi-viewport';
-
-import { atlas } from '../../atlases';
 
 export class RenderManager extends Manager {
   public sheets: Record<string, PIXI.Spritesheet> = {};
@@ -24,26 +21,11 @@ export class RenderManager extends Manager {
     return this.sheets[sheet]?.textures[`${sheet}.${key}`] ?? null;
   }
 
-  public async loadAtlases(): Promise<void[]> {
-    return Promise.all(
-      Object.keys(atlas)
-        .filter(key => !this.sheets[key])
-        .map(async key => {
-          const value = atlas[key];
-          this.sheets[key] = await getSpritesheetFromURL(
-            value.image,
-            value.atlas
-          );
-        })
-    );
-  }
-
   public getScreenPoint(point: Vector2): Vector3 {
     const TW = TILE_WIDTH;
     const TH = TILE_HEIGHT;
-    const map = this.game.$.map;
     const rel = point;
-    switch (map.world.projection) {
+    switch (this.game.$.map.projection) {
       case Projection.ISOMETRIC: {
         return {
           x: ((rel.x - rel.y) * TW) / 2,
@@ -67,7 +49,7 @@ export class RenderManager extends Manager {
     const TW = TILE_WIDTH / RESOLUTION;
     const TH = TILE_HEIGHT / RESOLUTION;
 
-    switch (this.game.$.map.world.projection) {
+    switch (this.game.$.map.projection) {
       case Projection.ISOMETRIC: {
         const x2 = point.x;
         const y2 = point.y;
@@ -88,7 +70,7 @@ export class RenderManager extends Manager {
     }
   }
 
-  public async init(): Promise<void> {
+  public async start(): Promise<void> {
     const { height: h, width: w } = view;
 
     this.app = new PIXI.Application({
@@ -111,7 +93,6 @@ export class RenderManager extends Manager {
     this.viewport.wheel();
     this.app.stage.addChild(this.viewport);
 
-    await this.loadAtlases();
     document.getElementById('root')?.appendChild(this.app.view);
   }
 }

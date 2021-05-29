@@ -19,7 +19,7 @@ export class Inventory extends Scene {
     if (next?.isKeyboard) {
       switch (next.key) {
         case 'i':
-          this.end();
+          this.stop();
           break;
         case ' ':
           this.use();
@@ -110,9 +110,9 @@ export class Inventory extends Scene {
     );
   }
 
-  public end(): void {
+  public stop(): void {
     render(null, document.getElementById('ui')!);
-    super.end();
+    super.stop();
   }
 
   public tick(): void {
@@ -124,7 +124,7 @@ export class Inventory extends Scene {
     }
   }
 
-  public init(): void {
+  public start(): void {
     this.xList.setItems([
       null,
       ItemType.WEAPON,

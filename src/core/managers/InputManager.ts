@@ -69,7 +69,7 @@ export class InputManager extends Manager {
     }
   };
 
-  public init(): void {
+  public async start(): Promise<void> {
     const stage = this.game.$.renderer.app.stage;
 
     stage.name = 'stage';

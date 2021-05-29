@@ -15,6 +15,7 @@ export abstract class WorldMap {
   protected point: Vector2;
   protected game: Game;
   protected size: Size;
+  protected options: WorldMapOptions;
 
   public fov: FOV.PreciseShadowcasting;
   public paths: Pathfinding.AStar;
@@ -42,9 +43,11 @@ export abstract class WorldMap {
   public abstract getSpawn(): Vector2;
 
   public constructor(game: Game, options: WorldMapOptions) {
+    this.options = options;
     this.game = game;
     this.point = { x: options.x, y: options.y };
     this.size = { width: options.width, height: options.height };
+
     this.paths = new Pathfinding.AStar({
       topology: 'eight',
       isBlockedCallback: point => this.collisions.isObstacle(point)

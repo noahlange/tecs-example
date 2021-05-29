@@ -44,11 +44,12 @@ export class Game {
 
   public async start(save?: any): Promise<void> {
     this.ctx.game = this;
-    // init systems...
+    // boot managers...
     for (const key of Object.keys(this.$) as (keyof GameManagers)[]) {
-      this.$[key].init?.();
+      await this.$[key].start?.();
     }
-    // boot managers
+
+    // start ctx
     await this.ctx.start();
     if (save) {
       // populate ECS with load save data.

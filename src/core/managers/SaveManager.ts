@@ -15,7 +15,7 @@ export class SaveManager extends Manager {
     return pako.deflate(JSON.stringify({ ecs }));
   }
 
-  public init(): void {
+  public async start(): Promise<void> {
     // window.save = () => {
     //   console.log(this.toSave());
     // };

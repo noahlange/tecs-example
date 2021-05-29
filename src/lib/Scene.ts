@@ -4,10 +4,10 @@ export class Scene<T = {}> {
   public game: Game;
 
   public tick?(d: number, ts: number): void;
-  public init?(props?: T): void;
+  public start?(props?: T): void;
   public render?(): void;
 
-  public end(): void {
+  public stop(): void {
     this.game.$.scenes.pop();
   }
 

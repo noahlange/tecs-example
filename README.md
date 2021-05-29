@@ -18,7 +18,9 @@ npm i && npm start
 Includes two misc. command line tools:
 
 - `atlas-gen`: generates image atlases with animation data.
-- `zip`: compresses json files using pako (for import with `jsonz.read()`)
+- `jsonz`: compress JSON with pako
+  - `jsonz (zip/unzip) "my-file.json"`
+  - import using `jsonz.read()`
 
 ## ideas / todo
 

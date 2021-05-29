@@ -2,7 +2,7 @@ import { armor } from './armor';
 import { attacks } from './attacks';
 import { consumables } from './consumables';
 import { items } from './items';
-import { enemies, player } from './mobs';
+import { enemies } from './mobs';
 import { weapons } from './weapons';
 
 export default [
@@ -14,4 +14,5 @@ export default [
   ...consumables
 ];
 
-export { attacks, armor, weapons, enemies, player, items, consumables };
+export { attacks, armor, weapons, enemies, items, consumables };
+export { getPlayerPrefab } from './mobs';

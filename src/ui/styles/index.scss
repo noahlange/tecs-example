@@ -32,11 +32,9 @@ body {
   align-items: center;
   justify-content: space-around;
   overflow: hidden;
-
   height: 100vh;
 }
 
-canvas,
 #ui,
 #root {
   width: $view-width;

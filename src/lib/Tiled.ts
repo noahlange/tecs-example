@@ -14,13 +14,19 @@ interface IterableLayer extends TiledLayer {
 }
 
 export class Tiled {
-  public static async from(source: string): Promise<Tiled> {
-    const tiled = new Tiled(source);
+  public static async from(map: TiledMap): Promise<Tiled> {
+    const tiled = new Tiled(map);
     await tiled.load();
     return tiled;
   }
 
-  protected source: string;
+  public static async fromURL(source: string): Promise<Tiled> {
+    const map = await jsonz.read(source);
+    const tiled = new Tiled(map);
+    await tiled.load();
+    return tiled;
+  }
+
   protected tilesets: TiledTileset[] = [];
   protected tilemap!: TiledMap;
   protected getID!: (index: number) => string;
@@ -56,7 +62,6 @@ export class Tiled {
   }
 
   public async load(): Promise<void> {
-    this.tilemap = await jsonz.read(this.source);
     this.getID = getTileIdentifier(this.tilemap.tilesets);
     this.tilesets = await Promise.all(
       this.tilemap.tilesets.map(tileset => {
@@ -71,7 +76,7 @@ export class Tiled {
     return getSpritesheetsFromTilesets(this.tilesets);
   }
 
-  protected constructor(source: string) {
-    this.source = source;
+  protected constructor(map: TiledMap) {
+    this.tilemap = map;
   }
 }

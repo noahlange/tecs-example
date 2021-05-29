@@ -38,6 +38,6 @@
       ]
     }
   },
-  "include": ["src/**/*", "./tools", "assets"],
+  "include": ["src/**/*", "./tools/**/*", "assets"],
   "exclude": [".ignore", "./static"]
 }

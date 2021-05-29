@@ -1,6 +1,7 @@
 import type { Game } from '@core';
 import type { GameTileData } from '@lib';
 import type { CollisionMethods, Vector2 } from '@lib/types';
+import type { TiledMap } from '@utils/tiled';
 import type { Entity } from 'tecs';
 
 import { Cell } from '@core/entities';
@@ -11,17 +12,9 @@ import { isObstacle, isObstruction } from '@utils';
 
 import { WorldMap } from '../lib/WorldMap';
 
-export interface StaticMapOptions {
-  x: number;
-  y: number;
-  width?: number;
-  height?: number;
-  map: string;
-}
-
 export class StaticMap extends WorldMap {
   protected tiles!: Vector2Array<GameTileData>;
-  protected options: StaticMapOptions;
+  protected tiled: TiledMap;
 
   public getSpawn(): Vector2 {
     return { x: 0, y: 0 };
@@ -48,7 +41,7 @@ export class StaticMap extends WorldMap {
   public set center(next: Vector2) {}
 
   public async generate(): Promise<void> {
-    const tilemap = await Tiled.from(this.options.map);
+    const tilemap = await Tiled.from(this.tiled);
     this.options.width = tilemap.width;
     this.options.height = tilemap.height;
     this.tiles = new Vector2Array(tilemap);
@@ -81,20 +74,12 @@ export class StaticMap extends WorldMap {
       if (layer.name === 'collision') {
         continue;
       }
-      for (const [point, key] of layer) {
-        const value = this.tiles.get(point);
-        entities.push(
-          this.game.ctx.create(Cell, {
-            sprite: {
-              key: key
-              // key:
-              //   (value?.collision === Collision.COMPLETE
-              //     ? value?.spriteKey
-              //     : key) ?? key
-            },
-            position: point
-          })
-        );
+      for (const [position, key] of layer) {
+        if (key) {
+          entities.push(
+            this.game.ctx.create(Cell, { sprite: { key }, position })
+          );
+        }
       }
     }
 
@@ -102,8 +87,8 @@ export class StaticMap extends WorldMap {
     this.game.emit('init.map.static', this);
   }
 
-  public constructor(game: Game, options: StaticMapOptions) {
-    super(game, { width: 0, height: 0, ...options });
-    this.options = options;
+  public constructor(game: Game, tiled: TiledMap) {
+    super(game, { width: tiled.width, height: tiled.height, x: 0, y: 0 });
+    this.tiled = tiled;
   }
 }
