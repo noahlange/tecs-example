@@ -42,5 +42,6 @@ export * as _ from './misc';
 // universal exports
 export * from './actions';
 export * from './decorators';
-export * from './dialogue';
 export * from './collisions';
+
+export type { UnwrapIterable } from './types';

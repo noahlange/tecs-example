@@ -6,7 +6,7 @@ import type { GeneratorPayload, GeneratorResponse } from '@workers/maps';
 import type { Entity } from 'tecs';
 
 import { Cell } from '@core/entities';
-import * as prefabbed from '@core/prefabs';
+import * as prefabbed from '@game/prefabs';
 import { Rectangle, Vector2Array } from '@lib';
 import { Tag } from '@lib/enums';
 import {

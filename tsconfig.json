@@ -32,12 +32,13 @@
       "@lib/*": ["./src/lib/*"],
       "@ui/*": ["./src/ui/*"],
       "@core/*": ["./src/core/*"],
+      "@game/*": ["./src/game/*"],
       "@workers/*": ["./src/workers/*"],
       "mini-signals": [
         "./node_modules/resource-loader/typings/mini-signals.d.ts"
       ]
     }
   },
-  "include": ["src/**/*", "./tools/**/*", "assets"],
+  "include": ["src/**/*", "./tools/**/*"],
   "exclude": [".ignore", "./static"]
 }

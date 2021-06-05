@@ -3,7 +3,7 @@ import type { Color, Prefab, Vector2 } from '@lib/types';
 import type { EntityClass } from 'tecs';
 
 import * as generators from '@core/maps/generators';
-import * as prefabbed from '@core/prefabs';
+import * as prefabbed from '@game/prefabs';
 import { Lighting } from '@lib';
 import { isObstruction, RGB, RNG } from '@utils';
 import { FOV } from 'malwoden';

@@ -1,13 +1,12 @@
-import { Collision as Collisions } from '@lib/enums';
-import { Entity } from 'tecs';
-
 import {
   Collision,
   Interactive,
   Position,
   Renderable,
   Sprite
-} from '../../components';
+} from '@core/components';
+import { Collision as Collisions } from '@lib/enums';
+import { Entity } from 'tecs';
 
 const openedText = [
   'you have opened the door',

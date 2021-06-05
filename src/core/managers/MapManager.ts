@@ -1,19 +1,19 @@
 import type { WorldMap } from '@core/maps';
 import type { CollisionMethods, Vector2 } from '@lib/types';
-import type { Pathfinding } from 'malwoden';
 
 import { Manager } from '@lib';
 import { Projection } from '@lib/enums';
+import { Pathfinding } from 'malwoden';
 
 export class MapManager extends Manager {
-  public world!: WorldMap;
+  protected world!: WorldMap;
 
   public get x(): number {
-    return this.world.x;
+    return this.world?.x ?? 0;
   }
 
   public get y(): number {
-    return this.world.y;
+    return this.world?.y ?? 0;
   }
 
   public get projection(): Projection {
@@ -31,7 +31,18 @@ export class MapManager extends Manager {
   }
 
   public get pathfinding(): Pathfinding.AStar {
-    return this.world.paths;
+    return (
+      this.world?.paths ??
+      new Pathfinding.AStar({
+        isBlockedCallback: () => false,
+        topology: 'eight'
+      })
+    );
+  }
+
+  public async load(world: WorldMap): Promise<void> {
+    await world.generate();
+    this.world = world;
   }
 
   public getPath(start: Vector2, end: Vector2): Vector2[] {

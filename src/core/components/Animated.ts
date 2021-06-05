@@ -19,20 +19,20 @@ export class Animated extends Component {
 
   public atlas!: Atlas;
   // e.g., walk (where walk.0 is north, etc)
-  public animation: string | null = null;
+  public name: string | null = null;
   public index: number | null = null;
   public dt: number = 0;
   public fps = 16;
   public reset: string | null = null;
 
   public getFrames(direction: Direction): string[] {
-    const name = [this.animation, dirKey[direction]].join('.');
+    const name = [this.name, dirKey[direction]].join('.');
     return this.atlas.animations[name] ?? [];
   }
 
   public getFrameKey(direction: Direction): string | null {
-    if (this.animation && this.index !== null) {
-      const animationName = [this.animation, dirKey[direction]].join('.');
+    if (this.name && this.index !== null) {
+      const animationName = [this.name, dirKey[direction]].join('.');
       if (animationName in this.atlas.animations) {
         return [
           this.atlas.meta.name,
