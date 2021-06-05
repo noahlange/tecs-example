@@ -3,9 +3,7 @@ import { resolve } from 'path';
 import { visualizer } from 'rollup-plugin-visualizer';
 
 export default defineConfig({
-  build: {
-    target: 'es2020'
-  },
+  build: { target: 'es2020' },
   esbuild: {
     jsxFactory: 'h',
     jsxFragment: 'Fragment'
@@ -18,14 +16,13 @@ export default defineConfig({
     alias: {
       // minified
       pako: resolve(__dirname, './node_modules/pako/dist/pako.min.js'),
-
-      // local aliases
       '@ui': resolve(__dirname, './src/ui'),
       '@utils': resolve(__dirname, './src/utils'),
       '@lib': resolve(__dirname, './src/lib'),
       '@types': resolve(__dirname, './src/types'),
       '@core': resolve(__dirname, './src/core'),
-      '@workers': resolve(__dirname, './src/workers')
+      '@workers': resolve(__dirname, './src/workers'),
+      '@game': resolve(__dirname, './src/game')
     }
   }
 });

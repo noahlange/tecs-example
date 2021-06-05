@@ -1,4 +1,4 @@
-import type { InventoryItem } from '../entities/types';
+import type { InventoryItem } from '@game/entities';
 
 import { Component } from 'tecs';
 

@@ -1,1 +1,0 @@
-export { MapTest } from './MapTest';

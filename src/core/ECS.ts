@@ -1,37 +1,9 @@
 import Stats from 'stats.js';
 import { Context } from 'tecs';
 
-import * as Components from './components';
-import * as Entities from './entities';
-import {
-  Animation,
-  Camera,
-  Collisions,
-  Interact,
-  Inventory,
-  Items,
-  Lighting,
-  Movement,
-  Pathfinding,
-  Renderer,
-  Scenes,
-  View
-} from './systems';
+import { Display, Logic, SceneSystem } from './systems';
 
-export class ECS extends Context.with(
-  Scenes,
-  Pathfinding,
-  Collisions,
-  Movement,
-  Interact,
-  Inventory,
-  Items,
-  View,
-  Lighting,
-  Renderer,
-  Camera,
-  Animation
-) {
+export class ECS extends Context.with(SceneSystem, Display, Logic) {
   protected ts: number = 0;
   protected stats: Stats | null = null;
 
@@ -58,13 +30,4 @@ export class ECS extends Context.with(
     this.initStats();
     await super.start();
   }
-
-  public constructor() {
-    super();
-    const components = Object.values(Components);
-    const entities = Object.values(Entities);
-    this.register(...entities, ...components);
-  }
 }
-
-export { Entities };

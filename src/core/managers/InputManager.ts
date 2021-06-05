@@ -4,7 +4,6 @@ import type * as PIXI from 'pixi.js';
 import type { Viewport } from 'pixi-viewport';
 
 import { Manager } from '@lib';
-import { debounce } from 'throttle-debounce-ts';
 
 interface ViewportClickedEvent {
   event: PIXI.InteractionEvent;
@@ -28,8 +27,11 @@ export class InputManager extends Manager {
     this.events.push(e);
   }
 
+  // @todo: handle input event pressure
   public getNextEvent(): AnyInputEvent | null {
-    return this.events.shift() ?? null;
+    const e = this.events.shift() ?? null;
+    this.events = [];
+    return e;
   }
 
   protected toKeyboardInputEvent(e: KeyboardEvent): KeyboardInputEvent {
@@ -44,7 +46,7 @@ export class InputManager extends Manager {
   }
 
   protected handle = {
-    onMouseMove: debounce(1000 / 30, (e: PIXI.InteractionEvent) => {
+    onMouseMove: (e: PIXI.InteractionEvent) => {
       const screen = this.game.$.renderer.viewport.toWorld(e.data.global);
       this.onInputEvent({
         name: 'mousemove',
@@ -53,7 +55,7 @@ export class InputManager extends Manager {
         screen,
         isKeyboard: false
       });
-    }),
+    },
     onClick: (e: ViewportClickedEvent) => {
       this.onInputEvent({
         name: e.event.type,

@@ -1,12 +1,11 @@
-import { Entity } from 'tecs';
-
 import {
   Collision,
   Interactive,
   Position,
   Renderable,
   Sprite
-} from '../../components';
+} from '@core/components';
+import { Entity } from 'tecs';
 
 export class Chest extends Entity.with(
   Sprite,

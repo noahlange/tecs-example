@@ -1,12 +1,23 @@
-import type { AreaOfEffect, Equippable } from '@core/components';
+import type { UnwrapIterable } from './types';
+import type { AreaOfEffect, IsEquipment } from '@core/components';
+import type { Usable } from '@core/components/Usable';
 import type { Attack } from '@core/entities';
-import type { InventoryEntity, InventoryItem } from '@core/entities/types';
+import type { GameAction, GameActionType } from '@game/utils';
+import type {
+  queryInventoryEntities,
+  queryInventoryItems
+} from '@game/utils/inventory';
 import type { Action } from '@lib/enums';
 import type { Vector2 } from '@lib/types';
 import type { EntityType } from 'tecs';
 
+type InventoryItem = UnwrapIterable<ReturnType<typeof queryInventoryItems>>;
+type InventoryEntity = UnwrapIterable<
+  ReturnType<typeof queryInventoryEntities>
+>;
+
 export interface ActionItem {
-  id: Action;
+  id: Action | GameAction;
   [key: string]: unknown;
 }
 
@@ -19,7 +30,7 @@ export interface MoveAction extends ActionItem {
 export interface CombatAttackAction extends ActionItem {
   id: Action.COMBAT_ATTACK;
   target: Vector2;
-  attack: EntityType<[typeof AreaOfEffect, typeof Equippable]>;
+  attack: EntityType<[typeof AreaOfEffect, typeof IsEquipment, typeof Usable]>;
 }
 
 export interface DestinationAction extends ActionItem {
@@ -81,6 +92,10 @@ export interface CombatAttackPaused extends ActionItem {
   attack: InstanceType<typeof Attack>;
 }
 
+export interface TogglePauseAction extends ActionItem {
+  id: Action.TOGGLE_PAUSE;
+}
+
 export type ActionType =
   | PickUpAction
   | MoveAction
@@ -104,4 +119,6 @@ export type ActionType =
   | DestinationAction
   | VoidAction
   | InteractAction
-  | MenuNavigateAction;
+  | MenuNavigateAction
+  | TogglePauseAction
+  | GameActionType;

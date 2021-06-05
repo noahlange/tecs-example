@@ -83,7 +83,7 @@ export class Game {
   }
 
   public pause(): void {
-    this.$.scenes.state = GameState.PAUSED;
+    this.$.scenes.state = this.paused ? GameState.RUNNING : GameState.PAUSED;
   }
 
   public log(text: string): void {

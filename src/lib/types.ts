@@ -1,5 +1,6 @@
-import type { DamageType, EffectType, Tag } from './enums';
+import type { Tag } from './enums';
 import type { ChunkMap, StaticMap } from '@core/maps';
+import type { DamageType, EffectType } from '@game/enums';
 import type * as PIXI from 'pixi.js';
 import type { DataType, EntityClass } from 'tecs';
 

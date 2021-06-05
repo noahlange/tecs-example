@@ -1,10 +1,10 @@
+import { Usable } from '@core/components/Usable';
 import { Entity } from 'tecs';
 
 import {
   AreaOfEffect,
   Collision,
-  Effects,
-  Equippable,
+  IsEquipment,
   Item,
   LightSource,
   Position,
@@ -14,16 +14,11 @@ import {
 } from '../components';
 import { Chest } from './interactive/Chest';
 import { Door } from './interactive/Door';
-import { Monster } from './mobs/Monster';
-import { Player } from './mobs/Player';
 
 const Cell = Entity.with(Position, Sprite, Collision, Renderable);
-const Mob = Entity.with(Position, Sprite, Renderable, LightSource);
 const Light = Entity.with(Position, LightSource);
-const Scroll = Entity.with(Position, Sprite, Renderable, Text, Item);
-const Potion = Entity.with(Position, Sprite, Renderable, Text, Item, Effects);
-const Book = Entity.with(Position, Sprite, Renderable, Text, Item, Effects);
-const Attack = Entity.with(AreaOfEffect, Equippable, Position);
+const Mob = Entity.with(Position, Sprite, Renderable, LightSource);
+const Attack = Entity.with(AreaOfEffect, IsEquipment, Position, Usable);
 
 const Equipment = Entity.with(
   Position,
@@ -31,20 +26,7 @@ const Equipment = Entity.with(
   Renderable,
   Text,
   Item,
-  Equippable
+  IsEquipment
 );
 
-export {
-  Cell,
-  Mob,
-  Light,
-  Scroll,
-  Potion,
-  Book,
-  Attack,
-  Equipment,
-  Door,
-  Chest,
-  Player,
-  Monster
-};
+export { Cell, Mob, Light, Attack, Equipment, Door, Chest };

@@ -21,6 +21,21 @@ export class RenderManager extends Manager {
     return this.sheets[sheet]?.textures[`${sheet}.${key}`] ?? null;
   }
 
+  public setTexture(sheet: string, key: string, texture: PIXI.Texture): void {
+    const textures = this.sheets[sheet]?.textures;
+    if (textures) {
+      textures[`${sheet}.${key}`] = texture;
+    }
+  }
+
+  public mergeTextures(...textures: PIXI.Texture[]): PIXI.Texture {
+    const [d, t] = [new PIXI.Container(), textures[0]];
+    d.addChild(...textures.map(texture => PIXI.Sprite.from(texture)));
+    const renderTexture = PIXI.RenderTexture.create(t);
+    this.app.renderer.render(d, { renderTexture });
+    return renderTexture;
+  }
+
   public getScreenPoint(point: Vector2): Vector3 {
     const TW = TILE_WIDTH;
     const TH = TILE_HEIGHT;
@@ -87,7 +102,8 @@ export class RenderManager extends Manager {
       worldWidth: w,
       worldHeight: h,
       ticker: this.app.ticker,
-      interaction: this.app.renderer.plugins.interaction
+      interaction: this.app.renderer.plugins.interaction,
+      disableOnContextMenu: true
     });
 
     this.viewport.wheel();

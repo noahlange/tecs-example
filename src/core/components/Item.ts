@@ -1,4 +1,4 @@
-import type { ItemType } from '@lib/enums';
+import type { ItemType } from '@game/enums';
 
 import { nanoid } from 'nanoid/non-secure';
 import { Component } from 'tecs';

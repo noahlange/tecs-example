@@ -6,7 +6,7 @@ import { Component } from 'tecs';
 export class AI extends Component {
   public static readonly type = 'ai';
 
-  public type: AIType = AIType.PASSIVE;
+  public type: AIType = AIType.NONE;
   public state: AIState = AIState.IDLE;
   public home?: Vector2;
 }
